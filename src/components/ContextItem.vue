@@ -7,6 +7,7 @@
          :title="title"
          :valueConstraints="valueConstraints"
          v-on:skip="sendSkip"
+         v-on:valueChanged="sendData"
          />
         <div class="loader" v-else>
           <b-progress :value="50" :max="100" animated variant="secondary" class="mb-3 align-middle">
@@ -99,9 +100,11 @@ export default {
       // send that the component got skipped to the parent
       this.$emit('skip');
     },
+    sendData(val) {
+      this.$emit('setData', val, this.index);
+    },
   },
   mounted() {
-    console.log('mounted', this.index);
     this.getData();
   },
 };

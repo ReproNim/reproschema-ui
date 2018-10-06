@@ -6,7 +6,9 @@
         <transition name="list">
         <ContextItem
          v-if="listShow.indexOf(contextReverse.length - index - 1) >= 0"
-         :item="content" :index="index" v-on:skip="nextQuestion"/>
+         :item="content" :index="contextReverse.length - index - 1" v-on:skip="nextQuestion"
+         v-on:setData="setResponse"
+         />
         </transition>
       </div>
     </transition-group>
@@ -46,6 +48,7 @@ export default {
     return {
       activity: {},
       listShow: [],
+      responses: [],
     };
   },
   components: {
@@ -53,9 +56,14 @@ export default {
   },
   methods: {
     nextQuestion() {
-      console.log(_.max(this.listShow) + 1);
       this.listShow.push(_.max(this.listShow) + 1);
       this.$forceUpdate();
+    },
+    setResponse(val, index) {
+      this.responses.push({
+        item: this.context[index],
+        response: val,
+      });
     },
   },
   watch: {

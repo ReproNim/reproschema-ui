@@ -11,6 +11,7 @@
                             :options="options"
                             stacked
                             class="text-left"
+                            @change="sendData"
                             name="radiosStacked">
         </b-form-radio-group>
       </b-form-group>
@@ -45,5 +46,10 @@ export default {
       /* eslint-ensable */
     },
   },
+  methods: {
+    sendData(val) {
+      this.$emit('valueChanged', val);
+    },
+  }
 };
 </script>

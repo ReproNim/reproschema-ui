@@ -11,7 +11,7 @@
     </b-alert>
 
     <div v-if="inputType==='radio'">
-        <Radio :constraints="valueConstraints"/>
+        <Radio :constraints="valueConstraints" v-on:valueChanged="sendData"/>
     </div>
 
     <div v-else>
@@ -48,6 +48,10 @@ export default {
   methods: {
     skip() {
       this.$emit('skip');
+    },
+    sendData(val) {
+      this.$emit('valueChanged', val);
+      this.skip();
     },
   },
 };
