@@ -1,5 +1,6 @@
 <template>
   <div class="hello">
+    <h1 v-if="!listShow.length">Loading...</h1>
     <transition-group name="list" tag="div">
       <div v-for="(content, index) in contextReverse" :key="index" class="mt-3 mb-3">
         <transition name="list">
