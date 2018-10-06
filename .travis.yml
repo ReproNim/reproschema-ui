@@ -3,18 +3,19 @@ language: node_js
 node_js:
 - '6.0'
 cache:
-  directories: 
+  directories:
+  - node_modules 
 branches:
   only:
   - master
 notifications:
   email: false
 before_script:
-- bash ./prepare.sh
+- npm install
 script:
-- cd SwipesForScience; npm run build
+- npm run --silent build
 after_success:
-- cd ..; bash ./deploy.sh
+- cd ..; bash deploy.sh
 env:
   global:
   - GH_USER: akeshavan
