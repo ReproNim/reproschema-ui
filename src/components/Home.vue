@@ -81,17 +81,6 @@ export default {
     contextReverse() {
       return this.context.slice().reverse();
     },
-    listRev() {
-      const q = this.listShow.slice();
-      q.reverse();
-      return q;
-    },
-    listContentRev() {
-      if (this.listRev) {
-        return _.map(this.listRev, i => this.context[i]);
-      }
-      return [];
-    },
   },
   mounted() {
     axios.get(config.githubSrc).then((resp) => {
