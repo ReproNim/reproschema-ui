@@ -15,7 +15,7 @@ before_script:
 script:
 - npm run --silent build
 after_success:
-- cd ..; bash deploy.sh
+- bash deploy.sh
 env:
   global:
   - GH_USER: akeshavan
