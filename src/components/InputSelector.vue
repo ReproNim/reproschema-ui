@@ -10,16 +10,19 @@
       This item does not have a title defined
     </b-alert>
 
+    <!-- If type is radio -->
     <div v-if="inputType==='radio'">
         <Radio :constraints="valueConstraints" v-on:valueChanged="sendData"/>
     </div>
 
+    <!-- if we don't have a component built for this type, then show an error -->
     <div v-else>
       <b-alert show>
         no input type UI built for "{{inputType}}" yet!
       </b-alert>
     </div>
 
+    <!-- you can skip this question if requiredValue is not true -->
     <div class="row float-right">
       <b-button class="" variant="default" v-if="!valueConstraints.requiredValue" @click="skip">
         Skip

@@ -1,12 +1,19 @@
 <template>
   <div class="hello">
-    <h1 v-if="!listShow.length">Loading...</h1>
+    <div v-if="!listShow.length">
+      <h1 >Loading...</h1>
+      <Loader />
+    </div>
+    <div v-else>
+      <b-progress :value="listShow.length" :max="context.length" class="mb-3"></b-progress>
+    </div>
     <transition-group name="list" tag="div">
       <div v-for="(content, index) in contextReverse" :key="index" class="mt-3 mb-3">
         <transition name="list">
         <ContextItem
          v-if="listShow.indexOf(contextReverse.length - index - 1) >= 0"
-         :item="content" :index="contextReverse.length - index - 1" v-on:skip="nextQuestion"
+         :item="content" :index="contextReverse.length - index - 1"
+         v-on:skip="nextQuestion(contextReverse.length - index - 1)"
          v-on:setData="setResponse"
          />
         </transition>
@@ -40,6 +47,7 @@ import axios from 'axios';
 import _ from 'lodash';
 import config from '../config';
 import ContextItem from './ContextItem';
+import Loader from './Loader';
 
 
 export default {
@@ -53,11 +61,13 @@ export default {
   },
   components: {
     ContextItem,
+    Loader,
   },
   methods: {
-    nextQuestion() {
-      this.listShow.push(_.max(this.listShow) + 1);
-      this.$forceUpdate();
+    nextQuestion(idx) {
+      if (idx === this.listShow.length - 1) {
+        this.listShow.push(_.max(this.listShow) + 1);
+      }
     },
     setResponse(val, index) {
       this.responses.push({

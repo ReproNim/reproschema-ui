@@ -1,5 +1,6 @@
 <template>
-  <b-card class="text-center">
+  <b-card class="text-center question mx-auto">
+    <!-- https://codepen.io/vikttor_/pen/jeqoPN?page=1& -->
     <div class="contextItem align-self-center center">
       <transition name="fade" mode="out-in">
         <InputSelector v-if="status === 'ready'"
@@ -10,9 +11,11 @@
          v-on:valueChanged="sendData"
          />
         <div class="loader" v-else>
-          <b-progress :value="50" :max="100" animated variant="secondary" class="mb-3 align-middle">
+          <!-- <b-progress :value="50"
+          :max="100" animated variant="secondary" class="mb-3 align-middle">
           </b-progress>
-          <span class="align-middle mt-3 text-muted">loading</span>
+          <span class="align-middle mt-3 text-muted">loading</span> -->
+          <Loader />
         </div>
       </transition>
     </div>
@@ -20,6 +23,10 @@
 </template>
 
 <style scoped>
+
+  .question {
+    /* max-width: 500px; */
+  }
 
   .loader {
     padding-top: 75px;
@@ -45,6 +52,7 @@
 <script>
 import axios from 'axios';
 import InputSelector from './InputSelector';
+import Loader from './Loader';
 // import _ from 'lodash';
 
 export default {
@@ -52,6 +60,7 @@ export default {
   props: ['item', 'index'],
   components: {
     InputSelector,
+    Loader,
   },
   data() {
     return {
