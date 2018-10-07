@@ -12,7 +12,7 @@
                             stacked
                             class="text-left"
                             @change="sendData"
-                            name="radiosStacked">
+                            >
         </b-form-radio-group>
       </b-form-group>
     </div>
