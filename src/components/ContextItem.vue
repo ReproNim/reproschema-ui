@@ -1,5 +1,5 @@
 <template>
-  <b-card class="text-center question mx-auto">
+  <b-card class="text-center question mx-auto" :border-variant="variant">
     <!-- https://codepen.io/vikttor_/pen/jeqoPN?page=1& -->
     <div class="contextItem align-self-center center">
       <transition name="fade" mode="out-in">
@@ -67,6 +67,7 @@ export default {
       data: [],
       status: 'loading',
       progress: 0,
+      variant: null,
     };
   },
   computed: {
@@ -105,11 +106,16 @@ export default {
           this.status = 'ready';
         });
     },
-    sendSkip() {
+    sendSkip(doSkip) {
       // send that the component got skipped to the parent
+      console.log('sending skip', doSkip);
+      if (doSkip) {
+        this.variant = 'warning';
+      }
       this.$emit('skip');
     },
     sendData(val) {
+      this.variant = null;
       this.$emit('setData', val, this.index);
     },
   },

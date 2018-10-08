@@ -24,7 +24,7 @@
 
     <!-- you can skip this question if requiredValue is not true -->
     <div class="row float-right">
-      <b-button class="" variant="default" v-if="!valueConstraints.requiredValue" @click="skip">
+      <b-button class="" variant="default" v-if="!valueConstraints.requiredValue" @click="skip(1)">
         Skip
       </b-button>
     </div>
@@ -49,12 +49,12 @@ export default {
     };
   },
   methods: {
-    skip() {
-      this.$emit('skip');
+    skip(val) {
+      this.$emit('skip', val);
     },
     sendData(val) {
       this.$emit('valueChanged', val);
-      this.skip();
+      this.skip(0);
     },
   },
 };
