@@ -15,6 +15,11 @@
         <Radio :constraints="valueConstraints" v-on:valueChanged="sendData"/>
     </div>
 
+    <!-- If type is audio -->
+    <div v-if="inputType==='audio'">
+        <AudioRecord :constraints="valueConstraints" v-on:valueChanged="sendData"/>
+    </div>
+
     <!-- if we don't have a component built for this type, then show an error -->
     <div v-else>
       <b-alert show>
@@ -36,12 +41,14 @@
 
 <script>
 import Radio from './Radio';
+import AudioRecord from './Audio';
 
 export default {
   name: 'InputSelector',
   props: ['inputType', 'title', 'valueConstraints'],
   components: {
     Radio,
+    AudioRecord,
   },
   data() {
     return {
