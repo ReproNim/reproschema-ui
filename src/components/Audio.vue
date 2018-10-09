@@ -1,7 +1,7 @@
 <template>
   <div>
     <audio-recorder
-      :attempts="3"
+      :attempts="1"
       :time="0.2"
       class="mx-auto"
       ref="audio"
@@ -20,7 +20,7 @@ import Vue from 'vue';
 Vue.use(AudioRecorder);
 
 export default {
-  name: 'audio',
+  name: 'audioRecord',
   data() {
     return {
 

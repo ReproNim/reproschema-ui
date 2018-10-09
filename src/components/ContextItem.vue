@@ -108,7 +108,6 @@ export default {
     },
     sendSkip(doSkip) {
       // send that the component got skipped to the parent
-      console.log('sending skip', doSkip);
       if (doSkip) {
         this.variant = 'warning';
       }
