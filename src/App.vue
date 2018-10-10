@@ -96,12 +96,22 @@ export default {
       this.$forceUpdate();
     },
   },
+  watch: {
+    $route() {
+      if (this.$route.params.id) {
+        this.activityIndex = this.$route.params.id;
+      }
+    },
+  },
   mounted() {
     axios.get(config.githubSrc).then((resp) => {
       this.schema = resp.data;
       /* eslint-disable */
       this.progress = _.map(this.schema._ui.order, () => 0);
       /* eslint-enable */
+      if (this.$route.params.id) {
+        this.activityIndex = this.$route.params.id;
+      }
     });
   },
   computed: {
