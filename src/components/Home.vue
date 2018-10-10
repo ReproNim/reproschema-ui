@@ -93,19 +93,19 @@ export default {
       if (this.srcUrl) {
         axios.get(this.srcUrl).then((resp) => {
           this.activity = resp.data;
+          this.listShow = [0];
 
-          // set listShow if there are responses for items in the context
-          const answered = _.filter(this.context, c => Object.keys(this.responses).indexOf(c['@id']) > -1);
-          if (!answered.length) {
-            this.listShow = [0];
-          } else {
-            this.listShow = _.map(new Array(answered.length + 1), (c, i) => i);
-          }
+          this.$nextTick(() => {
+            // set listShow if there are responses for items in the context
+            const answered = _.filter(this.context, c => Object.keys(this.responses).indexOf(c['@id']) > -1);
+            if (!answered.length) {
+              this.listShow = [0];
+            } else {
+              this.listShow = _.map(new Array(answered.length + 1), (c, i) => i);
+            }
+          });
         });
       }
-    },
-    responses() {
-
     },
   },
   computed: {
