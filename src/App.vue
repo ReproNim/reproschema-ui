@@ -13,7 +13,7 @@
                 <a @click="setActivity(index)" :class="{'current': index==activityIndex}">
                   <circleProgress
                    :radius="20"
-                   :progress="0"
+                   :progress="progress[index]"
                    :stroke="4"
                    strokeColor="#007bff" />
                    <span class="align-middle activityItem">
@@ -38,7 +38,7 @@
               </div>
           </nav>
           <b-container>
-            <router-view :srcUrl="srcUrl"/>
+            <router-view :srcUrl="srcUrl" v-on:updateProgress="updateProgress"/>
           </b-container>
       </div>
     </div>
@@ -68,6 +68,7 @@ export default {
       sidebarActive: true,
       schema: {},
       activityIndex: 0,
+      progress: [],
     };
   },
   methods: {
@@ -81,10 +82,17 @@ export default {
     setActivity(index) {
       this.activityIndex = index;
     },
+    updateProgress(progress) {
+      this.progress[this.activityIndex] = progress;
+      this.$forceUpdate();
+    },
   },
   mounted() {
     axios.get(config.githubSrc).then((resp) => {
       this.schema = resp.data;
+      /* eslint-disable */
+      this.progress = _.map(this.schema._ui.order, () => 0);
+      /* eslint-enable */
     });
   },
   computed: {
@@ -94,7 +102,7 @@ export default {
         console.log();
         return this.schema[this.schema._ui.order[this.activityIndex]]['@id'];
       }
-        /* eslint-enable */
+      /* eslint-enable */
       return null;
     },
   },

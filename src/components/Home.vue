@@ -5,7 +5,7 @@
       <Loader />
     </div>
     <div v-else>
-      <b-progress :value="listShow.length" :max="context.length" class="mb-3"></b-progress>
+      <b-progress :value="listShow.length - 1" :max="context.length" class="mb-3"></b-progress>
     </div>
     <transition-group name="list" tag="div" mode="in-out">
       <div v-for="(content, index) in contextReverse" :key="index" class="mt-3 mb-3">
@@ -79,6 +79,10 @@ export default {
   watch: {
     listContentRev() {
       this.$forceUpdate();
+    },
+    listShow() {
+      const progress = ((this.listShow.length - 1) / this.context.length) * 100;
+      this.$emit('updateProgress', progress);
     },
     srcUrl() {
       if (this.srcUrl) {
