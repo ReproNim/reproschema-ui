@@ -17,7 +17,7 @@
 <script>
 export default {
   name: 'TextInput',
-  props: ['constraints'],
+  props: ['constraints', 'init'],
   methods: {
     onSubmit(e) {
       e.preventDefault();
@@ -28,6 +28,11 @@ export default {
     return {
       input: '',
     };
+  },
+  mounted() {
+    if (this.init) {
+      this.input = this.init.value;
+    }
   },
 };
 </script>

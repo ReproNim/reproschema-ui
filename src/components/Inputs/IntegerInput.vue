@@ -24,6 +24,7 @@
 
 export default {
   name: 'IntegerInput',
+  props: ['constraints', 'init'],
   methods: {
     onSubmit(e) {
       e.preventDefault();
@@ -50,6 +51,11 @@ export default {
     return {
       input: null,
     };
+  },
+  mounted() {
+    if (this.init) {
+      this.input = this.init.value;
+    }
   },
 };
 </script>

@@ -13,7 +13,9 @@
         <ContextItem
          v-if="listShow.indexOf(contextReverse.length - index - 1) >= 0"
          :item="content" :index="contextReverse.length - index - 1"
-         v-on:skip="nextQuestion(contextReverse.length - index - 1)"
+         :init="responses[content['@id']]"
+         v-on:skip="nextQuestion(contextReverse.length - index - 1, 1)"
+         v-on:next="nextQuestion(contextReverse.length - index - 1, 0)"
          v-on:setData="setResponse"
          />
         </transition>
@@ -51,12 +53,11 @@ import Loader from './Loader';
 
 export default {
   name: 'Home',
-  props: ['srcUrl'],
+  props: ['srcUrl', 'responses'],
   data() {
     return {
       activity: {},
       listShow: [],
-      responses: [],
     };
   },
   components: {
@@ -64,16 +65,21 @@ export default {
     Loader,
   },
   methods: {
-    nextQuestion(idx) {
+    nextQuestion(idx, skip) {
+      if (skip) {
+        console.log('SKIPPING');
+        this.$emit('saveResponse', this.context[idx]['@id'], { skipped: 1, value: null });
+      }
       if (idx === this.listShow.length - 1) {
         this.listShow.push(_.max(this.listShow) + 1);
       }
     },
-    setResponse(val, index) {
-      this.responses.push({
-        item: this.context[index],
-        response: val,
-      });
+    setResponse(value, index) {
+      // this.responses.push({
+      //   item: this.context[index],
+      //   response: val,
+      // });
+      this.$emit('saveResponse', this.context[index]['@id'], { value, skipped: 0 });
     },
   },
   watch: {
@@ -87,11 +93,13 @@ export default {
     srcUrl() {
       if (this.srcUrl) {
         axios.get(this.srcUrl).then((resp) => {
-          console.log(resp);
           this.activity = resp.data;
           this.listShow = [0];
         });
       }
+    },
+    responses() {
+
     },
   },
   computed: {

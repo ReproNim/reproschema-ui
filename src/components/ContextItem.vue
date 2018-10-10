@@ -7,7 +7,9 @@
          :inputType="ui.inputType"
          :title="title"
          :valueConstraints="valueConstraints"
+         :init="init"
          v-on:skip="sendSkip"
+         v-on:next="sendNext"
          v-on:valueChanged="sendData"
          />
         <div class="loader" v-else>
@@ -57,7 +59,7 @@ import Loader from './Loader';
 
 export default {
   name: 'contextItem',
-  props: ['item', 'index'],
+  props: ['item', 'index', 'init'],
   components: {
     InputSelector,
     Loader,
@@ -112,6 +114,9 @@ export default {
         this.variant = 'warning';
       }
       this.$emit('skip');
+    },
+    sendNext() {
+      this.$emit('next');
     },
     sendData(val) {
       this.variant = null;

@@ -38,7 +38,10 @@
               </div>
           </nav>
           <b-container>
-            <router-view :srcUrl="srcUrl" v-on:updateProgress="updateProgress"/>
+            <router-view :srcUrl="srcUrl" :responses="responses"
+             v-on:updateProgress="updateProgress"
+             v-on:saveResponse="saveResponse"
+            />
           </b-container>
       </div>
     </div>
@@ -69,6 +72,7 @@ export default {
       schema: {},
       activityIndex: 0,
       progress: [],
+      responses: {},
     };
   },
   methods: {
@@ -85,6 +89,9 @@ export default {
     updateProgress(progress) {
       this.progress[this.activityIndex] = progress;
       this.$forceUpdate();
+    },
+    saveResponse(key, value) {
+      this.responses[key] = value;
     },
   },
   mounted() {
