@@ -20,6 +20,16 @@
         <AudioRecord :constraints="valueConstraints" v-on:valueChanged="sendData"/>
     </div>
 
+    <!-- If type is text -->
+    <div v-else-if="inputType==='text'">
+        <TextInput :constraints="valueConstraints" v-on:valueChanged="sendData"/>
+    </div>
+
+    <!-- If type is text -->
+    <div v-else-if="inputType==='xsd:int'">
+        <IntegerInput :constraints="valueConstraints" v-on:valueChanged="sendData"/>
+    </div>
+
     <!-- if we don't have a component built for this type, then show an error -->
     <div v-else>
       <b-alert show>
@@ -42,6 +52,8 @@
 <script>
 import Radio from './Radio';
 import AudioRecord from './Audio';
+import TextInput from './TextInput';
+import IntegerInput from './IntegerInput';
 
 export default {
   name: 'InputSelector',
@@ -49,6 +61,8 @@ export default {
   components: {
     Radio,
     AudioRecord,
+    TextInput,
+    IntegerInput,
   },
   data() {
     return {

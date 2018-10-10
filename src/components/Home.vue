@@ -7,7 +7,7 @@
     <div v-else>
       <b-progress :value="listShow.length" :max="context.length" class="mb-3"></b-progress>
     </div>
-    <transition-group name="list" tag="div">
+    <transition-group name="list" tag="div" mode="in-out">
       <div v-for="(content, index) in contextReverse" :key="index" class="mt-3 mb-3">
         <transition name="list">
         <ContextItem
@@ -45,13 +45,13 @@
 <script>
 import axios from 'axios';
 import _ from 'lodash';
-import config from '../config';
 import ContextItem from './ContextItem';
 import Loader from './Loader';
 
 
 export default {
   name: 'Home',
+  props: ['srcUrl'],
   data() {
     return {
       activity: {},
@@ -80,23 +80,33 @@ export default {
     listContentRev() {
       this.$forceUpdate();
     },
+    srcUrl() {
+      if (this.srcUrl) {
+        axios.get(this.srcUrl).then((resp) => {
+          console.log(resp);
+          this.activity = resp.data;
+          this.listShow = [0];
+        });
+      }
+    },
   },
   computed: {
     context() {
-      return _.filter(this.activity['@context'], (val, key) => {
-        const special = ['pav', 'xsd', 'oslc', 'bibo', 'schema'].indexOf(key) >= 0;
-        return key.indexOf(':') < 0 && key.indexOf('@') < 0 && key.indexOf('$') < 0 && !special;
-      });
+      /* eslint-disable */
+      if (this.activity._ui) {
+        const keys = this.activity._ui.order;
+        const self = this;
+        return _.map(keys, k => self.activity[k]);
+      }
+      /* eslint-enable */
+      return [{}];
     },
     contextReverse() {
       return this.context.slice().reverse();
     },
   },
   mounted() {
-    axios.get(config.githubSrc).then((resp) => {
-      this.activity = resp.data;
-      this.listShow.push(0);
-    });
+
   },
 };
 </script>

@@ -7,17 +7,17 @@
           <h3>Activities</h3>
         </div>
 
-        <ul class="list-unstyled components">
+        <ul class="list-unstyled components" v-if="schema._ui">
             <!-- <p>Dummy Heading</p> -->
-            <li>
-                <a href="#">
+            <li v-for="(ui, index) in schema._ui.order" :key="index">
+                <a @click="setActivity(index)" :class="{'current': index==activityIndex}">
                   <circleProgress
                    :radius="20"
-                   :progress="75"
+                   :progress="0"
                    :stroke="4"
                    strokeColor="#007bff" />
                    <span class="align-middle activityItem">
-                     PHQ-9
+                     {{ui}}
                    </span>
                 </a>
             </li>
@@ -38,7 +38,7 @@
               </div>
           </nav>
           <b-container>
-            <router-view/>
+            <router-view :srcUrl="srcUrl"/>
           </b-container>
       </div>
     </div>
@@ -48,9 +48,12 @@
 <script>
 import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
+import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import circleProgress from './components/Circle';
+import config from './config';
+
 
 Vue.use(BootstrapVue);
 Vue.filter('reverse', value => value.slice().reverse());
@@ -63,6 +66,8 @@ export default {
   data() {
     return {
       sidebarActive: true,
+      schema: {},
+      activityIndex: 0,
     };
   },
   methods: {
@@ -72,6 +77,25 @@ export default {
       } else {
         this.$refs.sidebar.className = '';
       }
+    },
+    setActivity(index) {
+      this.activityIndex = index;
+    },
+  },
+  mounted() {
+    axios.get(config.githubSrc).then((resp) => {
+      this.schema = resp.data;
+    });
+  },
+  computed: {
+    srcUrl() {
+      /* eslint-disable */
+      if (this.schema._ui) {
+        console.log();
+        return this.schema[this.schema._ui.order[this.activityIndex]]['@id'];
+      }
+        /* eslint-enable */
+      return null;
     },
   },
 };
@@ -135,9 +159,16 @@ export default {
     padding: 10px;
     font-size: 1.1em;
     display: block;
+    cursor: pointer;
 }
 #sidebar ul li a:hover {
+  background-color: #17a2b8;
+  color: white;
+}
 
+.current {
+  background-color: #17a2b8;
+  color: white !important;
 }
 
 #sidebar ul li.active > a, a[aria-expanded="true"] {
