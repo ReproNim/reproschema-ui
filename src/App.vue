@@ -29,12 +29,18 @@
           <!-- We'll fill this with dummy content -->
           <nav class="navbar navbar-expand-lg navbar-light bg-light">
               <div class="container-fluid">
+                <b-navbar-nav>
                   <button @click="toggleSidebar"
                           type="button"
                           id="sidebarCollapse"
                           class="btn">
                       <span class="navbar-toggler-icon"></span>
                   </button>
+                  </b-navbar-nav>
+
+                  <b-navbar-nav class="float-right">
+                    <b-nav-item to="/" exact>Home</b-nav-item>
+                  </b-navbar-nav>
               </div>
           </nav>
           <b-container>
@@ -70,7 +76,7 @@ export default {
     return {
       sidebarActive: true,
       schema: {},
-      activityIndex: 0,
+      activityIndex: null,
       progress: [],
       responses: {},
     };
@@ -117,7 +123,7 @@ export default {
   computed: {
     srcUrl() {
       /* eslint-disable */
-      if (this.schema._ui) {
+      if (this.schema._ui && this.activityIndex) {
         console.log();
         return this.schema[this.schema._ui.order[this.activityIndex]]['@id'];
       }
