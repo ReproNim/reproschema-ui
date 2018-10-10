@@ -46,6 +46,16 @@ export default {
       /* eslint-ensable */
     },
   },
+  watch: {
+    init: {
+      handler() {
+        if (this.init) {
+          this.selected = this.init.value;
+        }
+      },
+      deep: true,
+    }
+  },
   mounted() {
     if (this.init) {
       this.selected = this.init.value;

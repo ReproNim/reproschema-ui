@@ -85,13 +85,15 @@ export default {
     },
     setActivity(index) {
       this.activityIndex = index;
+      this.$router.push(`/activities/${index}`);
     },
     updateProgress(progress) {
       this.progress[this.activityIndex] = progress;
       this.$forceUpdate();
     },
     saveResponse(key, value) {
-      this.responses[key] = value;
+      this.$set(this.responses, key, value);
+      this.$forceUpdate();
     },
   },
   mounted() {
