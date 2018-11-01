@@ -73,9 +73,9 @@ export default {
   computed: {
     ui() {
       /* eslint-disable */
-      if (this.data._ui) {
-        if (this.data._ui.inputType) {
-          return this.data._ui;
+      if (this.data.ui) {
+        if (this.data.ui.inputType) {
+          return this.data.ui;
         }
       }
       return {'inputType': 'N/A'}
@@ -86,8 +86,8 @@ export default {
     },
     valueConstraints() {
       /* eslint-disable */
-      if (this.data._valueConstraints) {
-        return this.data._valueConstraints;
+      if (this.data.valueConstraints) {
+        return this.data.valueConstraints;
       }
       /* eslint-enable */
       return { requiredValue: false };
