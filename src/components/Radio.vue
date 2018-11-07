@@ -37,7 +37,7 @@ export default {
   computed: {
     options() {
       /* eslint-disable */
-      return _.map(this.constraints.literals, (v) => {
+      return _.map(this.constraints.choices, (v) => {
         return {
           text: v.label,
           value: v['@value'],

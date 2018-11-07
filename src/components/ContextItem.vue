@@ -82,7 +82,7 @@ export default {
       /* eslint-enable */
     },
     title() {
-      return this.data.title;
+      return this.data.question['@value'];
     },
     valueConstraints() {
       /* eslint-disable */

@@ -83,13 +83,18 @@ export default {
   },
   computed: {
     context() {
-      return _.filter(this.activity['@context'], (val, key) => {
-        const special = ['pav', 'xsd', 'oslc', 'bibo', 'schema'].indexOf(key) >= 0;
-        return key.indexOf(':') < 0 && key.indexOf('@') < 0 && key.indexOf('$') < 0 && !special;
-      });
+      if (this.activity.ui) {
+        return this.activity.ui.order;
+      }
+      return {};
     },
     contextReverse() {
-      return this.context.slice().reverse();
+      /* eslint-disable */
+      console.log(this.context);
+      if(this.context.length >0) {
+        return this.context.slice().reverse();
+      }
+      return {};
     },
   },
   mounted() {
