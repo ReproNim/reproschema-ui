@@ -83,10 +83,14 @@ export default {
   },
   computed: {
     context() {
+      /* eslint-disable */
       if (this.activity.ui) {
-        return this.activity.ui.order;
+        const keys = this.activity.ui.order;
+        const self = this;
+        return _.map(keys, k => self.activity[k]);
       }
-      return {};
+      /* eslint-enable */
+      return [{}];
     },
     contextReverse() {
       /* eslint-disable */
