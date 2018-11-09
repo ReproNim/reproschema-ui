@@ -59,6 +59,7 @@ import Loader from './Loader';
 
 export default {
   name: 'contextItem',
+
   props: ['item', 'index', 'init', 'responses'],
   components: {
     InputSelector,

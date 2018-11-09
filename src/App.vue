@@ -7,9 +7,9 @@
           <h3>Activities</h3>
         </div>
 
-        <ul class="list-unstyled components" v-if="schema._ui">
+        <ul class="list-unstyled components" v-if="schema.ui">
             <!-- <p>Dummy Heading</p> -->
-            <li v-for="(ui, index) in schema._ui.order" :key="index">
+            <li v-for="(ui, index) in schema.ui.order" :key="index">
                 <a @click="setActivity(index)" :class="{'current': index==activityIndex}">
                   <circleProgress
                    :radius="20"
@@ -113,7 +113,7 @@ export default {
     axios.get(config.githubSrc).then((resp) => {
       this.schema = resp.data;
       /* eslint-disable */
-      this.progress = _.map(this.schema._ui.order, () => 0);
+      this.progress = _.map(this.schema.ui.order, () => 0);
       /* eslint-enable */
       if (this.$route.params.id) {
         this.activityIndex = this.$route.params.id;
@@ -123,9 +123,9 @@ export default {
   computed: {
     srcUrl() {
       /* eslint-disable */
-      if (this.schema._ui && this.activityIndex) {
+      if (this.schema.ui && this.activityIndex) {
         console.log();
-        return this.schema[this.schema._ui.order[this.activityIndex]]['@id'];
+        return this.schema[this.schema.ui.order[this.activityIndex]]['@id'];
       }
       /* eslint-enable */
       return null;
