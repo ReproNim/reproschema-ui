@@ -91,6 +91,7 @@ export default {
     },
     setActivity(index) {
       this.activityIndex = index;
+      console.log('ssss: ', this.activityIndex);
       this.$router.push(`/activities/${index}`);
     },
     updateProgress(progress) {
@@ -124,7 +125,7 @@ export default {
     srcUrl() {
       /* eslint-disable */
       if (this.schema.ui && this.activityIndex) {
-        console.log();
+        console.log(this.schema[this.schema.ui.order[this.activityIndex]]['@id']);
         return this.schema[this.schema.ui.order[this.activityIndex]]['@id'];
       }
       /* eslint-enable */

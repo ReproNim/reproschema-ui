@@ -7,7 +7,7 @@
     <div v-else>
       <b-progress :value="listShow.length" :max="context.length" class="mb-3"></b-progress>
     </div>
-    <transition-group name="list" tag="div">
+    <transition-group name="list" tag="div" mode="in-out">
       <div v-for="(content, index) in contextReverse" :key="index" class="mt-3 mb-3">
         <transition name="list">
         <ContextItem
@@ -53,6 +53,7 @@ import Loader from './Loader';
 
 export default {
   name: 'Home',
+  props: ['srcUrl', 'responses'],
   data() {
     return {
       activity: {},
