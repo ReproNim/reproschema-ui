@@ -12,7 +12,7 @@
                             stacked
                             class="text-left"
                             @change="sendData"
-                            >
+        >
         </b-form-radio-group>
       </b-form-group>
     </div>
@@ -20,7 +20,6 @@
 </template>
 
 <style scoped>
-
 </style>
 
 <script>
@@ -28,7 +27,7 @@ import _ from 'lodash';
 
 export default {
   name: 'radioInput',
-  props: ['constraints'],
+  props: ['constraints', 'init'],
   data() {
     return {
       selected: null,
@@ -37,19 +36,34 @@ export default {
   computed: {
     options() {
       /* eslint-disable */
-      return _.map(this.constraints.choices, (v) => {
-        return {
-          text: v.label,
-          value: v['@value'],
-        };
-      });
-      /* eslint-ensable */
+        return _.map(this.constraints.choices, (v) => {
+          return {
+            text: v.label,
+            value: v['@value'],
+          };
+        });
+        /* eslint-ensable */
+      },
     },
-  },
-  methods: {
-    sendData(val) {
-      this.$emit('valueChanged', val);
+    watch: {
+      init: {
+        handler() {
+          if (this.init) {
+            this.selected = this.init.value;
+          }
+        },
+        deep: true,
+      }
     },
-  }
+    mounted() {
+      if (this.init) {
+        this.selected = this.init.value;
+      }
+    },
+    methods: {
+      sendData(val) {
+        this.$emit('valueChanged', val);
+      },
+    }
 };
 </script>

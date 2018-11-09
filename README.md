@@ -1,6 +1,7 @@
-# phq9
+# schema-ui
 
-> A Vue.js project
+[![Build Status](https://travis-ci.org/akeshavan/schema-ui.svg?branch=master)](https://travis-ci.org/akeshavan/schema-ui)
+
 
 ## Build Setup
 
