@@ -13,9 +13,10 @@
         <ContextItem
            v-if="listShow.indexOf(contextReverse.length - index - 1) >= 0"
            :item="content" :index="contextReverse.length - index - 1"
-           v-on:skip="nextQuestion(contextReverse.length - index - 1)"
+           :init="responses[content['@id']]"
+           v-on:skip="nextQuestion(contextReverse.length - index - 1, 1)"
+           v-on:next="nextQuestion(contextReverse.length - index - 1, 0)"
            v-on:setData="setResponse"
-           :responses="responses"
         />
         </transition>
       </div>
@@ -46,7 +47,6 @@
 <script>
 import axios from 'axios';
 import _ from 'lodash';
-import config from '../config';
 import ContextItem from './ContextItem';
 import Loader from './Loader';
 
@@ -58,7 +58,6 @@ export default {
     return {
       activity: {},
       listShow: [],
-      responses: [],
     };
   },
   components: {
@@ -66,21 +65,53 @@ export default {
     Loader,
   },
   methods: {
-    nextQuestion(idx) {
+    getData() {
+      axios.get(this.srcUrl).then((resp) => {
+        this.activity = resp.data;
+        this.listShow = [0];
+
+        this.$nextTick(() => {
+          // set listShow if there are responses for items in the context
+          const answered = _.filter(this.context, c => Object.keys(this.responses).indexOf(c['@id']) > -1);
+          if (!answered.length) {
+            this.listShow = [0];
+          } else {
+            this.listShow = _.map(new Array(answered.length + 1), (c, i) => i);
+          }
+        });
+      });
+    },
+    nextQuestion(idx, skip) {
+      if (skip) {
+        this.$emit('saveResponse', this.context[idx]['@id'], { skipped: 1, value: null });
+      }
       if (idx === this.listShow.length - 1) {
         this.listShow.push(_.max(this.listShow) + 1);
       }
     },
-    setResponse(val, index) {
-      this.responses.push({
-        item: this.context[index],
-        response: val,
-      });
+    setResponse(value, index) {
+      // this.responses.push({
+      //   item: this.context[index],
+      //   response: val,
+      // });
+      this.$emit('saveResponse', this.context[index]['@id'], { value, skipped: 0 });
     },
   },
   watch: {
+    $route() {
+      this.getData();
+    },
     listContentRev() {
       this.$forceUpdate();
+    },
+    listShow() {
+      const progress = ((this.listShow.length - 1) / this.context.length) * 100;
+      this.$emit('updateProgress', progress);
+    },
+    srcUrl() {
+      if (this.srcUrl) {
+        this.getData();
+      }
     },
   },
   computed: {
@@ -103,10 +134,9 @@ export default {
     },
   },
   mounted() {
-    axios.get(config.githubSrc).then((resp) => {
-      this.activity = resp.data;
-      this.listShow.push(0);
-    });
+    if (this.srcUrl) {
+      this.getData();
+    }
   },
 };
 </script>
