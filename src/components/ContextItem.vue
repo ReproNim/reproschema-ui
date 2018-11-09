@@ -57,7 +57,7 @@ import Loader from './Loader';
 
 export default {
   name: 'contextItem',
-  props: ['item', 'index'],
+  props: ['item', 'index', 'responses'],
   components: {
     InputSelector,
     Loader,
@@ -82,10 +82,20 @@ export default {
       /* eslint-enable */
     },
     title() {
+      // eslint-disable-next-line
+      if(this.responses.length > 0 && this.index > 0) {
+        const selectedLanguage = this.responses[0].response;
+        // eslint-disable-next-line
+        const activeQuestion =  _.filter(this.data.question, (q) => {
+          return q['@language'] === selectedLanguage;
+        });
+        return activeQuestion[0]['@value'];
+      }
+      // eslint-disable-next-line
       return this.data.question['@value'];
     },
     valueConstraints() {
-      /* eslint-disable */
+      // eslint-disable-next-line
       if (this.data.valueConstraints) {
         return this.data.valueConstraints;
       }
@@ -108,6 +118,7 @@ export default {
     },
     sendSkip(doSkip) {
       // send that the component got skipped to the parent
+      // eslint-disable-next-line
       console.log('sending skip', doSkip);
       if (doSkip) {
         this.variant = 'warning';
@@ -116,6 +127,7 @@ export default {
     },
     sendData(val) {
       this.variant = null;
+      /* eslint-enable */
       this.$emit('setData', val, this.index);
     },
   },

@@ -11,11 +11,12 @@
       <div v-for="(content, index) in contextReverse" :key="index" class="mt-3 mb-3">
         <transition name="list">
         <ContextItem
-         v-if="listShow.indexOf(contextReverse.length - index - 1) >= 0"
-         :item="content" :index="contextReverse.length - index - 1"
-         v-on:skip="nextQuestion(contextReverse.length - index - 1)"
-         v-on:setData="setResponse"
-         />
+           v-if="listShow.indexOf(contextReverse.length - index - 1) >= 0"
+           :item="content" :index="contextReverse.length - index - 1"
+           v-on:skip="nextQuestion(contextReverse.length - index - 1)"
+           v-on:setData="setResponse"
+           :responses="responses"
+        />
         </transition>
       </div>
     </transition-group>
@@ -86,15 +87,17 @@ export default {
       /* eslint-disable */
       if (this.activity.ui) {
         const keys = this.activity.ui.order;
-        const self = this;
-        return _.map(keys, k => self.activity[k]);
+        if(this.responses[0]) {
+          const selectedLanguage = this.responses[0].response;
+        }
+        return _.map(keys, k => this.activity[k]);
       }
       /* eslint-enable */
       return [{}];
     },
     contextReverse() {
       /* eslint-disable */
-      console.log(this.context);
+      //console.log(this.context);
       if(this.context.length >0) {
         return this.context.slice().reverse();
       }
