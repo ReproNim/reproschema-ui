@@ -7,7 +7,9 @@
          :inputType="ui.inputType"
          :title="title"
          :valueConstraints="valueConstraints"
+         :init="init"
          v-on:skip="sendSkip"
+         v-on:next="sendNext"
          v-on:valueChanged="sendData"
          />
         <div class="loader" v-else>
@@ -57,7 +59,7 @@ import Loader from './Loader';
 
 export default {
   name: 'contextItem',
-  props: ['item', 'index', 'responses'],
+  props: ['item', 'index', 'init', 'responses'],
   components: {
     InputSelector,
     Loader,
@@ -118,12 +120,13 @@ export default {
     },
     sendSkip(doSkip) {
       // send that the component got skipped to the parent
-      // eslint-disable-next-line
-      console.log('sending skip', doSkip);
       if (doSkip) {
         this.variant = 'warning';
       }
       this.$emit('skip');
+    },
+    sendNext() {
+      this.$emit('next');
     },
     sendData(val) {
       this.variant = null;
@@ -133,6 +136,11 @@ export default {
   },
   mounted() {
     this.getData();
+    if (this.init) {
+      if (this.init.skipped) {
+        this.variant = 'warning';
+      }
+    }
   },
 };
 </script>

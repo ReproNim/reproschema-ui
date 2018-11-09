@@ -12,7 +12,22 @@
 
     <!-- If type is radio -->
     <div v-if="inputType==='radio'">
-        <Radio :constraints="valueConstraints" v-on:valueChanged="sendData"/>
+        <Radio :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
+    </div>
+
+    <!-- If type is audio -->
+    <!-- <div v-else-if="inputType==='audio'">
+        <AudioRecord :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
+    </div> -->
+
+    <!-- If type is text -->
+    <div v-else-if="inputType==='text'">
+        <TextInput :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
+    </div>
+
+    <!-- If type is text -->
+    <div v-else-if="inputType==='xsd:int'">
+        <IntegerInput :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
     </div>
 
     <!-- if we don't have a component built for this type, then show an error -->
@@ -35,13 +50,19 @@
 <style></style>
 
 <script>
-import Radio from './Radio';
+import Radio from './Inputs/Radio';
+import AudioRecord from './Inputs/Audio';
+import TextInput from './Inputs/TextInput';
+import IntegerInput from './Inputs/IntegerInput';
 
 export default {
   name: 'InputSelector',
-  props: ['inputType', 'title', 'valueConstraints'],
+  props: ['inputType', 'title', 'valueConstraints', 'init'],
   components: {
     Radio,
+    AudioRecord,
+    TextInput,
+    IntegerInput,
   },
   data() {
     return {
@@ -54,7 +75,7 @@ export default {
     },
     sendData(val) {
       this.$emit('valueChanged', val);
-      this.skip(0);
+      this.$emit('next');
     },
   },
 };

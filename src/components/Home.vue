@@ -87,9 +87,6 @@ export default {
       /* eslint-disable */
       if (this.activity.ui) {
         const keys = this.activity.ui.order;
-        if(this.responses[0]) {
-          const selectedLanguage = this.responses[0].response;
-        }
         return _.map(keys, k => this.activity[k]);
       }
       /* eslint-enable */
