@@ -53,13 +53,13 @@
 
 <script>
 import axios from 'axios';
+import _ from 'lodash';
 import InputSelector from './InputSelector';
 import Loader from './Loader';
-// import _ from 'lodash';
+
 
 export default {
   name: 'contextItem',
-
   props: ['item', 'index', 'init', 'responses'],
   components: {
     InputSelector,
@@ -86,12 +86,22 @@ export default {
     },
     title() {
       // eslint-disable-next-line
-      if(this.responses.length > 0 && this.index > 0) {
-        const selectedLanguage = this.responses[0].response;
+      console.log(89, this.responses)
+      // eslint-disable-next-line
+      const selectedValues = _.valuesIn(this.responses)
+      if (selectedValues.length > 0 && this.index > 0) {
+        // eslint-disable-next-line
+        const selectedLanguage = selectedValues[0].value;
+        // eslint-disable-next-line
+        console.log('selectedLanguage', selectedLanguage);
+        // eslint-disable-next-line
+        console.log(this.data.question)
         // eslint-disable-next-line
         const activeQuestion =  _.filter(this.data.question, (q) => {
           return q['@language'] === selectedLanguage;
         });
+        // eslint-disable-next-line
+        console.log('activeQuestion', activeQuestion)
         return activeQuestion[0]['@value'];
       }
       // eslint-disable-next-line

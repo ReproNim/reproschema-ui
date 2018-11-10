@@ -17,6 +17,7 @@
            v-on:skip="nextQuestion(contextReverse.length - index - 1, 1)"
            v-on:next="nextQuestion(contextReverse.length - index - 1, 0)"
            v-on:setData="setResponse"
+           :responses="responses"
         />
         </transition>
       </div>
@@ -90,10 +91,6 @@ export default {
       }
     },
     setResponse(value, index) {
-      // this.responses.push({
-      //   item: this.context[index],
-      //   response: val,
-      // });
       this.$emit('saveResponse', this.context[index]['@id'], { value, skipped: 0 });
     },
   },
@@ -135,6 +132,8 @@ export default {
   },
   mounted() {
     if (this.srcUrl) {
+      // eslint-disable-next-line
+      console.log('Home mounted: ', this.srcUrl);
       this.getData();
     }
   },

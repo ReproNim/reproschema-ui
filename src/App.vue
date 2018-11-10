@@ -124,8 +124,9 @@ export default {
   computed: {
     srcUrl() {
       /* eslint-disable */
+      console.log('>>>>>: ', this.schema.ui);
       if (this.schema.ui && this.activityIndex) {
-        console.log(this.schema[this.schema.ui.order[this.activityIndex]]['@id']);
+        console.log('inside srcUrl if: ', this.schema[this.schema.ui.order[this.activityIndex]]['@id']);
         return this.schema[this.schema.ui.order[this.activityIndex]]['@id'];
       }
       /* eslint-enable */
