@@ -60,7 +60,7 @@ import Loader from './Loader';
 
 export default {
   name: 'contextItem',
-  props: ['item', 'index', 'init', 'responses'],
+  props: ['item', 'index', 'init', 'responses', 'score'],
   components: {
     InputSelector,
     Loader,
@@ -68,6 +68,7 @@ export default {
   data() {
     return {
       data: [],
+      valueC: [],
       status: 'loading',
       progress: 0,
       variant: null,
@@ -86,22 +87,22 @@ export default {
     },
     title() {
       // eslint-disable-next-line
-      console.log(89, this.responses)
-      // eslint-disable-next-line
-      const selectedValues = _.valuesIn(this.responses)
+      // console.log(89, this.responses);
+      const selectedValues = _.valuesIn(this.responses);
       if (selectedValues.length > 0 && this.index > 0) {
-        // eslint-disable-next-line
+        /* eslint-disable */
+        // console.log("this.item: ", this.item);
         const selectedLanguage = selectedValues[0].value;
         // eslint-disable-next-line
-        console.log('selectedLanguage', selectedLanguage);
+        // console.log('selectedLanguage', selectedLanguage);
         // eslint-disable-next-line
-        console.log(this.data.question)
+        // console.log(this.data.question)
         // eslint-disable-next-line
         const activeQuestion =  _.filter(this.data.question, (q) => {
           return q['@language'] === selectedLanguage;
         });
         // eslint-disable-next-line
-        console.log('activeQuestion', activeQuestion)
+        // console.log('activeQuestion', activeQuestion)
         return activeQuestion[0]['@value'];
       }
       // eslint-disable-next-line
@@ -109,8 +110,9 @@ export default {
     },
     valueConstraints() {
       // eslint-disable-next-line
+      // console.log('inside vc::::', this.data, this.data.valueConstraints);
       if (this.data.valueConstraints) {
-        return this.data.valueConstraints;
+          return this.valueC;
       }
       /* eslint-enable */
       return { requiredValue: false };
@@ -118,6 +120,8 @@ export default {
   },
   methods: {
     getData() {
+      // eslint-disable-next-line
+      // console.log('inside getData::::', this.data, this.data.valueConstraints);
       axios.get(this.item[this.item['@type']], {
         onDownloadProgress() {
           // TODO: for some reason pEvent has total defined as 0.
@@ -126,6 +130,14 @@ export default {
       })
         .then((resp) => {
           this.data = resp.data;
+          // eslint-disable-next-line
+          if (Object.keys(this.data.valueConstraints).indexOf('@id') > -1) {
+            axios.get(this.data.valueConstraints['@id']).then((rsp) => {
+              this.valueC = rsp.data;
+            });
+          } else {
+            this.valueC = this.data.valueConstraints;
+          }
           this.status = 'ready';
         });
     },
