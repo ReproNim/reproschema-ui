@@ -110,7 +110,7 @@ export default {
 
           try {
             // eslint-disable-next-line
-            console.log('scoringLogic::::', eval(str+'; '+ scoringLogic));
+            console.log('total_score::::', eval(str+'; '+ scoringLogic));
           } catch (e) {
             // Do nothing
           }
