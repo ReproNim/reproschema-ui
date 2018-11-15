@@ -6,7 +6,13 @@
         <div class="sidebar-header">
           <h3>Activities</h3>
         </div>
-
+        <div>
+          <select v-model="selected_language">
+            <option disabled value="">Select Language</option>
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+          </select>
+        </div>
         <ul class="list-unstyled components" v-if="schema.ui">
             <!-- <p>Dummy Heading</p> -->
             <li v-for="(ui, index) in schema.ui.order" :key="index">
@@ -75,6 +81,7 @@ export default {
   data() {
     return {
       sidebarActive: true,
+      selected_language: 'en',
       schema: {},
       activityIndex: null,
       progress: [],
@@ -90,6 +97,8 @@ export default {
       }
     },
     setActivity(index) {
+      // eslint-disable-next-line
+      console.log(101, this.selected_language);
       this.activityIndex = index;
       this.$router.push(`/activities/${index}`);
     },
@@ -212,4 +221,7 @@ ul ul a {
 
 }
 
+select > .placeholder {
+  display: none;
+}
 </style>

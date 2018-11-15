@@ -60,7 +60,7 @@ import Loader from './Loader';
 
 export default {
   name: 'contextItem',
-  props: ['item', 'index', 'init', 'responses', 'score'],
+  props: ['item', 'index', 'init', 'responses', 'score', 'selected_language'],
   components: {
     InputSelector,
     Loader,
@@ -87,7 +87,7 @@ export default {
     },
     title() {
       // eslint-disable-next-line
-      // console.log(89, this.responses);
+      console.log(89, this.selected_language);
       const selectedValues = _.valuesIn(this.responses);
       if (selectedValues.length > 0 && this.index > 0) {
         /* eslint-disable */

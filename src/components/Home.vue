@@ -55,7 +55,7 @@ import Loader from './Loader';
 
 export default {
   name: 'Home',
-  props: ['srcUrl', 'responses'],
+  props: ['srcUrl', 'responses', 'selected_language'],
   data() {
     return {
       activity: {},
@@ -157,6 +157,7 @@ export default {
   mounted() {
     if (this.srcUrl) {
       // eslint-disable-next-line
+      console.log(161, this.selected_language);
       console.log('Home mounted: ', this.srcUrl);
       this.getData();
     }

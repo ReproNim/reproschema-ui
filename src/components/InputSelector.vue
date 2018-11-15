@@ -26,7 +26,7 @@
     </div>
 
     <!-- If type is text -->
-    <div v-else-if="inputType==='xsd:int'">
+    <div v-else-if="inputType==='number'">
         <IntegerInput :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
     </div>
 
@@ -39,6 +39,9 @@
 
     <!-- you can skip this question if requiredValue is not true -->
     <div class="row float-right">
+      <b-button class="" variant="default" @click="skip(1)">
+        Don't Know
+      </b-button>
       <b-button class="" variant="default" v-if="!valueConstraints.requiredValue" @click="skip(1)">
         Skip
       </b-button>
