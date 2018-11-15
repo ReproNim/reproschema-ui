@@ -12,7 +12,7 @@
                             stacked
                             class="text-left"
                             @change="sendData"
-                            >
+        >
         </b-form-radio-group>
       </b-form-group>
     </div>
@@ -20,7 +20,6 @@
 </template>
 
 <style scoped>
-
 </style>
 
 <script>
@@ -37,34 +36,34 @@ export default {
   computed: {
     options() {
       /* eslint-disable */
-      return _.map(this.constraints.literals, (v) => {
-        return {
-          text: v.label,
-          value: v['@value'],
-        };
-      });
-      /* eslint-ensable */
-    },
-  },
-  watch: {
-    init: {
-      handler() {
-        if (this.init) {
-          this.selected = this.init.value;
-        }
+        return _.map(this.constraints.choices, (v) => {
+          return {
+            text: v.label,
+            value: v['@value'],
+          };
+        });
+        /* eslint-ensable */
       },
-      deep: true,
-    }
-  },
-  mounted() {
-    if (this.init) {
-      this.selected = this.init.value;
-    }
-  },
-  methods: {
-    sendData(val) {
-      this.$emit('valueChanged', val);
     },
-  }
+    watch: {
+      init: {
+        handler() {
+          if (this.init) {
+            this.selected = this.init.value;
+          }
+        },
+        deep: true,
+      }
+    },
+    mounted() {
+      if (this.init) {
+        this.selected = this.init.value;
+      }
+    },
+    methods: {
+      sendData(val) {
+        this.$emit('valueChanged', val);
+      },
+    }
 };
 </script>

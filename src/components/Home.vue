@@ -5,19 +5,21 @@
       <Loader />
     </div>
     <div v-else>
-      <b-progress :value="listShow.length - 1" :max="context.length" class="mb-3"></b-progress>
+      <b-progress :value="listShow.length" :max="context.length" class="mb-3"></b-progress>
     </div>
     <transition-group name="list" tag="div" mode="in-out">
       <div v-for="(content, index) in contextReverse" :key="index" class="mt-3 mb-3">
         <transition name="list">
         <ContextItem
-         v-if="listShow.indexOf(contextReverse.length - index - 1) >= 0"
-         :item="content" :index="contextReverse.length - index - 1"
-         :init="responses[content['@id']]"
-         v-on:skip="nextQuestion(contextReverse.length - index - 1, 1)"
-         v-on:next="nextQuestion(contextReverse.length - index - 1, 0)"
-         v-on:setData="setResponse"
-         />
+           v-if="listShow.indexOf(contextReverse.length - index - 1) >= 0"
+           :item="content" :index="contextReverse.length - index - 1"
+           :init="responses[content['@id']]"
+           v-on:skip="nextQuestion(contextReverse.length - index - 1, 1)"
+           v-on:next="nextQuestion(contextReverse.length - index - 1, 0)"
+           v-on:setData="setResponse"
+           :responses="responses"
+           :score="score"
+        />
         </transition>
       </div>
     </transition-group>
@@ -58,6 +60,7 @@ export default {
     return {
       activity: {},
       listShow: [],
+      score: 0,
     };
   },
   components: {
@@ -69,7 +72,8 @@ export default {
       axios.get(this.srcUrl).then((resp) => {
         this.activity = resp.data;
         this.listShow = [0];
-
+        /* eslint-disable */
+        // console.log(74, this.activity);
         this.$nextTick(() => {
           // set listShow if there are responses for items in the context
           const answered = _.filter(this.context, c => Object.keys(this.responses).indexOf(c['@id']) > -1);
@@ -90,11 +94,28 @@ export default {
       }
     },
     setResponse(value, index) {
-      // this.responses.push({
-      //   item: this.context[index],
-      //   response: val,
-      // });
-      this.$emit('saveResponse', this.context[index]['@id'], { value, skipped: 0 });
+      this.$emit('saveResponse', this.activity.ui.order[index], {value, skipped: 0});
+
+      if (this.activity.scoringLogic) {
+        var scoringLogic = this.activity.scoringLogic.code;
+        if(this.responses) {
+          var str ='';
+          _.forOwn(this.responses, function (val, key) {
+            // eslint-disable-next-line
+            if (scoringLogic.indexOf(key) > -1) {
+              // scoringLogic = _.replace(scoringLogic,new RegExp(key,'g'),val.value)
+              str += 'const '+key + '=' + val.value +'; ';
+            }
+          });
+
+          try {
+            // eslint-disable-next-line
+            console.log('total_score::::', eval(str+'; '+ scoringLogic));
+          } catch (e) {
+            // Do nothing
+          }
+        }
+      }
     },
   },
   watch: {
@@ -117,20 +138,26 @@ export default {
   computed: {
     context() {
       /* eslint-disable */
-      if (this.activity._ui) {
-        const keys = this.activity._ui.order;
-        const self = this;
-        return _.map(keys, k => self.activity[k]);
+      if (this.activity.ui) {
+        const keys = this.activity.ui.order;
+        return _.map(keys, k => this.activity[k]);
       }
       /* eslint-enable */
       return [{}];
     },
     contextReverse() {
-      return this.context.slice().reverse();
+      /* eslint-disable */
+      //console.log(this.context);
+      if(this.context.length >0) {
+        return this.context.slice().reverse();
+      }
+      return {};
     },
   },
   mounted() {
     if (this.srcUrl) {
+      // eslint-disable-next-line
+      console.log('Home mounted: ', this.srcUrl);
       this.getData();
     }
   },

@@ -53,13 +53,14 @@
 
 <script>
 import axios from 'axios';
+import _ from 'lodash';
 import InputSelector from './InputSelector';
 import Loader from './Loader';
-// import _ from 'lodash';
+
 
 export default {
   name: 'contextItem',
-  props: ['item', 'index', 'init'],
+  props: ['item', 'index', 'init', 'responses', 'score'],
   components: {
     InputSelector,
     Loader,
@@ -67,6 +68,7 @@ export default {
   data() {
     return {
       data: [],
+      valueC: [],
       status: 'loading',
       progress: 0,
       variant: null,
@@ -75,21 +77,42 @@ export default {
   computed: {
     ui() {
       /* eslint-disable */
-      if (this.data._ui) {
-        if (this.data._ui.inputType) {
-          return this.data._ui;
+      if (this.data.ui) {
+        if (this.data.ui.inputType) {
+          return this.data.ui;
         }
       }
       return {'inputType': 'N/A'}
       /* eslint-enable */
     },
     title() {
-      return this.data.title;
+      // eslint-disable-next-line
+      // console.log(89, this.responses);
+      const selectedValues = _.valuesIn(this.responses);
+      if (selectedValues.length > 0 && this.index > 0) {
+        /* eslint-disable */
+        // console.log("this.item: ", this.item);
+        const selectedLanguage = selectedValues[0].value;
+        // eslint-disable-next-line
+        // console.log('selectedLanguage', selectedLanguage);
+        // eslint-disable-next-line
+        // console.log(this.data.question)
+        // eslint-disable-next-line
+        const activeQuestion =  _.filter(this.data.question, (q) => {
+          return q['@language'] === selectedLanguage;
+        });
+        // eslint-disable-next-line
+        // console.log('activeQuestion', activeQuestion)
+        return activeQuestion[0]['@value'];
+      }
+      // eslint-disable-next-line
+      return this.data.question['@value'];
     },
     valueConstraints() {
-      /* eslint-disable */
-      if (this.data._valueConstraints) {
-        return this.data._valueConstraints;
+      // eslint-disable-next-line
+      // console.log('inside vc::::', this.data, this.data.valueConstraints);
+      if (this.data.valueConstraints) {
+          return this.valueC;
       }
       /* eslint-enable */
       return { requiredValue: false };
@@ -97,6 +120,8 @@ export default {
   },
   methods: {
     getData() {
+      // eslint-disable-next-line
+      // console.log('inside getData::::', this.data, this.data.valueConstraints);
       axios.get(this.item[this.item['@type']], {
         onDownloadProgress() {
           // TODO: for some reason pEvent has total defined as 0.
@@ -105,6 +130,14 @@ export default {
       })
         .then((resp) => {
           this.data = resp.data;
+          // eslint-disable-next-line
+          if (Object.keys(this.data.valueConstraints).indexOf('@id') > -1) {
+            axios.get(this.data.valueConstraints['@id']).then((rsp) => {
+              this.valueC = rsp.data;
+            });
+          } else {
+            this.valueC = this.data.valueConstraints;
+          }
           this.status = 'ready';
         });
     },
@@ -120,6 +153,7 @@ export default {
     },
     sendData(val) {
       this.variant = null;
+      /* eslint-enable */
       this.$emit('setData', val, this.index);
     },
   },

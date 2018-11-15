@@ -3,7 +3,7 @@
     <b-form ref="form" @submit="onSubmit" :novalidate="true">
       <b-form-group>
         <b-form-input ref="integerInput" v-model="input"
-         :class="{'is-invalid': !isValidInt, 'is-valid': isValidInt}">
+                      :class="{'is-invalid': !isValidInt, 'is-valid': isValidInt}">
         </b-form-input>
         <div class="invalid-feedback">
           Please enter an integer
@@ -15,13 +15,11 @@
 </template>
 
 <style>
-
 </style>
 
 <script>
 // import _ from 'lodash';
 // window._ = _;
-
 export default {
   name: 'IntegerInput',
   props: ['constraints', 'init'],

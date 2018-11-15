@@ -17,7 +17,6 @@ import VueMarkdown from 'vue-markdown';
 import config from '../config';
 import Loader from './Loader';
 
-
 export default {
   components: {
     VueMarkdown,
