@@ -12,7 +12,8 @@
 
     <!-- If type is radio -->
     <div v-if="inputType==='radio'">
-        <Radio :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
+        <Radio :constraints="valueConstraints"
+        :init="init" :selected_language="selected_language" v-on:valueChanged="sendData"/>
     </div>
 
     <!-- If type is audio -->
@@ -26,7 +27,7 @@
     </div>
 
     <!-- If type is text -->
-    <div v-else-if="inputType==='xsd:int'">
+    <div v-else-if="inputType==='number'">
         <IntegerInput :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
     </div>
 
@@ -39,6 +40,9 @@
 
     <!-- you can skip this question if requiredValue is not true -->
     <div class="row float-right">
+      <b-button class="" variant="default" @click="skip(1)">
+        Don't Know
+      </b-button>
       <b-button class="" variant="default" v-if="!valueConstraints.requiredValue" @click="skip(1)">
         Skip
       </b-button>
@@ -57,7 +61,7 @@ import IntegerInput from './Inputs/IntegerInput';
 
 export default {
   name: 'InputSelector',
-  props: ['inputType', 'title', 'valueConstraints', 'init'],
+  props: ['inputType', 'title', 'valueConstraints', 'init', 'selected_language'],
   components: {
     Radio,
     AudioRecord,

@@ -6,7 +6,13 @@
         <div class="sidebar-header">
           <h3>Activities</h3>
         </div>
-
+        <div>
+          <select v-model="selected_language">
+            <option disabled value="">Select Language</option>
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+          </select>
+        </div>
         <ul class="list-unstyled components" v-if="schema.ui">
             <!-- <p>Dummy Heading</p> -->
             <li v-for="(ui, index) in schema.ui.order" :key="index">
@@ -44,9 +50,11 @@
               </div>
           </nav>
           <b-container>
-            <router-view :srcUrl="srcUrl" :responses="responses"
-             v-on:updateProgress="updateProgress"
-             v-on:saveResponse="saveResponse"
+            <router-view
+              :srcUrl="srcUrl" :responses="responses"
+              :selected_language="selected_language"
+              v-on:updateProgress="updateProgress"
+              v-on:saveResponse="saveResponse"
             />
           </b-container>
       </div>
@@ -75,6 +83,7 @@ export default {
   data() {
     return {
       sidebarActive: true,
+      selected_language: 'en',
       schema: {},
       activityIndex: null,
       progress: [],
@@ -212,4 +221,7 @@ ul ul a {
 
 }
 
+select > .placeholder {
+  display: none;
+}
 </style>

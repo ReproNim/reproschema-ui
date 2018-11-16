@@ -8,6 +8,7 @@
          :title="title"
          :valueConstraints="valueConstraints"
          :init="init"
+         :selected_language="selected_language"
          v-on:skip="sendSkip"
          v-on:next="sendNext"
          v-on:valueChanged="sendData"
@@ -60,7 +61,7 @@ import Loader from './Loader';
 
 export default {
   name: 'contextItem',
-  props: ['item', 'index', 'init', 'responses', 'score'],
+  props: ['item', 'index', 'init', 'responses', 'score', 'selected_language'],
   components: {
     InputSelector,
     Loader,
@@ -86,33 +87,12 @@ export default {
       /* eslint-enable */
     },
     title() {
-      // eslint-disable-next-line
-      // console.log(89, this.responses);
-      const selectedValues = _.valuesIn(this.responses);
-      if (selectedValues.length > 0 && this.index > 0) {
-        /* eslint-disable */
-        // console.log("this.item: ", this.item);
-        const selectedLanguage = selectedValues[0].value;
-        // eslint-disable-next-line
-        // console.log('selectedLanguage', selectedLanguage);
-        // eslint-disable-next-line
-        // console.log(this.data.question)
-        // eslint-disable-next-line
-        const activeQuestion =  _.filter(this.data.question, (q) => {
-          return q['@language'] === selectedLanguage;
-        });
-        // eslint-disable-next-line
-        // console.log('activeQuestion', activeQuestion)
-        return activeQuestion[0]['@value'];
-      }
-      // eslint-disable-next-line
-      return this.data.question['@value'];
+      const activeQuestion = _.filter(this.data.question, q => q['@language'] === this.selected_language);
+      return activeQuestion[0]['@value'];
     },
     valueConstraints() {
-      // eslint-disable-next-line
-      // console.log('inside vc::::', this.data, this.data.valueConstraints);
       if (this.data.valueConstraints) {
-          return this.valueC;
+        return this.valueC;
       }
       /* eslint-enable */
       return { requiredValue: false };
@@ -121,7 +101,6 @@ export default {
   methods: {
     getData() {
       // eslint-disable-next-line
-      // console.log('inside getData::::', this.data, this.data.valueConstraints);
       axios.get(this.item[this.item['@type']], {
         onDownloadProgress() {
           // TODO: for some reason pEvent has total defined as 0.
