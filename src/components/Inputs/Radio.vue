@@ -27,7 +27,7 @@ import _ from 'lodash';
 
 export default {
   name: 'radioInput',
-  props: ['constraints', 'init'],
+  props: ['constraints', 'init', 'selected_language'],
   data() {
     return {
       selected: null,
@@ -37,8 +37,9 @@ export default {
     options() {
       /* eslint-disable */
         return _.map(this.constraints.choices, (v) => {
+          const activeValueChoices = _.filter(v.label, ac => ac['@language'] === this.selected_language);
           return {
-            text: v.label,
+            text: activeValueChoices[0]['@value'],
             value: v['@value'],
           };
         });

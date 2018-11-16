@@ -50,9 +50,11 @@
               </div>
           </nav>
           <b-container>
-            <router-view :srcUrl="srcUrl" :responses="responses"
-             v-on:updateProgress="updateProgress"
-             v-on:saveResponse="saveResponse"
+            <router-view
+              :srcUrl="srcUrl" :responses="responses"
+              :selected_language="selected_language"
+              v-on:updateProgress="updateProgress"
+              v-on:saveResponse="saveResponse"
             />
           </b-container>
       </div>
@@ -97,8 +99,6 @@ export default {
       }
     },
     setActivity(index) {
-      // eslint-disable-next-line
-      console.log(101, this.selected_language);
       this.activityIndex = index;
       this.$router.push(`/activities/${index}`);
     },

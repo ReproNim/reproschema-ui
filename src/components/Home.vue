@@ -7,6 +7,7 @@
     <div v-else>
       <b-progress :value="listShow.length" :max="context.length" class="mb-3"></b-progress>
     </div>
+
     <transition-group name="list" tag="div" mode="in-out">
       <div v-for="(content, index) in contextReverse" :key="index" class="mt-3 mb-3">
         <transition name="list">
@@ -18,6 +19,7 @@
            v-on:next="nextQuestion(contextReverse.length - index - 1, 0)"
            v-on:setData="setResponse"
            :responses="responses"
+           :selected_language="selected_language"
            :score="score"
         />
         </transition>
@@ -110,7 +112,7 @@ export default {
 
           try {
             // eslint-disable-next-line
-            console.log('total_score::::', eval(str+'; '+ scoringLogic));
+            // console.log('total_score::::', eval(str+'; '+ scoringLogic));
           } catch (e) {
             // Do nothing
           }
@@ -156,8 +158,6 @@ export default {
   },
   mounted() {
     if (this.srcUrl) {
-      // eslint-disable-next-line
-      console.log(161, this.selected_language);
       console.log('Home mounted: ', this.srcUrl);
       this.getData();
     }

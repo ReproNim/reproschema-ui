@@ -12,7 +12,8 @@
 
     <!-- If type is radio -->
     <div v-if="inputType==='radio'">
-        <Radio :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
+        <Radio :constraints="valueConstraints"
+        :init="init" :selected_language="selected_language" v-on:valueChanged="sendData"/>
     </div>
 
     <!-- If type is audio -->
@@ -60,7 +61,7 @@ import IntegerInput from './Inputs/IntegerInput';
 
 export default {
   name: 'InputSelector',
-  props: ['inputType', 'title', 'valueConstraints', 'init'],
+  props: ['inputType', 'title', 'valueConstraints', 'init', 'selected_language'],
   components: {
     Radio,
     AudioRecord,
