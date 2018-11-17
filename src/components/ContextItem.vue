@@ -88,6 +88,8 @@ export default {
     },
     title() {
       const activeQuestion = _.filter(this.data.question, q => q['@language'] === this.selected_language);
+      // eslint-disable-next-line
+      console.log('ac ques: ', activeQuestion[0]['@value']);
       return activeQuestion[0]['@value'];
     },
     valueConstraints() {
