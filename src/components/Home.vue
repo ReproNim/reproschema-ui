@@ -6,6 +6,9 @@
     </div>
     <div v-else>
       <b-progress :value="listShow.length" :max="context.length" class="mb-3"></b-progress>
+      <div v-if="preambleText" class="preamble-text">
+        <strong> {{ preambleText }} </strong>
+      </div>
     </div>
 
     <transition-group name="list" tag="div" mode="in-out">
@@ -46,6 +49,9 @@
     opacity: 0;
     transform: translateY(-10px);
   }
+  .preamble-text{
+    text-align:left;
+  }
 </style>
 
 <script>
@@ -75,7 +81,6 @@ export default {
         this.activity = resp.data;
         this.listShow = [0];
         /* eslint-disable */
-        // console.log(74, this.activity);
         this.$nextTick(() => {
           // set listShow if there are responses for items in the context
           const answered = _.filter(this.context, c => Object.keys(this.responses).indexOf(c['@id']) > -1);
@@ -96,10 +101,12 @@ export default {
       }
     },
     setResponse(value, index) {
-      this.$emit('saveResponse', this.activity.ui.order[index], {value, skipped: 0});
+      this.$emit('saveResponse', this.context[index]['@id'], {value, skipped: 0});
 
       if (this.activity.scoringLogic) {
         var scoringLogic = this.activity.scoringLogic.code;
+        // eslint-disable-next-line
+        // console.log('scoringLogic ', scoringLogic);
         if(this.responses) {
           var str ='';
           _.forOwn(this.responses, function (val, key) {
@@ -109,7 +116,6 @@ export default {
               str += 'const '+key + '=' + val.value +'; ';
             }
           });
-
           try {
             // eslint-disable-next-line
             // console.log('total_score::::', eval(str+'; '+ scoringLogic));
@@ -154,6 +160,13 @@ export default {
         return this.context.slice().reverse();
       }
       return {};
+    },
+    preambleText() {
+      if (this.activity.preamble) {
+        const activePreamble = _.filter(this.activity.preamble, p => p['@language'] === this.selected_language);
+        return activePreamble[0]['@value'];
+      }
+      return '';
     },
   },
   mounted() {
