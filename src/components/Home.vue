@@ -81,6 +81,7 @@ export default {
         this.activity = resp.data;
         this.listShow = [0];
         /* eslint-disable */
+        // console.log(87, this.preambleText);
         this.$nextTick(() => {
           // set listShow if there are responses for items in the context
           const answered = _.filter(this.context, c => Object.keys(this.responses).indexOf(c['@id']) > -1);
