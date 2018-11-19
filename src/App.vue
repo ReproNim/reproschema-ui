@@ -51,7 +51,7 @@
           </nav>
           <b-container>
             <router-view
-              :srcUrl="srcUrl" :responses="responses"
+              :srcUrl="srcUrl" :responses="responses[activityIndex]"
               :selected_language="selected_language"
               v-on:updateProgress="updateProgress"
               v-on:saveResponse="saveResponse"
@@ -107,7 +107,9 @@ export default {
       this.$forceUpdate();
     },
     saveResponse(key, value) {
-      this.$set(this.responses, key, value);
+      this.responses[this.activityIndex][key] = value;
+      // eslint-disable-next-line
+      // console.log('TOTAL RESPONSE:', this.responses);
       this.$forceUpdate();
     },
   },
@@ -123,6 +125,9 @@ export default {
       this.schema = resp.data;
       /* eslint-disable */
       this.progress = _.map(this.schema.ui.order, () => 0);
+      this.responses = _.map(this.schema.ui.order, () => new Object());
+      // eslint-disable-next-line
+      // console.log('this.responses', this.responses);
       /* eslint-enable */
       if (this.$route.params.id) {
         this.activityIndex = this.$route.params.id;

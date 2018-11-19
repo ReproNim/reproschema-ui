@@ -10,6 +10,7 @@
          :init="init"
          :selected_language="selected_language"
          v-on:skip="sendSkip"
+         v-on:dontKnow="sendDontKnow"
          v-on:next="sendNext"
          v-on:valueChanged="sendData"
          />
@@ -88,6 +89,8 @@ export default {
     },
     title() {
       const activeQuestion = _.filter(this.data.question, q => q['@language'] === this.selected_language);
+      // eslint-disable-next-line
+      // console.log('activeQuestion[0][\'@value\'] ', activeQuestion[0]['@value']);
       return activeQuestion[0]['@value'];
     },
     valueConstraints() {
@@ -100,6 +103,8 @@ export default {
   },
   methods: {
     getData() {
+      // eslint-disable-next-line
+      // console.log('getData in ContextItem ');
       // eslint-disable-next-line
       axios.get(this.item[this.item['@type']], {
         onDownloadProgress() {
@@ -126,6 +131,13 @@ export default {
         this.variant = 'warning';
       }
       this.$emit('skip');
+    },
+    sendDontKnow(doDontKnow) {
+      // send the dont know answer to the parent
+      if (doDontKnow) {
+        this.variant = 'warning';
+      }
+      this.$emit('dontKnow');
     },
     sendNext() {
       this.$emit('next');
