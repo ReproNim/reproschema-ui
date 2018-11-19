@@ -18,7 +18,8 @@
            v-if="listShow.indexOf(contextReverse.length - index - 1) >= 0"
            :item="content" :index="contextReverse.length - index - 1"
            :init="responses[content['@id']]"
-           v-on:skip="nextQuestion(contextReverse.length - index - 1, 1)"
+           v-on:skip="nextQuestion(contextReverse.length - index - 1, 1, 0)"
+           v-on:dontKnow="nextQuestion(contextReverse.length - index - 1, 0, 1)"
            v-on:next="nextQuestion(contextReverse.length - index - 1, 0)"
            v-on:setData="setResponse"
            :responses="responses"
@@ -81,44 +82,50 @@ export default {
         this.activity = resp.data;
         this.listShow = [0];
         /* eslint-disable */
-        // console.log(87, this.preambleText);
+        // console.log(83, this.responses);
         this.$nextTick(() => {
           // set listShow if there are responses for items in the context
           const answered = _.filter(this.context, c => Object.keys(this.responses).indexOf(c['@id']) > -1);
+          /* eslint-disable */
+          // console.log(89, answered);
           if (!answered.length) {
             this.listShow = [0];
+            // eslint-disable-next-line
+            // console.log('answered.length 92', answered.length, this.listShow);
+
           } else {
             this.listShow = _.map(new Array(answered.length + 1), (c, i) => i);
+            // eslint-disable-next-line
+            // console.log('answered.length 98', answered.length, this.listShow);
           }
         });
       });
     },
-    nextQuestion(idx, skip) {
+    nextQuestion(idx, skip, dontKnow) {
       if (skip) {
-        this.$emit('saveResponse', this.context[idx]['@id'], { skipped: 1, value: null });
+        this.$emit('saveResponse', this.context[idx]['@id'], { skipped: 1, value: null, question: this.activity.ui.order[idx]});
+      }
+      if (dontKnow) {
+        this.$emit('saveResponse', this.context[idx]['@id'], { dontKnow: 1, value: null,question: this.activity.ui.order[idx]});
       }
       if (idx === this.listShow.length - 1) {
         this.listShow.push(_.max(this.listShow) + 1);
       }
     },
     setResponse(value, index) {
-      this.$emit('saveResponse', this.activity.ui.order[index], {value, skipped: 0});
-
+      this.$emit('saveResponse', this.context[index]['@id'], {value, skipped: 0, dontKnow: 0, question: this.activity.ui.order[index]});
       if (this.activity.scoringLogic) {
         var scoringLogic = this.activity.scoringLogic.code;
-        if(this.responses) {
+        if (this.responses) {
           var str ='';
           _.forOwn(this.responses, function (val, key) {
-            // eslint-disable-next-line
-            if (scoringLogic.indexOf(key) > -1) {
-              // scoringLogic = _.replace(scoringLogic,new RegExp(key,'g'),val.value)
-              str += 'const '+key + '=' + val.value +'; ';
+            if (scoringLogic.indexOf(val.question) > -1) {
+              str += 'const '+val.question + '=' + val.value +'; ';
             }
           });
-
           try {
             // eslint-disable-next-line
-            // console.log('total_score::::', eval(str+'; '+ scoringLogic));
+            console.log('TOTAL SCORE::::', eval(str+' '+ scoringLogic));
           } catch (e) {
             // Do nothing
           }
