@@ -156,5 +156,13 @@ export default {
       }
     }
   },
+  watch: {
+    item: {
+      handler() {
+        this.getData();
+      },
+      deep: true,
+    },
+  },
 };
 </script>
