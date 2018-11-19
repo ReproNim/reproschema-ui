@@ -51,6 +51,8 @@ export default {
         handler() {
           if (this.init) {
             this.selected = this.init.value;
+          } else {
+            this.selected = false;
           }
         },
         deep: true,
