@@ -109,7 +109,7 @@ export default {
     saveResponse(key, value) {
       this.responses[this.activityIndex][key] = value;
       // eslint-disable-next-line
-      // console.log('TOTAL RESPONSE:', this.responses);
+      console.log('TOTAL RESPONSE:', this.responses);
       this.$forceUpdate();
     },
   },
