@@ -4,7 +4,7 @@ node_js:
 - '6.0'
 cache:
   directories:
-  - node_modules 
+  - node_modules
 branches:
   only:
   - master
@@ -18,6 +18,6 @@ after_success:
 - bash deploy.sh
 env:
   global:
-  - GH_USER: akeshavan
+  - GH_USER: ReproNim
   - GH_REPO: schema-ui
-  - secure: iDFGbrYaaQeBDarfCwQiwvPX/xpb1wR9UIdgetkB3TU2MaJh0ueuMI9+49mL6W1Emg1UxtGNim/WyHqwUvUWNEPZDAZCC/PBusLxAg0N5NN3PiB7AJj7kpzivBqYBJMFjZ/jeIEfBdBYVzPTf9/T2RBcxypsOIuJCxoPk/EwSmnd93g/O+5gfW1GNcN2qY3VNfnTA8G41dYTazYHf46ApbT9tDnFIX/VY90EFmJINOTDZRjVN4WcoMWL9crqan1URPr5IZEt1aHeAJS8X13+xWokspoGj3sQr1j1WeiUSVKu8NWYPHfHqWMrloEIl1/7VU2D7MBzskv5umxlanvEH7EcJ53Md1JGLWMt/i7cQARjunARt7Px3O3mVgBHLLsHedMqAxUUTX+E2BbPPfUcXofA5yplKMNgbGYD4XR6JWpVU1eiEV+3jauWPWMtM2L+G1/9B0fzBTUGHZ/ko6XjXOC0v2E0Mz8Q3imsYBKuuquC63Te/MHcoxFqSmhxs8BAlpbRUlhn/s0ATP62X/tNLKGsPnoeaBzLpPIOA1TQPUVzzuoHfMxSuTkHc8FBKoMvq1fbCIgb7QUMNu4hCwTU9FEn2lzMmX3S8vNYUA8xSMT0oGInUa9CCJ+neQd8xvyPrgmOWq/1tD9NWPgxJt156qHjc5824J8Oc/OPL6g07ys=
+  - secure: M4XnFnHpaMAwzx2JDwyRuHM/i7P+G4lGpNEbcKY/ub7H7/XzM2UvYHumZXW5AnGOJGFhEltzdO88KESU5xDqlf5bgOJkdqUqLk1g2t5/QfTW1D8liCpJFWHpF+xTopW7oJTEXavhUArEBAIDaJGn8+A4GMw3F8fDgGYNl2peg7pU+Y6Qk/27ee1Ia5Ly1Og6byqsbH0opve+zjvswCwlEDxhkN6HuaQKl6pxkHEg0YVbdDCwtPW+hEnlL3xmsOaA3aSYpsmfH/pNZgFiWiDGj961W2K5AGidNPwVQFNd0b0qgL/eOzuZ34R2zGnvW1qrtYT89n3GQw02odTHHbZyveaH62gvBc1XdVhSB7IcEBSLnF160S7LrGqfkwvA3Eu6FqimRBrS+abPiAY+0OuNgjO66hdYrlbjKd5CSeHV3/57trv+ZqhHJa/Gy7I2G0kjCq2j0HgLp9OupTredRSPsOzPtDfRweWVuEBmoCClVlLIQQ45tiW2kwxKyLKkWWqtLcnLy3L+S0uuE3Bh3Y9ENuHL8VWAMJM79GWl8CFxiI0isjWPKpRl2gpEASOaZlfmMT2gxZslBazJEJp7nMbpiWqMGLQ9IMi2Emmu4mUM6osJNEAKs4XzBN9P5Xn7Fimx4kBi3gj5TNxffln0rdj8U2mz1QTfhFfCJ8/NqQdkzdM=
