@@ -36,11 +36,14 @@ export default {
   computed: {
     options() {
       /* eslint-disable */
-        return _.map(this.constraints.choices, (v) => {
-          const activeValueChoices = _.filter(v.label, ac => ac['@language'] === this.selected_language);
+      // console.log('R39', this.constraints['http://schema.org/itemListElement'][0]['@list']);
+        return _.map(this.constraints['http://schema.org/itemListElement'][0]['@list'], (v) => {
+          // console.log(41,'v ', v['http://schema.org/value'][0]['@value']);
+          const activeValueChoices = _.filter(v['http://schema.org/name'], ac => ac['@language'] === this.selected_language);
+          // console.log(42, 'av ', activeValueChoices[0]['@value']);
           return {
             text: activeValueChoices[0]['@value'],
-            value: v['@value'],
+            value: v['http://schema.org/value'][0]['@value'],
           };
         });
         /* eslint-ensable */
@@ -65,6 +68,7 @@ export default {
     },
     methods: {
       sendData(val) {
+        console.log('R71');
         this.$emit('valueChanged', val);
       },
     }

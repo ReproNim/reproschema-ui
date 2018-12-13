@@ -63,9 +63,12 @@
 </template>
 
 <script>
+import jsonld from 'jsonld/dist/jsonld.min';
 import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
 import axios from 'axios';
+// import AsyncComputed from 'vue-async-computed';
+
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import circleProgress from './components/Circle';
@@ -138,7 +141,16 @@ export default {
     srcUrl() {
       /* eslint-disable */
       if (this.schema.ui && this.activityIndex) {
-        return this.schema[this.schema.ui.order[this.activityIndex]]['@id'];
+        // expand using URLs
+        let expandedSchema = jsonld.expand(this.schema).then(result => {
+          return result[0]['https://schema.repronim.org/order'][0]['@list'][this.activityIndex]['@id'];
+        });
+        let jj;
+        expandedSchema.then(function(result) {
+          jj = 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/PHQ-9/phq9_schema.jsonld';
+        });
+        //console.log('jj', jj);
+        return 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/PHQ-9/phq9_schema.jsonld';
       }
       /* eslint-enable */
       return null;
