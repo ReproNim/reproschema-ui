@@ -68,7 +68,6 @@ export default {
     },
     methods: {
       sendData(val) {
-        console.log('R71');
         this.$emit('valueChanged', val);
       },
     }

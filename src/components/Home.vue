@@ -57,7 +57,6 @@
 
 <script>
 import jsonld from 'jsonld/dist/jsonld.min';
-// import axios from 'axios';
 import _ from 'lodash';
 import ContextItem from './ContextItem';
 import Loader from './Loader';
@@ -82,30 +81,18 @@ export default {
     getData() {
       jsonld.expand(this.srcUrl).then((resp) => {
         this.activity = resp[0];
-        // eslint-disable-next-line
-        // console.log(85, this.activity);
-        // console.log(83, resp[0]['https://schema.repronim.org/order'][0]['@list']);
         this.listShow = [0];
         this.$nextTick(() => {
-          // eslint-disable-next-line
-          // console.log('nexttick', this.context);
           // set listShow if there are responses for items in the context
           const answered = _.filter(this.context, c =>
             Object.keys(this.responses).indexOf(c['@id']) > -1);
-          // eslint-disable-next-line
-          // console.log(89, this.responses);
           if (!answered.length) {
             this.listShow = [0];
-            // eslint-disable-next-line
-            // console.log('answered.length 92', answered.length, this.listShow);
           } else {
             this.listShow = _.map(new Array(answered.length + 1), (c, i) => i);
-            // eslint-disable-next-line
-            // console.log('answered.length 98', answered.length, this.listShow);
           }
         });
       });
-      // console.log(133);
     },
     nextQuestion(idx, skip, dontKnow) {
       if (skip) {
@@ -113,7 +100,6 @@ export default {
         this.$emit('saveResponse', this.context[idx]['@id'], { skipped: 1, value: null, question: currentQuestion });
       }
       if (dontKnow) {
-        // console.log(115, this.activity['https://schema.repronim.org/order'][0]['@list'][idx]);
         const currentQuestion = this.activity['https://schema.repronim.org/order'][0]['@list'][idx];
         this.$emit('saveResponse', this.context[idx]['@id'], { dontKnow: 1, value: null, question: currentQuestion });
       }
@@ -124,13 +110,14 @@ export default {
     setResponse(value, index) {
       const currentQuestion = this.activity['https://schema.repronim.org/order'][0]['@list'][index];
       this.$emit('saveResponse', this.context[index]['@id'], { value, skipped: 0, dontKnow: 0, question: currentQuestion });
-      if (this.activity.scoringLogic) {
-        const scoringLogic = this.activity.scoringLogic.code;
+      if (this.activity['https://schema.repronim.org/scoringLogic']) {
+        const scoringLogic = (this.activity['https://schema.repronim.org/scoringLogic'][0]['@value']).split('= ')[1];
         if (this.responses) {
           let str = '';
           _.forOwn(this.responses, (val) => {
-            if (scoringLogic.indexOf(val.question) > -1) {
-              str += `const ${val.question}=${val.value}; `;
+            const qId = ((val.question['@id']).split(/\/items\//)[1]).split(/.jsonld/)[0]; // split url to get the key
+            if (scoringLogic) {
+              str += `const ${qId}=${val.value}; `;
             }
           });
           try {
@@ -146,7 +133,6 @@ export default {
   watch: {
     $route() {
       this.getData();
-      // console.log(170);
     },
     listContentRev() {
       this.$forceUpdate();
@@ -164,11 +150,6 @@ export default {
   computed: {
     context() {
       /* eslint-disable */
-      /*if (this.activity.ui) {
-        const keys = this.activity.ui.order;
-        // console.log('keys order:: ', _.map(keys, k => this.activity[k]));
-        return _.map(keys, k => this.activity[k]);
-      }*/
       if (this.activity['https://schema.repronim.org/order']) {
         const keys = this.activity['https://schema.repronim.org/order'][0]['@list'];
         return keys;
