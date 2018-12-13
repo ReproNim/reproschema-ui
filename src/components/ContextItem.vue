@@ -4,7 +4,7 @@
     <div class="contextItem align-self-center center">
       <transition name="fade" mode="out-in">
         <InputSelector v-if="status === 'ready'"
-         :inputType="ui.inputType"
+         :inputType="ui"
          :title="title"
          :valueConstraints="valueConstraints"
          :init="init"
@@ -54,7 +54,8 @@
 </style>
 
 <script>
-import axios from 'axios';
+// import axios from 'axios';
+import jsonld from 'jsonld/dist/jsonld.min';
 import _ from 'lodash';
 import InputSelector from './InputSelector';
 import Loader from './Loader';
@@ -79,22 +80,22 @@ export default {
   computed: {
     ui() {
       /* eslint-disable */
-      if (this.data.ui) {
-        if (this.data.ui.inputType) {
-          return this.data.ui;
-        }
+      if (this.data['https://schema.repronim.org/inputType']) {
+        // console.log('C83', this.data['https://schema.repronim.org/inputType'][0]['@value']);
+        return this.data['https://schema.repronim.org/inputType'][0]['@value'];
       }
-      return {'inputType': 'N/A'}
+      return 'N/A';
       /* eslint-enable */
     },
     title() {
-      const activeQuestion = _.filter(this.data.question, q => q['@language'] === this.selected_language);
+      const activeQuestion = _.filter(this.data['http://schema.org/question'], q => q['@language'] === this.selected_language);
       // eslint-disable-next-line
       // console.log('activeQuestion[0][\'@value\'] ', activeQuestion[0]['@value']);
       return activeQuestion[0]['@value'];
     },
     valueConstraints() {
-      if (this.data.valueConstraints) {
+      if (this.data['https://schema.repronim.org/valueconstraints']) {
+        // eslint-disable-next-line
         return this.valueC;
       }
       /* eslint-enable */
@@ -103,27 +104,22 @@ export default {
   },
   methods: {
     getData() {
-      // eslint-disable-next-line
-      // console.log('getData in ContextItem ');
-      // eslint-disable-next-line
-      axios.get(this.item[this.item['@type']], {
+      jsonld.expand(this.item['@id'], {
         onDownloadProgress() {
           // TODO: for some reason pEvent has total defined as 0.
           // so a progress bar won't work here.
         },
-      })
-        .then((resp) => {
-          this.data = resp.data;
-          // eslint-disable-next-line
-          if (Object.keys(this.data.valueConstraints).indexOf('@id') > -1) {
-            axios.get(this.data.valueConstraints['@id']).then((rsp) => {
-              this.valueC = rsp.data;
-            });
-          } else {
-            this.valueC = this.data.valueConstraints;
-          }
-          this.status = 'ready';
-        });
+      }).then((resp) => {
+        this.data = resp[0];
+        if (Object.keys(this.data['https://schema.repronim.org/valueconstraints'][0]).indexOf('@id') > -1) {
+          jsonld.expand(this.data['https://schema.repronim.org/valueconstraints'][0]['@id']).then((rsp) => {
+            this.valueC = rsp[0];
+          });
+        } else {
+          this.valueC = this.data['https://schema.repronim.org/valueconstraints'][0];
+        }
+        this.status = 'ready';
+      });
     },
     sendSkip(doSkip) {
       // send that the component got skipped to the parent
