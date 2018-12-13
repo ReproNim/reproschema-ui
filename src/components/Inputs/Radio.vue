@@ -52,7 +52,6 @@ export default {
     watch: {
       init: {
         handler() {
-          console.log('R53');
           if (this.init) {
             this.selected = this.init.value;
           } else {
@@ -64,7 +63,6 @@ export default {
     },
     mounted() {
       if (this.init) {
-        console.log('R65');
         this.selected = this.init.value;
       }
     },

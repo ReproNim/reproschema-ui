@@ -109,17 +109,21 @@ export default {
     },
     nextQuestion(idx, skip, dontKnow) {
       if (skip) {
-        this.$emit('saveResponse', this.context[idx]['@id'], { skipped: 1, value: null, question: this.activity.ui.order[idx] });
+        const currentQuestion = this.activity['https://schema.repronim.org/order'][0]['@list'][idx];
+        this.$emit('saveResponse', this.context[idx]['@id'], { skipped: 1, value: null, question: currentQuestion });
       }
       if (dontKnow) {
-        this.$emit('saveResponse', this.context[idx]['@id'], { dontKnow: 1, value: null, question: this.activity.ui.order[idx] });
+        // console.log(115, this.activity['https://schema.repronim.org/order'][0]['@list'][idx]);
+        const currentQuestion = this.activity['https://schema.repronim.org/order'][0]['@list'][idx];
+        this.$emit('saveResponse', this.context[idx]['@id'], { dontKnow: 1, value: null, question: currentQuestion });
       }
       if (idx === this.listShow.length - 1) {
         this.listShow.push(_.max(this.listShow) + 1);
       }
     },
     setResponse(value, index) {
-      this.$emit('saveResponse', this.context[index]['@id'], { value, skipped: 0, dontKnow: 0, question: this.activity.ui.order[index] });
+      const currentQuestion = this.activity['https://schema.repronim.org/order'][0]['@list'][index];
+      this.$emit('saveResponse', this.context[index]['@id'], { value, skipped: 0, dontKnow: 0, question: currentQuestion });
       if (this.activity.scoringLogic) {
         const scoringLogic = this.activity.scoringLogic.code;
         if (this.responses) {
