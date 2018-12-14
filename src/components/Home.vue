@@ -165,9 +165,8 @@ export default {
       return {};
     },
     preambleText() {
-      // console.log(210);
-      if (this.activity.preamble) {
-        const activePreamble = _.filter(this.activity.preamble, p => p['@language'] === this.selected_language);
+      if (this.activity['http://schema.repronim.org/preamble']) {
+        const activePreamble = _.filter(this.activity['http://schema.repronim.org/preamble'], p => p['@language'] === this.selected_language);
         return activePreamble[0]['@value'];
       }
       return '';
