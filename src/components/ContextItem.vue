@@ -8,6 +8,7 @@
          :title="title"
          :valueConstraints="valueConstraints"
          :init="init"
+         :responses="responses"
          :selected_language="selected_language"
          v-on:skip="sendSkip"
          v-on:dontKnow="sendDontKnow"
@@ -81,7 +82,6 @@ export default {
     ui() {
       /* eslint-disable */
       if (this.data['https://schema.repronim.org/inputType']) {
-        // console.log('C83', this.data['https://schema.repronim.org/inputType'][0]['@value']);
         return this.data['https://schema.repronim.org/inputType'][0]['@value'];
       }
       return 'N/A';
@@ -89,8 +89,6 @@ export default {
     },
     title() {
       const activeQuestion = _.filter(this.data['http://schema.org/question'], q => q['@language'] === this.selected_language);
-      // eslint-disable-next-line
-      // console.log('activeQuestion[0][\'@value\'] ', activeQuestion[0]['@value']);
       return activeQuestion[0]['@value'];
     },
     valueConstraints() {

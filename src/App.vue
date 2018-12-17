@@ -10,7 +10,6 @@
           <select v-model="selected_language">
             <option disabled value="">Select Language</option>
             <option value="en">English</option>
-            <option value="es">Spanish</option>
           </select>
         </div>
         <ul class="list-unstyled components" v-if="schema.ui">
@@ -63,7 +62,7 @@
 </template>
 
 <script>
-import jsonld from 'jsonld/dist/jsonld.min';
+// import jsonld from 'jsonld/dist/jsonld.min';
 import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
 import axios from 'axios';
@@ -89,6 +88,7 @@ export default {
       selected_language: 'en',
       schema: {},
       activityIndex: null,
+      activityUrl: null,
       progress: [],
       responses: {},
     };
@@ -142,14 +142,9 @@ export default {
       /* eslint-disable */
       if (this.schema.ui && this.activityIndex) {
         // expand using URLs
-        let expandedSchema = jsonld.expand(this.schema).then(result => {
-          return result[0]['https://schema.repronim.org/order'][0]['@list'][this.activityIndex]['@id'];
-        });
-        let jj;
-        expandedSchema.then(function(result) {
-          jj = 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/PHQ-9/phq9_schema.jsonld';
-        });
-        //console.log('jj', jj);
+        /*jsonld.expand(this.schema, result => {
+          result[0]['https://schema.repronim.org/order'][0]['@list'][this.activityIndex]['@id'];
+        });*/
         return 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/PHQ-9/phq9_schema.jsonld';
       }
       /* eslint-enable */
