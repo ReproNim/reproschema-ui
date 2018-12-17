@@ -35,41 +35,36 @@ export default {
   },
   computed: {
     options() {
-      /* eslint-disable */
-      // console.log('R39', this.constraints['http://schema.org/itemListElement'][0]['@list']);
-        return _.map(this.constraints['http://schema.org/itemListElement'][0]['@list'], (v) => {
-          // console.log(41,'v ', v['http://schema.org/value'][0]['@value']);
-          const activeValueChoices = _.filter(v['http://schema.org/name'], ac => ac['@language'] === this.selected_language);
-          // console.log(42, 'av ', activeValueChoices[0]['@value']);
-          return {
-            text: activeValueChoices[0]['@value'],
-            value: v['http://schema.org/value'][0]['@value'],
-          };
-        });
-        /* eslint-ensable */
+      return _.map(this.constraints['http://schema.org/itemListElement'][0]['@list'], (v) => {
+        const activeValueChoices = _.filter(v['http://schema.org/name'], ac => ac['@language'] === this.selected_language);
+        return {
+          text: activeValueChoices[0]['@value'],
+          value: v['http://schema.org/value'][0]['@value'],
+        };
+      });
+    },
+  },
+  watch: {
+    init: {
+      handler() {
+        if (this.init) {
+          this.selected = this.init.value;
+        } else {
+          this.selected = false;
+        }
       },
+      deep: true,
     },
-    watch: {
-      init: {
-        handler() {
-          if (this.init) {
-            this.selected = this.init.value;
-          } else {
-            this.selected = false;
-          }
-        },
-        deep: true,
-      }
-    },
-    mounted() {
-      if (this.init) {
-        this.selected = this.init.value;
-      }
-    },
-    methods: {
-      sendData(val) {
-        this.$emit('valueChanged', val);
-      },
+  },
+  mounted() {
+    if (this.init) {
+      this.selected = this.init.value;
     }
+  },
+  methods: {
+    sendData(val) {
+      this.$emit('valueChanged', val);
+    },
+  },
 };
 </script>

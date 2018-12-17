@@ -83,41 +83,95 @@ export default {
         this.activity = resp[0];
         this.listShow = [0];
         this.$nextTick(() => {
+          // eslint-disable-next-line
+          // console.log(86, this.context);
           // set listShow if there are responses for items in the context
           const answered = _.filter(this.context, c =>
             Object.keys(this.responses).indexOf(c['@id']) > -1);
           if (!answered.length) {
             this.listShow = [0];
+            // eslint-disable-next-line
+            // console.log(92, this.listShow);
           } else {
             this.listShow = _.map(new Array(answered.length + 1), (c, i) => i);
+            // eslint-disable-next-line
+            // console.log(95, this.listShow);
           }
         });
       });
     },
     nextQuestion(idx, skip, dontKnow) {
       if (skip) {
-        const currentQuestion = this.activity['https://schema.repronim.org/order'][0]['@list'][idx];
-        this.$emit('saveResponse', this.context[idx]['@id'], { skipped: 1, value: null, question: currentQuestion });
+        this.$emit('saveResponse', this.context[idx]['@id'], 'skipped');
+        if (this.activity['https://schema.repronim.org/scoringLogic']) {
+          const scoringLogic = (this.activity['https://schema.repronim.org/scoringLogic'][0]['@value']).split('= ')[1];
+          if (this.responses) {
+            let str = '';
+            _.forOwn(this.responses, (val, key) => {
+              const qId = (key.split(/\/items\//)[1]).split(/.jsonld/)[0]; // split url to get the scoring key
+              if (scoringLogic) {
+                if (isNaN(val)) {
+                  str += `const ${qId}=0; `;
+                } else {
+                  str += `const ${qId}=${val}; `;
+                }
+              }
+            });
+            try {
+              // eslint-disable-next-line
+              console.log('TOTAL SCORE::::', eval(str+' '+ scoringLogic));
+            } catch (e) {
+              // Do nothing
+            }
+          }
+        }
       }
       if (dontKnow) {
-        const currentQuestion = this.activity['https://schema.repronim.org/order'][0]['@list'][idx];
-        this.$emit('saveResponse', this.context[idx]['@id'], { dontKnow: 1, value: null, question: currentQuestion });
+        this.$emit('saveResponse', this.context[idx]['@id'], 'dontKnow');
+        if (this.activity['https://schema.repronim.org/scoringLogic']) {
+          const scoringLogic = (this.activity['https://schema.repronim.org/scoringLogic'][0]['@value']).split('= ')[1];
+          if (this.responses) {
+            // eslint-disable-next-line
+            // console.log(113, this.responses);
+            let str = '';
+            _.forOwn(this.responses, (val, key) => {
+              const qId = (key.split(/\/items\//)[1]).split(/.jsonld/)[0]; // split url to get the scoring key
+              // console.log(142, qId, val);
+              if (scoringLogic) {
+                if (isNaN(val)) {
+                  str += `const ${qId}=0; `;
+                } else {
+                  str += `const ${qId}=${val}; `;
+                }
+              }
+            });
+            try {
+              // eslint-disable-next-line
+              console.log('TOTAL SCORE::::', eval(str+' '+ scoringLogic));
+            } catch (e) {
+              // Do nothing
+            }
+          }
+        }
       }
       if (idx === this.listShow.length - 1) {
         this.listShow.push(_.max(this.listShow) + 1);
       }
     },
     setResponse(value, index) {
-      const currentQuestion = this.activity['https://schema.repronim.org/order'][0]['@list'][index];
-      this.$emit('saveResponse', this.context[index]['@id'], { value, skipped: 0, dontKnow: 0, question: currentQuestion });
+      this.$emit('saveResponse', this.context[index]['@id'], value);
       if (this.activity['https://schema.repronim.org/scoringLogic']) {
         const scoringLogic = (this.activity['https://schema.repronim.org/scoringLogic'][0]['@value']).split('= ')[1];
         if (this.responses) {
           let str = '';
-          _.forOwn(this.responses, (val) => {
-            const qId = ((val.question['@id']).split(/\/items\//)[1]).split(/.jsonld/)[0]; // split url to get the key
+          _.forOwn(this.responses, (val, key) => {
+            const qId = (key.split(/\/items\//)[1]).split(/.jsonld/)[0]; // split url to get the scoring key
             if (scoringLogic) {
-              str += `const ${qId}=${val.value}; `;
+              if (isNaN(val)) {
+                str += `const ${qId}=0; `;
+              } else {
+                str += `const ${qId}=${val}; `;
+              }
             }
           });
           try {
@@ -174,6 +228,7 @@ export default {
   },
   mounted() {
     if (this.srcUrl) {
+      // eslint-disable-next-line
       console.log('Home mounted: ', this.srcUrl);
       this.getData();
     }

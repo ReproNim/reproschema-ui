@@ -40,10 +40,10 @@
 
     <!-- you can skip this question if requiredValue is not true -->
     <div class="row float-right">
-      <b-button class="" variant="default" @click="dontKnow(1)">
+      <b-button class="" variant="default" @click="dontKnow">
         Don't Know
       </b-button>
-      <b-button class="" variant="default" v-if="!valueConstraints.requiredValue" @click="skip(1)">
+      <b-button class="" variant="default" v-if="!valueConstraints.requiredValue" @click="skip">
         Skip
       </b-button>
     </div>
