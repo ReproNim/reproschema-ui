@@ -24,6 +24,7 @@
 
 <script>
 import _ from 'lodash';
+// import { bus } from '../../main';
 
 export default {
   name: 'radioInput',
@@ -60,6 +61,8 @@ export default {
     if (this.init) {
       this.selected = this.init.value;
     }
+    // console.log(65);
+    // bus.$on('resetChild', this.resetChildMethod);
   },
   methods: {
     sendData(val) {

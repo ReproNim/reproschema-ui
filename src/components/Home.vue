@@ -119,7 +119,7 @@ export default {
             });
             try {
               // eslint-disable-next-line
-              console.log('TOTAL SCORE::::', eval(str+' '+ scoringLogic));
+              console.log('TOTAL SCORE::::', eval(str + ' ' + scoringLogic));
             } catch (e) {
               // Do nothing
             }
@@ -147,7 +147,7 @@ export default {
             });
             try {
               // eslint-disable-next-line
-              console.log('TOTAL SCORE::::', eval(str+' '+ scoringLogic));
+              console.log('TOTAL SCORE::::', eval(str + ' ' + scoringLogic));
             } catch (e) {
               // Do nothing
             }
@@ -176,12 +176,35 @@ export default {
           });
           try {
             // eslint-disable-next-line
-            console.log('TOTAL SCORE::::', eval(str+' '+ scoringLogic));
+            console.log('TOTAL SCORE::::', eval(str + ' ' + scoringLogic));
+            // console.log('str', str);
           } catch (e) {
             // Do nothing
           }
         }
       }
+      /* if (this.activity['https://schema.repronim.org/branchLogic']) {
+        const branchLogic = this.activity['https://schema.repronim.org/branchLogic'][0]['@value'].split();
+        if (this.responses) {
+          let br = '';
+          _.forOwn(this.responses, (val, key) => {
+            const qId = (key.split(/\/items\//)[1]).split(/.jsonld/)[0];
+            if (branchLogic) {
+              if (isNaN(val)) {
+                br += `const ${qId}=0; `;
+              } else {
+                br += `const ${qId}=${val}; `;
+              }
+            }
+          });
+          try {
+            // eslint-disable-next-line
+            console.log('branch logic::::', eval(br+' '+ branchLogic));
+            console.log('br', br);
+          } catch (e) {
+            console.log('catch-br', br);
+            // Do nothing
+          } */
     },
   },
   watch: {
