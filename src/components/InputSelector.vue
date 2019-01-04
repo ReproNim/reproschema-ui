@@ -54,6 +54,7 @@
 <style></style>
 
 <script>
+// import { bus } from '../main';
 import Radio from './Inputs/Radio';
 import AudioRecord from './Inputs/Audio';
 import TextInput from './Inputs/TextInput';
@@ -77,8 +78,10 @@ export default {
     skip(val) {
       this.$emit('skip', val);
     },
-    dontKnow(val) {
-      this.$emit('dontKnow', val);
+    dontKnow() {
+      // this emits an event on the bus with optional 'data' param
+      // bus.$emit('resetChild', this.index);
+      this.$emit('dontKnow');
     },
     sendData(val) {
       this.$emit('valueChanged', val);

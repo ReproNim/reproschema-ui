@@ -66,8 +66,6 @@
 import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
 import axios from 'axios';
-// import AsyncComputed from 'vue-async-computed';
-
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import circleProgress from './components/Circle';
@@ -88,7 +86,6 @@ export default {
       selected_language: 'en',
       schema: {},
       activityIndex: null,
-      activityUrl: null,
       progress: [],
       responses: {},
     };
