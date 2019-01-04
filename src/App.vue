@@ -75,6 +75,13 @@ import config from './config';
 Vue.use(BootstrapVue);
 Vue.filter('reverse', value => value.slice().reverse());
 
+const contextObj = {
+  nda_guid: 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/NDA/nda_guid.jsonld',
+  phq9_schema: 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/PHQ-9/phq9_schema.jsonld',
+  phq9a_schema: 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/PHQ-9a/phq9a_schema.jsonld',
+  phq8_schema: 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/PHQ-8/phq8_schema.jsonld',
+};
+
 export default {
   name: 'App',
   components: {
@@ -142,7 +149,8 @@ export default {
         /*jsonld.expand(this.schema, result => {
           result[0]['https://schema.repronim.org/order'][0]['@list'][this.activityIndex]['@id'];
         });*/
-        return 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/PHQ-9/phq9_schema.jsonld';
+        return contextObj[this.schema.ui.order[this.activityIndex]];
+        // return 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/PHQ-9/phq9_schema.jsonld';
       }
       /* eslint-enable */
       return null;

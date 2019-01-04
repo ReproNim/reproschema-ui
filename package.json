@@ -2,7 +2,7 @@
   "name": "phq9",
   "version": "1.0.0",
   "description": "A Vue.js project",
-  "author": "akeshavan <keshavan@berkeley.edu>",
+  "author": ["akeshavan <keshavan@berkeley.edu>", "Sanu Ann Abraham <sanuann@mit.edu>"],
   "private": true,
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
