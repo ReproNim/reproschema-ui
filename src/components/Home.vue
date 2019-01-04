@@ -252,7 +252,6 @@ export default {
   mounted() {
     if (this.srcUrl) {
       // eslint-disable-next-line
-      console.log('Home mounted: ', this.srcUrl);
       this.getData();
     }
   },
