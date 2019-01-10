@@ -114,7 +114,8 @@ export default {
       this.$forceUpdate();
     },
     saveResponse(key, value) {
-      this.responses[this.activityIndex][key] = value;
+      // this.responses[this.activityIndex][key] = value;
+      Vue.set(this.responses[this.activityIndex], key, value);
       // eslint-disable-next-line
       // console.log('TOTAL RESPONSE:', this.responses);
       this.$forceUpdate();

@@ -48,7 +48,7 @@ export default {
   watch: {
     init: {
       handler() {
-        if (this.init) {
+        if (this.init != null) {
           this.selected = this.init.value;
         } else {
           this.selected = false;
