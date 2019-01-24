@@ -38,49 +38,15 @@ const getters = {
   readyForActivity(state) {
     return state.storeReady && state.activityReady;
   },
-  // eslint-disable-next-line
   context(state) {
     if (state.activities) {
-      if (state.activities[state.activityIndex]) {
-        const currentActivity = state.activities[state.activityIndex].activity;
-        if (currentActivity) {
-          const currentActivityOrder = currentActivity['https://schema.repronim.org/order'];
-          if (currentActivityOrder) {
-            const keys = currentActivityOrder[0]['@list'];
-            return keys;
-          }
+      if (state.activityIndex) {
+        if (state.activities[state.activityIndex].activity) {
+          console.log('hey context');
+          return state.activities[state.activityIndex].activityList;
         }
       }
     }
-    /* eslint-enable */
-    return [{}];
-  },
-  // eslint-disable-next-line
-  contextReverse(state) {
-    if (state.context) {
-      if (state.context.length > 0) {
-        return state.context.slice().reverse();
-      }
-    }
-    return {};
-  },
-  // eslint-disable-next-line
-  preambleText(state) {
-    if (state.activities) {
-      if (state.activities[state.activityIndex]) {
-        const currentActivity = state.activities[state.activityIndex].activity;
-        if (currentActivity) {
-          const currentActivityPreamble = currentActivity['http://schema.repronim.org/preamble'];
-          if (currentActivityPreamble) {
-            const activePreamble = _.filter(currentActivityPreamble, p => p['@language'] === state.selected_language);
-            if (activePreamble.length) {
-              return activePreamble[0]['@value'];
-            }
-          }
-        }
-      }
-    }
-    return '';
   },
 };
 
@@ -120,6 +86,12 @@ const mutations = {
   setLanguage(state, lang) {
     state.selected_language = lang;
   },
+  // eslint-disable-next-line
+  setActivityList(state, actList) {
+    if (state.activities[state.activityIndex]) {
+      state.activities[state.activityIndex].activityList = actList;
+    }
+  },
 };
 
 const actions = {
@@ -144,6 +116,9 @@ const actions = {
   },
   setLanguage({ commit }, lang) {
     commit('setLanguage', lang);
+  },
+  setActivityList({ commit }, actList) {
+    commit('setActivityList', actList);
   },
 };
 

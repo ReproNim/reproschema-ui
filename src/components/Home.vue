@@ -233,8 +233,22 @@ export default {
         this.$store.dispatch('getActivityData');
       }
     },
+    storeContext() {
+      this.$store.dispatch('setActivityList', this.storeContext);
+    },
   },
   computed: {
+    storeContext() {
+      const state = this.$store.state;
+      if (state.activities.length && state.activityIndex != null) {
+        if (state.activities[state.activityIndex].activity) {
+          const currentActivity = state.activities[state.activityIndex].activity;
+          const actList = currentActivity['https://schema.repronim.org/order'][0]['@list'];
+          return actList;
+        }
+      }
+      return [{}];
+    },
     context() {
       /* eslint-disable */
       if (this.activity['https://schema.repronim.org/order']) {
