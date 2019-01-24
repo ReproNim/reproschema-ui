@@ -65,22 +65,12 @@
 // import jsonld from 'jsonld/dist/jsonld.min';
 import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
-import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import circleProgress from './components/Circle';
-import config from './config';
-
 
 Vue.use(BootstrapVue);
 Vue.filter('reverse', value => value.slice().reverse());
-
-const contextObj = {
-  nda_guid: 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/NDA/nda_guid.jsonld',
-  phq9_schema: 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/PHQ-9/phq9_schema.jsonld',
-  phq9a_schema: 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/PHQ-9a/phq9a_schema.jsonld',
-  phq8_schema: 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/PHQ-8/phq8_schema.jsonld',
-};
 
 export default {
   name: 'App',
@@ -91,10 +81,6 @@ export default {
     return {
       sidebarActive: true,
       selected_language: 'en',
-      // schema: {},
-      // activityIndex: null,
-      // progress: [],
-      // responses: {},
     };
   },
   methods: {
@@ -106,38 +92,25 @@ export default {
       }
     },
     setActivity(index) {
-      // this.activityIndex = index;
-      // this.$store.dispatch('setActivityIndex', index);
       this.$router.push(`/activities/${index}`);
     },
     updateProgress(progress) {
       this.$store.dispatch('updateProgress', progress);
-      // this.progress[this.activityIndex] = progress;
       this.$forceUpdate();
     },
     saveResponse(key, value) {
-      // this.responses[this.activityIndex][key] = value;
       this.$store.dispatch('saveResponse', { key, value });
-      // Vue.set(this.responses[this.activityIndex], key, value);
-      // eslint-disable-next-line
-      // console.log('TOTAL RESPONSE:', this.responses);
-      // this.$forceUpdate();
     },
   },
   watch: {
     $route() {
       if (this.$route.params.id !== undefined) {
-        // this.activityIndex = this.$route.params.id;
         this.$store.dispatch('setActivityIndex', this.$route.params.id);
       }
     },
     selected_language() {
       this.$store.dispatch('setLanguage', this.selected_language);
     },
-  },
-  beforeCreate() {
-    // console.log('before App.vue create')
-    // this.$store.dispatch('getBaseSchema');
   },
   created() {
     this.$store.dispatch('getBaseSchema');
