@@ -58,8 +58,8 @@ export default {
     },
   },
   mounted() {
-    if (this.init) {
-      this.selected = this.init.value;
+    if (this.init !== undefined) {
+      this.selected = this.init;
     }
     // console.log(65);
     // bus.$on('resetChild', this.resetChildMethod);
