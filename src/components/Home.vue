@@ -79,6 +79,7 @@ export default {
   },
   methods: {
     getData() {
+      // this.$store.dispatch('getActivityData');
       jsonld.expand(this.srcUrl).then((resp) => {
         this.activity = resp[0];
         this.listShow = [0];
@@ -156,6 +157,7 @@ export default {
       }
       if (idx === this.listShow.length - 1) {
         this.listShow.push(_.max(this.listShow) + 1);
+        this.$store.dispatch('updateListShow', this.listShow);
       }
     },
     setResponse(value, index) {
@@ -210,6 +212,9 @@ export default {
   watch: {
     $route() {
       this.getData();
+      if (this.readyForActivity) {
+        this.$store.dispatch('getActivityData');
+      }
     },
     listContentRev() {
       this.$forceUpdate();
@@ -223,8 +228,27 @@ export default {
         this.getData();
       }
     },
+    readyForActivity() {
+      if (this.readyForActivity) {
+        this.$store.dispatch('getActivityData');
+      }
+    },
+    storeContext() {
+      this.$store.dispatch('setActivityList', this.storeContext);
+    },
   },
   computed: {
+    storeContext() {
+      const state = this.$store.state;
+      if (state.activities.length && state.activityIndex != null) {
+        if (state.activities[state.activityIndex].activity) {
+          const currentActivity = state.activities[state.activityIndex].activity;
+          const actList = currentActivity['https://schema.repronim.org/order'][0]['@list'];
+          return actList;
+        }
+      }
+      return [{}];
+    },
     context() {
       /* eslint-disable */
       if (this.activity['https://schema.repronim.org/order']) {
@@ -247,6 +271,12 @@ export default {
         return activePreamble[0]['@value'];
       }
       return '';
+    },
+    /**
+     * we need to keep an eye on the store. 
+     */
+    readyForActivity() {
+      return this.$store.getters.readyForActivity;
     },
   },
   mounted() {

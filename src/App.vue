@@ -65,22 +65,12 @@
 // import jsonld from 'jsonld/dist/jsonld.min';
 import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
-import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import circleProgress from './components/Circle';
-import config from './config';
-
 
 Vue.use(BootstrapVue);
 Vue.filter('reverse', value => value.slice().reverse());
-
-const contextObj = {
-  nda_guid: 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/NDA/nda_guid.jsonld',
-  phq9_schema: 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/PHQ-9/phq9_schema.jsonld',
-  phq9a_schema: 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/PHQ-9a/phq9a_schema.jsonld',
-  phq8_schema: 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/PHQ-8/phq8_schema.jsonld',
-};
 
 export default {
   name: 'App',
@@ -91,10 +81,6 @@ export default {
     return {
       sidebarActive: true,
       selected_language: 'en',
-      schema: {},
-      activityIndex: null,
-      progress: [],
-      responses: {},
     };
   },
   methods: {
@@ -106,55 +92,49 @@ export default {
       }
     },
     setActivity(index) {
-      this.activityIndex = index;
       this.$router.push(`/activities/${index}`);
     },
     updateProgress(progress) {
-      this.progress[this.activityIndex] = progress;
+      this.$store.dispatch('updateProgress', progress);
       this.$forceUpdate();
     },
     saveResponse(key, value) {
-      // this.responses[this.activityIndex][key] = value;
-      Vue.set(this.responses[this.activityIndex], key, value);
-      // eslint-disable-next-line
-      // console.log('TOTAL RESPONSE:', this.responses);
-      this.$forceUpdate();
+      this.$store.dispatch('saveResponse', { key, value });
     },
   },
   watch: {
     $route() {
-      if (this.$route.params.id) {
-        this.activityIndex = this.$route.params.id;
+      if (this.$route.params.id !== undefined) {
+        this.$store.dispatch('setActivityIndex', this.$route.params.id);
       }
     },
+    selected_language() {
+      this.$store.dispatch('setLanguage', this.selected_language);
+    },
+  },
+  created() {
+    this.$store.dispatch('getBaseSchema');
   },
   mounted() {
-    axios.get(config.githubSrc).then((resp) => {
-      this.schema = resp.data;
-      /* eslint-disable */
-      this.progress = _.map(this.schema.ui.order, () => 0);
-      this.responses = _.map(this.schema.ui.order, () => new Object());
-      // eslint-disable-next-line
-      // console.log('this.responses', this.responses);
-      /* eslint-enable */
-      if (this.$route.params.id) {
-        this.activityIndex = this.$route.params.id;
-      }
-    });
+    if (this.$route.params.id) {
+      this.$store.dispatch('setActivityIndex', this.$route.params.id);
+    }
   },
   computed: {
     srcUrl() {
-      /* eslint-disable */
-      if (this.schema.ui && this.activityIndex) {
-        // expand using URLs
-        /*jsonld.expand(this.schema, result => {
-          result[0]['https://schema.repronim.org/order'][0]['@list'][this.activityIndex]['@id'];
-        });*/
-        return contextObj[this.schema.ui.order[this.activityIndex]];
-        // return 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/PHQ-9/phq9_schema.jsonld';
-      }
-      /* eslint-enable */
-      return null;
+      return this.$store.getters.srcUrl;
+    },
+    schema() {
+      return this.$store.state.schema;
+    },
+    responses() {
+      return this.$store.state.responses;
+    },
+    activityIndex() {
+      return this.$store.state.activityIndex;
+    },
+    progress() {
+      return this.$store.state.progress;
     },
   },
 };
