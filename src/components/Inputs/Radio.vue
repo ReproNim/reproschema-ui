@@ -59,7 +59,7 @@ export default {
     },
   },
   mounted() {
-    if (this.init != null) {
+    if (this.init !== undefined || this.init != null) {
       this.selected = this.init;
     }
   },
