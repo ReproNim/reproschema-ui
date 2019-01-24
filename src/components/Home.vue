@@ -79,6 +79,7 @@ export default {
   },
   methods: {
     getData() {
+      // this.$store.dispatch('getActivityData');
       jsonld.expand(this.srcUrl).then((resp) => {
         this.activity = resp[0];
         this.listShow = [0];
@@ -156,6 +157,7 @@ export default {
       }
       if (idx === this.listShow.length - 1) {
         this.listShow.push(_.max(this.listShow) + 1);
+        this.$store.dispatch('updateListShow', this.listShow);
       }
     },
     setResponse(value, index) {
@@ -210,6 +212,9 @@ export default {
   watch: {
     $route() {
       this.getData();
+      if (this.readyForActivity) {
+        this.$store.dispatch('getActivityData');
+      }
     },
     listContentRev() {
       this.$forceUpdate();
@@ -221,6 +226,11 @@ export default {
     srcUrl() {
       if (this.srcUrl) {
         this.getData();
+      }
+    },
+    readyForActivity() {
+      if (this.readyForActivity) {
+        this.$store.dispatch('getActivityData');
       }
     },
   },
@@ -247,6 +257,12 @@ export default {
         return activePreamble[0]['@value'];
       }
       return '';
+    },
+    /**
+     * we need to keep an eye on the store. 
+     */
+    readyForActivity() {
+      return this.$store.getters.readyForActivity;
     },
   },
   mounted() {

@@ -95,6 +95,7 @@ export default {
       activityIndex: null,
       progress: [],
       responses: {},
+      storeReady: false,
     };
   },
   methods: {
@@ -107,14 +108,17 @@ export default {
     },
     setActivity(index) {
       this.activityIndex = index;
+      // this.$store.dispatch('setActivityIndex', index);
       this.$router.push(`/activities/${index}`);
     },
     updateProgress(progress) {
+      this.$store.dispatch('updateProgress', progress);
       this.progress[this.activityIndex] = progress;
       this.$forceUpdate();
     },
     saveResponse(key, value) {
       // this.responses[this.activityIndex][key] = value;
+      this.$store.dispatch('saveResponse', { key, value });
       Vue.set(this.responses[this.activityIndex], key, value);
       // eslint-disable-next-line
       // console.log('TOTAL RESPONSE:', this.responses);
@@ -123,10 +127,21 @@ export default {
   },
   watch: {
     $route() {
-      if (this.$route.params.id) {
+      if (this.$route.params.id !== undefined) {
         this.activityIndex = this.$route.params.id;
+        this.$store.dispatch('setActivityIndex', this.$route.params.id);
       }
     },
+    selected_language() {
+      this.$store.dispatch('setLanguage', this.selected_language);
+    },
+  },
+  beforeCreate() {
+    // console.log('before App.vue create')
+    // this.$store.dispatch('getBaseSchema');
+  },
+  created() {
+    this.$store.dispatch('getBaseSchema');
   },
   mounted() {
     axios.get(config.githubSrc).then((resp) => {
@@ -139,6 +154,7 @@ export default {
       /* eslint-enable */
       if (this.$route.params.id) {
         this.activityIndex = this.$route.params.id;
+        this.$store.dispatch('setActivityIndex', this.activityIndex);
       }
     });
   },
