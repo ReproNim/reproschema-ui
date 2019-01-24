@@ -35,22 +35,14 @@ const getters = {
     }
     return null;
   },
+  // eslint-disable-next-line
   readyForActivity(state) {
     return state.storeReady && state.activityReady;
-  },
-  context(state) {
-    if (state.activities) {
-      if (state.activityIndex) {
-        if (state.activities[state.activityIndex].activity) {
-          console.log('hey context');
-          return state.activities[state.activityIndex].activityList;
-        }
-      }
-    }
   },
 };
 
 const mutations = {
+  // eslint-disable-next-line
   setBaseSchema(state, { data }) {
     console.log('setting base schema');
     state.schema = data;
@@ -74,7 +66,6 @@ const mutations = {
   },
   // eslint-disable-next-line
   setActivityData(state, resp) {
-    console.log('setting activity data,', state, state.activityIndex, resp);
     state.activities[state.activityIndex].activity = resp[0];
     state.activities[state.activityIndex].listShow = [0];
   },
@@ -98,7 +89,7 @@ const actions = {
   async getBaseSchema({ commit }) {
     commit('setBaseSchema', await (axios.get(config.githubSrc)));
   },
-  async setActivityIndex({ commit, dispatch }, idx) {
+  async setActivityIndex({ commit }, idx) {
     commit('setActivityIndex', idx);
   },
   saveResponse({ commit }, { key, value }) {
