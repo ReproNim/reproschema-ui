@@ -52,6 +52,7 @@
             <router-view
               :srcUrl="srcUrl" :responses="responses[activityIndex]"
               :selected_language="selected_language"
+              :progress="progress[activityIndex]"
               v-on:updateProgress="updateProgress"
               v-on:saveResponse="saveResponse"
             />
@@ -128,6 +129,7 @@ export default {
   },
   created() {
     const url = this.$route.query.url;
+    console.log('url is', url);
     this.$store.dispatch('getBaseSchema', url);
   },
   mounted() {

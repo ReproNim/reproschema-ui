@@ -5,7 +5,7 @@
       <Loader />
     </div>
     <div v-else>
-      <b-progress :value="listShow.length" :max="context.length" class="mb-3"></b-progress>
+      <b-progress :value="progress" :max="100" class="mb-3"></b-progress>
       <div v-if="preambleText" class="preamble-text">
         <strong> {{ preambleText }} </strong>
       </div>
@@ -64,7 +64,7 @@ import Loader from './Loader';
 
 export default {
   name: 'Home',
-  props: ['srcUrl', 'responses', 'selected_language'],
+  props: ['srcUrl', 'responses', 'selected_language', 'progress'],
   data() {
     return {
       activity: {},
@@ -221,7 +221,7 @@ export default {
       this.$forceUpdate();
     },
     listShow() {
-      const progress = ((this.listShow.length - 1) / this.context.length) * 100;
+      const progress = ((Object.keys(this.responses).length) / this.context.length) * 100;
       this.$emit('updateProgress', progress);
     },
     srcUrl() {

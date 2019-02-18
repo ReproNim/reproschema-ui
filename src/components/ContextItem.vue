@@ -126,7 +126,7 @@ export default {
       }
       this.$emit('skip');
     },
-    sendDontKnow(doDontKnow) {
+    sendDontKnow() {
       // send the dont know answer to the parent
       this.variant = 'info';
       this.$emit('dontKnow');
