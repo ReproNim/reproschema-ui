@@ -12,16 +12,16 @@
     </div>
 
   <transition name="list" tag="div" mode="in-out">
-    <div v-if="progress === 100">
+    <div v-if="progress === 100" class="mt-3">
       <h3>
         Thanks!
       </h3>
       <p>
         Review your responses below:
       </p>
-      <pre class="text-left">
-{{responses}}
-      </pre>
+      <code class="text-left">
+        {{responses}}
+      </code>
     </div>
   </transition>
 
