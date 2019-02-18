@@ -155,6 +155,7 @@ export default {
           }
         }
       }
+      this.$forceUpdate();
       if (idx === this.listShow.length - 1) {
         this.listShow.push(_.max(this.listShow) + 1);
         this.$store.dispatch('updateListShow', this.listShow);

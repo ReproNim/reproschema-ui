@@ -128,9 +128,7 @@ export default {
     },
     sendDontKnow(doDontKnow) {
       // send the dont know answer to the parent
-      if (doDontKnow) {
-        this.variant = 'warning';
-      }
+      this.variant = 'info';
       this.$emit('dontKnow');
     },
     sendNext() {
@@ -145,8 +143,10 @@ export default {
   mounted() {
     this.getData();
     if (this.init) {
-      if (this.init.skipped) {
+      if (this.init === 'skipped') {
         this.variant = 'warning';
+      } else if (this.init === 'dontKnow') {
+        this.variant = 'info';
       }
     }
   },
