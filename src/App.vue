@@ -44,7 +44,7 @@
                   </b-navbar-nav>
 
                   <b-navbar-nav class="float-right">
-                    <b-nav-item to="/" exact>Home</b-nav-item>
+                    <b-nav-item :to="{name: 'Landing', query: $route.query}" exact>Home</b-nav-item>
                   </b-navbar-nav>
               </div>
           </nav>
@@ -92,7 +92,11 @@ export default {
       }
     },
     setActivity(index) {
-      this.$router.push(`/activities/${index}`);
+      if (this.$route.query.url) {
+        this.$router.push(`/activities/${index}?url=${this.$route.query.url}`);
+      } else {
+        this.$router.push(`/activities/${index}`);
+      }
     },
     updateProgress(progress) {
       this.$store.dispatch('updateProgress', progress);
@@ -113,7 +117,8 @@ export default {
     },
   },
   created() {
-    this.$store.dispatch('getBaseSchema');
+    const url = this.$route.query.url;
+    this.$store.dispatch('getBaseSchema', url);
   },
   mounted() {
     if (this.$route.params.id) {

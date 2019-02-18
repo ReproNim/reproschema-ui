@@ -86,8 +86,8 @@ const mutations = {
 };
 
 const actions = {
-  async getBaseSchema({ commit }) {
-    commit('setBaseSchema', await (axios.get(config.githubSrc)));
+  async getBaseSchema({ commit }, url) {
+    commit('setBaseSchema', await (axios.get(url || config.githubSrc)));
   },
   async setActivityIndex({ commit }, idx) {
     commit('setActivityIndex', idx);
