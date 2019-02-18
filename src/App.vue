@@ -12,9 +12,9 @@
             <option value="en">English</option>
           </select>
         </div>
-        <ul class="list-unstyled components" v-if="schema.ui">
+        <ul class="list-unstyled components">
             <!-- <p>Dummy Heading</p> -->
-            <li v-for="(ui, index) in schema.ui.order" :key="index">
+            <li v-for="(ui, index) in schemaOrder" :key="index">
                 <a @click="setActivity(index)" :class="{'current': index==activityIndex}">
                   <circleProgress
                    :radius="20"
@@ -22,7 +22,7 @@
                    :stroke="4"
                    strokeColor="#007bff" />
                    <span class="align-middle activityItem">
-                     {{ui}}
+                     {{getName(ui)}}
                    </span>
                 </a>
             </li>
@@ -65,6 +65,7 @@
 // import jsonld from 'jsonld/dist/jsonld.min';
 import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
+import _ from 'lodash';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import circleProgress from './components/Circle';
@@ -105,6 +106,15 @@ export default {
     saveResponse(key, value) {
       this.$store.dispatch('saveResponse', { key, value });
     },
+    getName(url) {
+      // TODO: this is a hack. the jsonld expander should give us this info.
+      if (url) {
+        const folders = url.split('/');
+        const N = folders.length;
+        return folders[N - 1].split('_schema')[0].split('.jsonld')[0];
+      }
+      return null;
+    },
   },
   watch: {
     $route() {
@@ -140,6 +150,14 @@ export default {
     },
     progress() {
       return this.$store.state.progress;
+    },
+    schemaOrder() {
+      if (!_.isEmpty(this.$store.state.schema)) {
+        const order = _.map(this.$store.state.schema['https://schema.repronim.org/order'][0]['@list'],
+          u => u['@id']);
+        return order;
+      }
+      return [];
     },
   },
 };

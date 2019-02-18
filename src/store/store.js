@@ -1,10 +1,10 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import axios from 'axios';
 import _ from 'lodash';
 import jsonld from 'jsonld/dist/jsonld.min';
 import config from '../config';
 
+window.jsonld = jsonld;
 
 Vue.use(Vuex);
 const state = {
@@ -17,21 +17,11 @@ const state = {
   activityReady: false,
 };
 
-const contextObj = {
-  nda_guid: 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/NDA/nda_guid.jsonld',
-  phq9_schema: 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/PHQ-9/phq9_schema.jsonld',
-  phq9a_schema: 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/PHQ-9a/phq9a_schema.jsonld',
-  phq8_schema: 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/PHQ-8/phq8_schema.jsonld',
-};
-
 const getters = {
   // eslint-disable-next-line
   srcUrl(state) {
-    if (state.schema && state.activityIndex) {
-      if (state.schema.ui) {
-        return contextObj[state.schema.ui.order[state.activityIndex]];
-      }
-      // return 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/PHQ-9/phq9_schema.jsonld';
+    if (!_.isEmpty(state.schema) && state.activityIndex) {
+      return state.schema['https://schema.repronim.org/order'][0]['@list'][state.activityIndex]['@id'];
     }
     return null;
   },
@@ -43,12 +33,11 @@ const getters = {
 
 const mutations = {
   // eslint-disable-next-line
-  setBaseSchema(state, { data }) {
-    console.log('setting base schema');
-    state.schema = data;
-    state.progress = _.map(data.ui.order, () => 0);
-    state.responses = _.map(data.ui.order, () => ({}));
-    state.activities = _.map(data.ui.order, () => ({}));
+  setBaseSchema(state, data) {
+    state.schema = data[0];
+    state.progress = _.map(data[0]['https://schema.repronim.org/order'][0]['@list'], () => 0);
+    state.responses = _.map(data[0]['https://schema.repronim.org/order'][0]['@list'], () => ({}));
+    state.activities = _.map(data[0]['https://schema.repronim.org/order'][0]['@list'], () => ({}));
     state.storeReady = true;
   },
   // eslint-disable-next-line
@@ -87,7 +76,7 @@ const mutations = {
 
 const actions = {
   async getBaseSchema({ commit }, url) {
-    commit('setBaseSchema', await (axios.get(url || config.githubSrc)));
+    commit('setBaseSchema', await (jsonld.expand(url || config.githubSrc)));
   },
   async setActivityIndex({ commit }, idx) {
     commit('setActivityIndex', idx);
