@@ -11,6 +11,20 @@
       </div>
     </div>
 
+  <transition name="list" tag="div" mode="in-out">
+    <div v-if="progress === 100">
+      <h3>
+        Thanks!
+      </h3>
+      <p>
+        Review your responses below:
+      </p>
+      <pre class="text-left">
+{{responses}}
+      </pre>
+    </div>
+  </transition>
+
     <transition-group name="list" tag="div" mode="in-out">
       <div v-for="(content, index) in contextReverse" :key="index" class="mt-3 mb-3">
         <transition name="list">
