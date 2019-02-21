@@ -5,25 +5,30 @@
       <Loader />
     </div>
     <div v-else>
+      <transition name="list" tag="div" mode="in-out">
+        <div v-if="progress === 100" class="mt-3 mb-3">
+          <h3>
+            Thanks!
+          </h3>
+          <p>
+            Review your responses below:
+          </p>
+          <code class="text-left">
+            {{responses}}
+          </code>
+          <b-row class="mt-3 mb-3">
+            <b-col>
+              <b-button size="lg" @click="restart">Start Over</b-button>
+            </b-col>
+          </b-row>
+        </div>
+      </transition>
       <b-progress :value="progress" :max="100" class="mb-3"></b-progress>
       <div v-if="preambleText" class="preamble-text">
         <strong> {{ preambleText }} </strong>
       </div>
     </div>
 
-  <transition name="list" tag="div" mode="in-out">
-    <div v-if="progress === 100" class="mt-3">
-      <h3>
-        Thanks!
-      </h3>
-      <p>
-        Review your responses below:
-      </p>
-      <code class="text-left">
-        {{responses}}
-      </code>
-    </div>
-  </transition>
 
     <transition-group name="list" tag="div" mode="in-out">
       <div v-for="(content, index) in contextReverse" :key="index" class="mt-3 mb-3">
@@ -134,7 +139,8 @@ export default {
             });
             try {
               // eslint-disable-next-line
-              console.log('TOTAL SCORE::::', eval(str + ' ' + scoringLogic));
+              this.score = eval(str + ' ' + scoringLogic);
+              console.log('TOTAL SCORE::::', this.score);
             } catch (e) {
               // Do nothing
             }
@@ -162,7 +168,8 @@ export default {
             });
             try {
               // eslint-disable-next-line
-              console.log('TOTAL SCORE::::', eval(str + ' ' + scoringLogic));
+              this.score = eval(str + ' ' + scoringLogic);
+              console.log('TOTAL SCORE::::', this.score);
             } catch (e) {
               // Do nothing
             }
@@ -222,6 +229,10 @@ export default {
             console.log('catch-br', br);
             // Do nothing
           } */
+    },
+    restart() {
+      this.$emit('clearResponses');
+      this.listShow = [0];
     },
   },
   watch: {

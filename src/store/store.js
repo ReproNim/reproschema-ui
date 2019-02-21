@@ -72,6 +72,11 @@ const mutations = {
       state.activities[state.activityIndex].activityList = actList;
     }
   },
+  // eslint-disable-next-line
+  clearResponses(state, actIndex) {
+    state.responses[actIndex] = {};
+    state.progress[actIndex] = 0;
+  },
 };
 
 const actions = {
@@ -99,6 +104,9 @@ const actions = {
   },
   setActivityList({ commit }, actList) {
     commit('setActivityList', actList);
+  },
+  clearResponses({ commit }, actIndex) {
+    commit('clearResponses', actIndex);
   },
 };
 

@@ -55,7 +55,7 @@
 
 <script>
 // import { bus } from '../main';
-import Radio from './Inputs/Radio';
+import Radio from './Inputs/WebRadio/';
 import AudioRecord from './Inputs/Audio';
 import TextInput from './Inputs/TextInput';
 import IntegerInput from './Inputs/IntegerInput';

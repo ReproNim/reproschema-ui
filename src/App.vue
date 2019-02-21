@@ -55,6 +55,7 @@
               :progress="progress[activityIndex]"
               v-on:updateProgress="updateProgress"
               v-on:saveResponse="saveResponse"
+              v-on:clearResponses="clearResponses"
             />
           </b-container>
       </div>
@@ -107,6 +108,10 @@ export default {
     saveResponse(key, value) {
       this.$store.dispatch('saveResponse', { key, value });
     },
+    clearResponses() {
+      this.$store.dispatch('clearResponses', this.activityIndex);
+      this.$forceUpdate();
+    },
     getName(url) {
       // TODO: this is a hack. the jsonld expander should give us this info.
       if (url) {
@@ -129,7 +134,7 @@ export default {
   },
   created() {
     const url = this.$route.query.url;
-    console.log('url is', url);
+    // console.log('url is', url);
     this.$store.dispatch('getBaseSchema', url);
   },
   mounted() {
