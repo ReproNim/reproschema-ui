@@ -91,24 +91,6 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/survey@0.0.2": {
-        "files": [
-            {
-                "relativePath": "src/components/Survey/Survey.vue",
-                "test": false,
-                "name": "Survey.vue"
-            },
-            {
-                "relativePath": "src/components/Survey/index.js",
-                "test": false,
-                "name": "index.js"
-            }
-        ],
-        "mainFile": "src/components/Survey/index.js",
-        "trackDir": "src/components/Survey",
-        "origin": "AUTHORED",
-        "exported": true
-    },
     "akeshavan.mindlogger-web/survey-item@0.0.2": {
         "files": [
             {
@@ -178,6 +160,24 @@
         ],
         "mainFile": "src/components/Loader/index.js",
         "trackDir": "src/components/Loader",
+        "origin": "AUTHORED",
+        "exported": true
+    },
+    "akeshavan.mindlogger-web/survey@0.0.4": {
+        "files": [
+            {
+                "relativePath": "src/components/Survey/Survey.vue",
+                "test": false,
+                "name": "Survey.vue"
+            },
+            {
+                "relativePath": "src/components/Survey/index.js",
+                "test": false,
+                "name": "index.js"
+            }
+        ],
+        "mainFile": "src/components/Survey/index.js",
+        "trackDir": "src/components/Survey",
         "origin": "AUTHORED",
         "exported": true
     },
