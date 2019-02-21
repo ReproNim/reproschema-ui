@@ -77,8 +77,8 @@
 <script>
 import jsonld from 'jsonld/dist/jsonld.min';
 import _ from 'lodash';
-import ContextItem from './ContextItem';
-import Loader from './Loader';
+import ContextItem from '../SurveyItem/';
+import Loader from '../Loader/';
 
 
 export default {

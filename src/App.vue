@@ -70,7 +70,7 @@ import BootstrapVue from 'bootstrap-vue';
 import _ from 'lodash';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
-import circleProgress from './components/Circle';
+import circleProgress from './components/Circle/';
 
 Vue.use(BootstrapVue);
 Vue.filter('reverse', value => value.slice().reverse());

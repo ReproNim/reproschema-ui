@@ -58,8 +58,8 @@
 // import axios from 'axios';
 import jsonld from 'jsonld/dist/jsonld.min';
 import _ from 'lodash';
-import InputSelector from './InputSelector';
-import Loader from './Loader';
+import InputSelector from '../InputSelector/';
+import Loader from '../Loader/';
 
 
 export default {

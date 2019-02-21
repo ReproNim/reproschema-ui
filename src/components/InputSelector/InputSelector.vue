@@ -54,11 +54,10 @@
 <style></style>
 
 <script>
-// import { bus } from '../main';
-import Radio from './Inputs/WebRadio/';
-import AudioRecord from './Inputs/Audio';
-import TextInput from './Inputs/TextInput';
-import IntegerInput from './Inputs/IntegerInput';
+import Radio from '../Inputs/WebRadio/';
+import AudioRecord from '../Inputs/WebAudioRecord/';
+import TextInput from '../Inputs/WebTextInput/';
+import IntegerInput from '../Inputs/WebIntegerInput/';
 
 export default {
   name: 'InputSelector',
