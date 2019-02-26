@@ -163,7 +163,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/survey@0.0.6": {
+    "akeshavan.mindlogger-web/survey@0.0.7": {
         "files": [
             {
                 "relativePath": "src/components/Survey/Survey.vue",
