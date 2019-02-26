@@ -7,20 +7,7 @@
     <div v-else>
       <transition name="list" tag="div" mode="in-out">
         <div v-if="progress === 100" class="mt-3 mb-3">
-          <h3>
-            Thanks!
-          </h3>
-          <p>
-            Review your responses below:
-          </p>
-          <code class="text-left">
-            {{responses}}
-          </code>
-          <b-row class="mt-3 mb-3">
-            <b-col>
-              <b-button size="lg" @click="restart">Start Over</b-button>
-            </b-col>
-          </b-row>
+          <slot></slot>
         </div>
       </transition>
       <b-progress :value="progress" :max="100" class="mb-3"></b-progress>
@@ -31,7 +18,7 @@
 
 
     <transition-group name="list" tag="div" mode="in-out">
-      <div v-for="(content, index) in contextReverse" :key="index" class="mt-3 mb-3">
+      <div v-for="(content, index) in contextReverse" :key="content['@id']" class="mt-3 mb-3">
         <transition name="list">
         <ContextItem
            v-if="listShow.indexOf(contextReverse.length - index - 1) >= 0"
@@ -140,7 +127,7 @@ export default {
             try {
               // eslint-disable-next-line
               this.score = eval(str + ' ' + scoringLogic);
-              console.log('TOTAL SCORE::::', this.score);
+              // console.log('TOTAL SCORE::::', this.score);
             } catch (e) {
               // Do nothing
             }
@@ -169,7 +156,7 @@ export default {
             try {
               // eslint-disable-next-line
               this.score = eval(str + ' ' + scoringLogic);
-              console.log('TOTAL SCORE::::', this.score);
+              // console.log('TOTAL SCORE::::', this.score);
             } catch (e) {
               // Do nothing
             }
