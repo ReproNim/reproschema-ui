@@ -110,7 +110,7 @@ export default {
     nextQuestion(idx, skip, dontKnow) {
       if (skip) {
         this.$emit('saveResponse', this.context[idx]['@id'], 'skipped');
-        if (this.activity['https://schema.repronim.org/scoringLogic']) {
+        if (!_.isEmpty(this.activity['https://schema.repronim.org/scoringLogic'])) {
           const scoringLogic = (this.activity['https://schema.repronim.org/scoringLogic'][0]['@value']).split('= ')[1];
           if (this.responses) {
             let str = '';
@@ -136,7 +136,7 @@ export default {
       }
       if (dontKnow) {
         this.$emit('saveResponse', this.context[idx]['@id'], 'dontKnow');
-        if (this.activity['https://schema.repronim.org/scoringLogic']) {
+        if (!_.isEmpty(this.activity['https://schema.repronim.org/scoringLogic'])) {
           const scoringLogic = (this.activity['https://schema.repronim.org/scoringLogic'][0]['@value']).split('= ')[1];
           if (this.responses) {
             // eslint-disable-next-line
@@ -173,7 +173,7 @@ export default {
     },
     setResponse(value, index) {
       this.$emit('saveResponse', this.context[index]['@id'], value);
-      if (this.activity['https://schema.repronim.org/scoringLogic']) {
+      if (!_.isEmpty(this.activity['https://schema.repronim.org/scoringLogic'])) {
         const scoringLogic = (this.activity['https://schema.repronim.org/scoringLogic'][0]['@value']).split('= ')[1];
         if (this.responses) {
           let str = '';

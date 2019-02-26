@@ -17,9 +17,9 @@
     </div>
 
     <!-- If type is audio -->
-    <!-- <div v-else-if="inputType==='audio'">
+    <div v-else-if="inputType==='audioRecord'">
         <AudioRecord :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
-    </div> -->
+    </div>
 
     <!-- If type is text -->
     <div v-else-if="inputType==='text'">
