@@ -55,24 +55,6 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/web-audio-record@0.0.1": {
-        "files": [
-            {
-                "relativePath": "src/components/Inputs/WebAudioRecord/Audio.vue",
-                "test": false,
-                "name": "Audio.vue"
-            },
-            {
-                "relativePath": "src/components/Inputs/WebAudioRecord/index.js",
-                "test": false,
-                "name": "index.js"
-            }
-        ],
-        "mainFile": "src/components/Inputs/WebAudioRecord/index.js",
-        "trackDir": "src/components/Inputs/WebAudioRecord",
-        "origin": "AUTHORED",
-        "exported": true
-    },
     "akeshavan.mindlogger-web/circle@0.0.2": {
         "files": [
             {
@@ -88,42 +70,6 @@
         ],
         "mainFile": "src/components/Circle/index.js",
         "trackDir": "src/components/Circle",
-        "origin": "AUTHORED",
-        "exported": true
-    },
-    "akeshavan.mindlogger-web/survey-item@0.0.2": {
-        "files": [
-            {
-                "relativePath": "src/components/SurveyItem/SurveyItem.vue",
-                "test": false,
-                "name": "SurveyItem.vue"
-            },
-            {
-                "relativePath": "src/components/SurveyItem/index.js",
-                "test": false,
-                "name": "index.js"
-            }
-        ],
-        "mainFile": "src/components/SurveyItem/index.js",
-        "trackDir": "src/components/SurveyItem",
-        "origin": "AUTHORED",
-        "exported": true
-    },
-    "akeshavan.mindlogger-web/input-selector@0.0.2": {
-        "files": [
-            {
-                "relativePath": "src/components/InputSelector/InputSelector.vue",
-                "test": false,
-                "name": "InputSelector.vue"
-            },
-            {
-                "relativePath": "src/components/InputSelector/index.js",
-                "test": false,
-                "name": "index.js"
-            }
-        ],
-        "mainFile": "src/components/InputSelector/index.js",
-        "trackDir": "src/components/InputSelector",
         "origin": "AUTHORED",
         "exported": true
     },
@@ -163,7 +109,43 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/survey@0.0.7": {
+    "akeshavan.mindlogger-web/web-audio-record@0.0.2": {
+        "files": [
+            {
+                "relativePath": "src/components/Inputs/WebAudioRecord/Audio.vue",
+                "test": false,
+                "name": "Audio.vue"
+            },
+            {
+                "relativePath": "src/components/Inputs/WebAudioRecord/index.js",
+                "test": false,
+                "name": "index.js"
+            }
+        ],
+        "mainFile": "src/components/Inputs/WebAudioRecord/index.js",
+        "trackDir": "src/components/Inputs/WebAudioRecord",
+        "origin": "AUTHORED",
+        "exported": true
+    },
+    "akeshavan.mindlogger-web/input-selector@0.0.3": {
+        "files": [
+            {
+                "relativePath": "src/components/InputSelector/InputSelector.vue",
+                "test": false,
+                "name": "InputSelector.vue"
+            },
+            {
+                "relativePath": "src/components/InputSelector/index.js",
+                "test": false,
+                "name": "index.js"
+            }
+        ],
+        "mainFile": "src/components/InputSelector/index.js",
+        "trackDir": "src/components/InputSelector",
+        "origin": "AUTHORED",
+        "exported": true
+    },
+    "akeshavan.mindlogger-web/survey@0.0.8": {
         "files": [
             {
                 "relativePath": "src/components/Survey/Survey.vue",
@@ -178,6 +160,24 @@
         ],
         "mainFile": "src/components/Survey/index.js",
         "trackDir": "src/components/Survey",
+        "origin": "AUTHORED",
+        "exported": true
+    },
+    "akeshavan.mindlogger-web/survey-item@0.0.3": {
+        "files": [
+            {
+                "relativePath": "src/components/SurveyItem/SurveyItem.vue",
+                "test": false,
+                "name": "SurveyItem.vue"
+            },
+            {
+                "relativePath": "src/components/SurveyItem/index.js",
+                "test": false,
+                "name": "index.js"
+            }
+        ],
+        "mainFile": "src/components/SurveyItem/index.js",
+        "trackDir": "src/components/SurveyItem",
         "origin": "AUTHORED",
         "exported": true
     },

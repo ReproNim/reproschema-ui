@@ -16,9 +16,17 @@
         :init="init" :selected_language="selected_language" v-on:valueChanged="sendData"/>
     </div>
 
-    <!-- If type is audio -->
+    <!-- If type is audioRecord -->
     <div v-else-if="inputType==='audioRecord'">
         <AudioRecord :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
+    </div>
+
+    <!-- If type is audioImageRecord -->
+    <div v-else-if="inputType==='audioImageRecord'">
+        <AudioRecord
+        :constraints="valueConstraints"
+        :init="init" v-on:valueChanged="sendData"
+        mode="audioImageRecord" />
     </div>
 
     <!-- If type is text -->
