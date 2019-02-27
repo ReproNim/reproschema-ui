@@ -1,16 +1,18 @@
 <template>
   <div>
     <b-alert :show="!supported">Oh no, your browser doesn't support audio</b-alert>
-    <div v-if="mode==='audioImageRecord'" class="mb-3">
-      <img class="img-fluid" :src="constraints['http://schema.org/image'][0]['@value']" />
-    </div>
-    <b-button v-if="!isRecording && !hasRecording" @click="record" variant="danger">
-      record
-    </b-button>
-    <b-button v-if="isRecording" @click="stop">stop</b-button>
-    <b-button variant="success" v-if="hasRecording" @click="play">play</b-button>
-    <div v-if="hasRecording" class="mt-2">
-      <a href="" @click="reset">Redo recording</a>
+    <div v-if="supported">
+      <div v-if="mode==='audioImageRecord'" class="mb-3">
+        <img class="img-fluid" :src="constraints['http://schema.org/image'][0]['@value']" />
+      </div>
+      <b-button v-if="!isRecording && !hasRecording" @click="record" variant="danger">
+        record
+      </b-button>
+      <b-button v-if="isRecording" @click="stop">stop</b-button>
+      <b-button variant="success" v-if="hasRecording" @click="play" ref="play">play</b-button>
+      <div v-if="hasRecording" class="mt-2">
+        <a href="" @click="reset">Redo recording</a>
+      </div>
     </div>
   </div>
 </template>
@@ -19,6 +21,7 @@
 </style>
 
 <script>
+const MediaStreamRecorder = require('msr');
 
 export default {
   name: 'audioRecord',
@@ -41,21 +44,29 @@ export default {
       hasRecording: false,
       audioCtx: {},
       audioConstraints: { audio: true, video: false },
-      chunks: [],
+      // chunks: [],
       mediaRecorder: {},
       supported: null,
     };
   },
+  computed: {
+    recordingTime() {
+      return this.constraints['http://schema.org/maxValue'][0]['@value'];
+    },
+  },
   methods: {
     record() {
       this.isRecording = true;
-      this.mediaRecorder.start();
+      this.mediaRecorder.start(this.recordingTime);
     },
     play() {
       this.recording.play();
     },
     stop() {
       this.mediaRecorder.stop();
+      this.hasRecording = true;
+      this.isRecording = false;
+      this.$emit('valueChanged', this.recording.src);
     },
     reset(e) {
       e.preventDefault();
@@ -63,20 +74,23 @@ export default {
       this.isRecording = false;
     },
     initialize(audioStream) {
-      this.mediaRecorder = new MediaRecorder(audioStream);
+      this.mediaRecorder = new MediaStreamRecorder(audioStream);
+      this.mediaRecorder.mimeType = 'audio/wav'; // check this line for audio/wav
       const self = this;
       this.mediaRecorder.ondataavailable = (e) => {
-        self.chunks.push(e.data);
+        // self.chunks.push(e.data);
+        const blobURL = URL.createObjectURL(e);
+        self.recording.src = blobURL;
       };
-      this.mediaRecorder.onstop = () => {
-        self.isRecording = false;
-        const blob = new Blob(this.chunks, { type: 'audio/ogg; codecs=opus' });
-        self.chunks = [];
-        const audioURL = window.URL.createObjectURL(blob);
-        self.recording.src = audioURL;
-        self.hasRecording = true;
-        this.$emit('valueChanged', audioURL);
-      };
+      // this.mediaRecorder.onstop = () => {
+      //   self.isRecording = false;
+      //   const blob = new Blob(this.chunks, { type: 'audio/ogg; codecs=opus' });
+      //   self.chunks = [];
+      //   const audioURL = window.URL.createObjectURL(blob);
+      //   self.recording.src = audioURL;
+      //   self.hasRecording = true;
+      //   this.$emit('valueChanged', audioURL);
+      // };
     },
     error() {
     },
@@ -90,7 +104,7 @@ export default {
   },
   mounted() {
     this.recording = new Audio();
-    const AudioContext = window.AudioContext || window.webKit.AudioContext;
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
     this.audioCtx = new AudioContext();
     if (navigator.mediaDevices.getUserMedia) {
       this.supported = true;
