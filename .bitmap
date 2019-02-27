@@ -109,7 +109,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/web-audio-record@0.0.2": {
+    "akeshavan.mindlogger-web/web-audio-record@0.0.3": {
         "files": [
             {
                 "relativePath": "src/components/Inputs/WebAudioRecord/Audio.vue",
@@ -127,7 +127,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/input-selector@0.0.3": {
+    "akeshavan.mindlogger-web/input-selector@0.0.4": {
         "files": [
             {
                 "relativePath": "src/components/InputSelector/InputSelector.vue",
@@ -145,7 +145,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/survey@0.0.8": {
+    "akeshavan.mindlogger-web/survey@0.0.9": {
         "files": [
             {
                 "relativePath": "src/components/Survey/Survey.vue",
@@ -163,7 +163,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/survey-item@0.0.3": {
+    "akeshavan.mindlogger-web/survey-item@0.0.4": {
         "files": [
             {
                 "relativePath": "src/components/SurveyItem/SurveyItem.vue",

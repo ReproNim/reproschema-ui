@@ -2,7 +2,7 @@
   <div>
     <b-alert :show="!supported">Oh no, your browser doesn't support audio</b-alert>
     <div v-if="mode==='audioImageRecord'" class="mb-3">
-      <img :src="constraints['http://schema.org/image'][0]['@value']" />
+      <img class="w-100" :src="constraints['http://schema.org/image'][0]['@value']" />
     </div>
     <b-button v-if="!isRecording && !hasRecording" @click="record" variant="danger">
       record
