@@ -9,6 +9,9 @@
         record
       </b-button>
       <b-button v-if="isRecording" @click="stop">stop</b-button>
+      <div v-if="isRecording">
+        <small>{{timeRemaining}} seconds left</small>
+      </div>
       <b-button variant="success" v-if="hasRecording" @click="play" ref="play">play</b-button>
       <div v-if="hasRecording" class="mt-2">
         <a href="" @click="reset">Redo recording</a>
@@ -47,6 +50,8 @@ export default {
       // chunks: [],
       mediaRecorder: {},
       supported: null,
+      interval: {},
+      timeRemaining: null,
     };
   },
   computed: {
@@ -58,6 +63,14 @@ export default {
     record() {
       this.isRecording = true;
       this.mediaRecorder.start(this.recordingTime);
+      this.interval = setInterval(this.countdown, 1000);
+    },
+    countdown() {
+      if (this.timeRemaining <= 0) {
+        clearInterval(this.interval);
+      } else {
+        this.timeRemaining -= 1;
+      }
     },
     play() {
       this.recording.play();
@@ -66,6 +79,8 @@ export default {
       this.mediaRecorder.stop();
       this.hasRecording = true;
       this.isRecording = false;
+      clearInterval(this.interval);
+      this.timeRemaining = this.recordingTime;
       this.$emit('valueChanged', this.recording.src);
     },
     reset(e) {
@@ -76,21 +91,14 @@ export default {
     initialize(audioStream) {
       this.mediaRecorder = new MediaStreamRecorder(audioStream);
       this.mediaRecorder.mimeType = 'audio/wav'; // check this line for audio/wav
+      this.timeRemaining = this.recordingTime / 1000;
+      window.mediaRecorder = this.mediaRecorder;
       const self = this;
       this.mediaRecorder.ondataavailable = (e) => {
-        // self.chunks.push(e.data);
         const blobURL = URL.createObjectURL(e);
         self.recording.src = blobURL;
+        self.stop();
       };
-      // this.mediaRecorder.onstop = () => {
-      //   self.isRecording = false;
-      //   const blob = new Blob(this.chunks, { type: 'audio/ogg; codecs=opus' });
-      //   self.chunks = [];
-      //   const audioURL = window.URL.createObjectURL(blob);
-      //   self.recording.src = audioURL;
-      //   self.hasRecording = true;
-      //   this.$emit('valueChanged', audioURL);
-      // };
     },
     error() {
     },
