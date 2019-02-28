@@ -12,7 +12,15 @@
       <div v-if="isRecording">
         <small>{{timeRemaining}} seconds left</small>
       </div>
-      <b-button variant="success" v-if="hasRecording" @click="play" ref="play">play</b-button>
+      <b-button variant="success" v-if="hasRecording && !isPlaying" @click="play" ref="play">
+        <span> play </span>
+      </b-button>
+
+      <b-button variant="secondary"
+      v-if="hasRecording && isPlaying" @click="pause" ref="play">
+        <span> pause </span>
+      </b-button>
+
       <div v-if="hasRecording" class="mt-2">
         <a href="" @click="reset">Redo recording</a>
       </div>
@@ -52,6 +60,7 @@ export default {
       supported: null,
       interval: {},
       timeRemaining: null,
+      isPlaying: false,
     };
   },
   computed: {
@@ -74,6 +83,14 @@ export default {
     },
     play() {
       this.recording.play();
+      this.isPlaying = true;
+    },
+    pause() {
+      this.recording.pause();
+      this.endPlay();
+    },
+    endPlay() {
+      this.isPlaying = false;
     },
     stop() {
       this.mediaRecorder.stop();
@@ -112,6 +129,7 @@ export default {
   },
   mounted() {
     this.recording = new Audio();
+    this.recording.onended = this.endPlay;
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     this.audioCtx = new AudioContext();
     if (navigator.mediaDevices.getUserMedia) {
