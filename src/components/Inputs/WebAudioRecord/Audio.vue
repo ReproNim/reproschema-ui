@@ -80,7 +80,7 @@ export default {
       this.hasRecording = true;
       this.isRecording = false;
       clearInterval(this.interval);
-      this.timeRemaining = this.recordingTime;
+      this.timeRemaining = this.recordingTime / 1000;
       this.$emit('valueChanged', this.recording.src);
     },
     reset(e) {
