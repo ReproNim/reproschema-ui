@@ -17,21 +17,21 @@
     </div>
 
     <transition-group name="list" tag="div" mode="in-out">
-      <div v-for="(content, index) in contextReverse" :key="index" class="mt-3 mb-3">
+      <div v-for="(content, index) in contextReverse" :key="content['@id']+index" class="mt-3 mb-3">
         <transition name="list" :key="'t'+content['@id']">
-        <ContextItem
-          :key="'c' + content['@id']"
-           v-if="listShow.indexOf(contextReverse.length - index - 1) >= 0"
-           :item="content" :index="contextReverse.length - index - 1"
-           :init="responses[content['@id']]"
-           v-on:skip="nextQuestion(contextReverse.length - index - 1, 1, 0)"
-           v-on:dontKnow="nextQuestion(contextReverse.length - index - 1, 0, 1)"
-           v-on:next="nextQuestion(contextReverse.length - index - 1, 0)"
-           v-on:setData="setResponse"
-           :responses="responses"
-           :selected_language="selected_language"
-           :score="score"
-        />
+          <ContextItem
+            :key="'c' + content['@id']"
+            v-if="shouldShow[index]"
+            :item="content" :index="contextReverse.length - index - 1"
+            :init="responses[content['@id']]"
+            v-on:skip="nextQuestion(contextReverse.length - index - 1, 1, 0)"
+            v-on:dontKnow="nextQuestion(contextReverse.length - index - 1, 0, 1)"
+            v-on:next="nextQuestion(contextReverse.length - index - 1, 0)"
+            v-on:setData="setResponse"
+            :responses="responses"
+            :selected_language="selected_language"
+            :score="score"
+          />
         </transition>
       </div>
     </transition-group>
@@ -192,6 +192,7 @@ export default {
       if (this.activity['https://schema.repronim.org/branchLogic']) {
         this.evaluateBranchingLogic();
       }
+      this.updateProgress();
     },
     restart() {
       this.$emit('clearResponses');
@@ -239,6 +240,15 @@ export default {
       }
       return {};
     },
+    updateProgress() {
+      let totalQ = this.context.length;
+      if (!_.isEmpty(this.visibility)) {
+        totalQ = _.filter(this.visibility).length;
+        console.log(totalQ);
+      }
+      const progress = ((Object.keys(this.responses).length) / totalQ) * 100;
+      this.$emit('updateProgress', progress);
+    },
   },
   watch: {
     $route() {
@@ -253,8 +263,7 @@ export default {
       this.$forceUpdate();
     },
     listShow() {
-      const progress = ((Object.keys(this.responses).length) / this.context.length) * 100;
-      this.$emit('updateProgress', progress);
+      this.updateProgress();
     },
     srcUrl() {
       if (this.srcUrl) {
@@ -291,14 +300,24 @@ export default {
     order() {
       return this.activity['https://schema.repronim.org/order'][0]['@list'];
     },
+    shouldShow() {
+      return _.map(this.contextReverse, (o, index) => {
+        const criteria1 = this.listShow.indexOf(this.contextReverse.length - index - 1) >= 0;
+        let criteria2 = true;
+        if (!_.isEmpty(this.visibility)) {
+          criteria2 = this.visibility[o['@id']];
+        }
+        return criteria1 && criteria2;
+      });
+    },
     context() {
       /* eslint-disable */
       if (this.activity['https://schema.repronim.org/order']) {
         const keys = this.activity['https://schema.repronim.org/order'][0]['@list'];
 
-        if (!_.isEmpty(this.visibility)) {
-          return _.filter(keys, k => this.visibility[k['@id']]);
-        }
+        // if (!_.isEmpty(this.visibility)) {
+        //   return _.filter(keys, k => this.visibility[k['@id']]);
+        // }
         return keys;
       }
       /* eslint-enable */
