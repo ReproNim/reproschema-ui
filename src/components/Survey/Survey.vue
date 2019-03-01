@@ -189,9 +189,9 @@ export default {
         this.evaluateScoringLogic();
       }
 
-      if (this.activity['https://schema.repronim.org/branchLogic']) {
-        this.evaluateBranchingLogic();
-      }
+      // if (this.activity['https://schema.repronim.org/branchLogic']) {
+      //   this.evaluateBranchingLogic();
+      // }
       this.updateProgress();
     },
     restart() {
