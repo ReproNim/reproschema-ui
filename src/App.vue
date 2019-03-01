@@ -84,6 +84,7 @@ export default {
     return {
       sidebarActive: true,
       selected_language: 'en',
+      // responses: [],
     };
   },
   methods: {

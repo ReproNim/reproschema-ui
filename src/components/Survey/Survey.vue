@@ -17,7 +17,7 @@
     </div>
 
     <transition-group name="list" tag="div" mode="in-out">
-      <div v-for="(content, index) in contextReverse" :key="content['@id']+index" class="mt-3 mb-3">
+      <div v-for="(content, index) in contextReverse" :key="index" class="mt-3 mb-3">
         <transition name="list" :key="'t'+content['@id']">
         <ContextItem
           :key="'c' + content['@id']"
@@ -67,6 +67,7 @@ import _ from 'lodash';
 import ContextItem from '../SurveyItem/';
 import Loader from '../Loader/';
 
+const safeEval = require('safe-eval');
 
 export default {
   name: 'Home',
@@ -76,6 +77,7 @@ export default {
       activity: {},
       listShow: [],
       parsedJSONLD: {},
+      visibility: {},
       score: 0,
     };
   },
@@ -104,64 +106,71 @@ export default {
             // eslint-disable-next-line
             // console.log(95, this.listShow);
           }
+          this.visibility = this.getVisibility(this.responses);
         });
       });
+    },
+    evaluateScoringLogic() {
+      const scoringLogic = (this.activity['https://schema.repronim.org/scoringLogic'][0]['@value']).split('= ')[1];
+      if (this.responses) {
+        let str = '';
+        _.forOwn(this.responses, (val, key) => {
+          const qId = (key.split(/\/items\//)[1]).split(/.jsonld/)[0]; // split url to get the scoring key
+          if (scoringLogic) {
+            if (isNaN(val)) {
+              str += `const ${qId}=0; `;
+            } else {
+              str += `const ${qId}=${val}; `;
+            }
+          }
+        });
+        try {
+          // eslint-disable-next-line
+          this.score = eval(`${str}  ${scoringLogic}`);
+          // console.log('TOTAL SCORING LOGIC::::', this.score);
+        } catch (e) {
+          // Do nothing
+        }
+      }
+    },
+    evaluateBranchingLogic() {
+      const branchLogic = this.activity['https://schema.repronim.org/branchLogic'][0]['@value'].split();
+      if (this.responses) {
+        let br = '';
+        _.forOwn(this.responses, (val, key) => {
+          const qId = (key.split(/\/items\//)[1]).split(/.jsonld/)[0];
+          if (branchLogic) {
+            if (isNaN(val)) {
+              br += `const ${qId}=0; `;
+            } else {
+              br += `const ${qId}=${val}; `;
+            }
+          }
+        });
+        try {
+          // console.log(`eval('${br} ${branchLogic}')`);
+          // console.log(this.responses);
+          // eslint-disable-next-line
+          // console.log('branch logic::::', eval(br+' '+ branchLogic));
+          // console.log('br', br);
+        } catch (e) {
+          // console.log('catch-br', br);
+          // Do nothing
+        }
+      }
     },
     nextQuestion(idx, skip, dontKnow) {
       if (skip) {
         this.$emit('saveResponse', this.context[idx]['@id'], 'skipped');
-        if (!_.isEmpty(this.activity['https://schema.repronim.org/scoringLogic'])) {
-          const scoringLogic = (this.activity['https://schema.repronim.org/scoringLogic'][0]['@value']).split('= ')[1];
-          if (this.responses) {
-            let str = '';
-            _.forOwn(this.responses, (val, key) => {
-              const qId = (key.split(/\/items\//)[1]).split(/.jsonld/)[0]; // split url to get the scoring key
-              if (scoringLogic) {
-                if (isNaN(val)) {
-                  str += `const ${qId}=0; `;
-                } else {
-                  str += `const ${qId}=${val}; `;
-                }
-              }
-            });
-            try {
-              // eslint-disable-next-line
-              this.score = eval(str + ' ' + scoringLogic);
-              // console.log('TOTAL SCORE::::', this.score);
-            } catch (e) {
-              // Do nothing
-            }
-          }
-        }
+        // if (!_.isEmpty(this.activity['https://schema.repronim.org/scoringLogic'])) {
+        //   this.evaluateScoringLogic();
+        // }
       }
       if (dontKnow) {
         this.$emit('saveResponse', this.context[idx]['@id'], 'dontKnow');
-        if (!_.isEmpty(this.activity['https://schema.repronim.org/scoringLogic'])) {
-          const scoringLogic = (this.activity['https://schema.repronim.org/scoringLogic'][0]['@value']).split('= ')[1];
-          if (this.responses) {
-            // eslint-disable-next-line
-            // console.log(113, this.responses);
-            let str = '';
-            _.forOwn(this.responses, (val, key) => {
-              const qId = (key.split(/\/items\//)[1]).split(/.jsonld/)[0]; // split url to get the scoring key
-              // console.log(142, qId, val);
-              if (scoringLogic) {
-                if (isNaN(val)) {
-                  str += `const ${qId}=0; `;
-                } else {
-                  str += `const ${qId}=${val}; `;
-                }
-              }
-            });
-            try {
-              // eslint-disable-next-line
-              this.score = eval(str + ' ' + scoringLogic);
-              // console.log('TOTAL SCORE::::', this.score);
-            } catch (e) {
-              // Do nothing
-            }
-          }
-        }
+        // if (!_.isEmpty(this.activity['https://schema.repronim.org/scoringLogic'])) {
+        //   this.evaluateScoringLogic();
+        // }
       }
       this.$forceUpdate();
       if (idx === this.listShow.length - 1) {
@@ -173,55 +182,62 @@ export default {
     },
     setResponse(value, index) {
       this.$emit('saveResponse', this.context[index]['@id'], value);
+      const currResponses = { ...this.responses };
+      currResponses[this.context[index]['@id']] = value;
+      this.visibility = this.getVisibility(currResponses);
       if (!_.isEmpty(this.activity['https://schema.repronim.org/scoringLogic'])) {
-        const scoringLogic = (this.activity['https://schema.repronim.org/scoringLogic'][0]['@value']).split('= ')[1];
-        if (this.responses) {
-          let str = '';
-          _.forOwn(this.responses, (val, key) => {
-            const qId = (key.split(/\/items\//)[1]).split(/.jsonld/)[0]; // split url to get the scoring key
-            if (scoringLogic) {
-              if (isNaN(val)) {
-                str += `const ${qId}=0; `;
-              } else {
-                str += `const ${qId}=${val}; `;
-              }
-            }
-          });
-          try {
-            // eslint-disable-next-line
-            console.log('TOTAL SCORE::::', eval(str + ' ' + scoringLogic));
-            // console.log('str', str);
-          } catch (e) {
-            // Do nothing
-          }
-        }
+        this.evaluateScoringLogic();
       }
-      /* if (this.activity['https://schema.repronim.org/branchLogic']) {
-        const branchLogic = this.activity['https://schema.repronim.org/branchLogic'][0]['@value'].split();
-        if (this.responses) {
-          let br = '';
-          _.forOwn(this.responses, (val, key) => {
-            const qId = (key.split(/\/items\//)[1]).split(/.jsonld/)[0];
-            if (branchLogic) {
-              if (isNaN(val)) {
-                br += `const ${qId}=0; `;
-              } else {
-                br += `const ${qId}=${val}; `;
-              }
-            }
-          });
-          try {
-            // eslint-disable-next-line
-            console.log('branch logic::::', eval(br+' '+ branchLogic));
-            console.log('br', br);
-          } catch (e) {
-            console.log('catch-br', br);
-            // Do nothing
-          } */
+
+      if (this.activity['https://schema.repronim.org/branchLogic']) {
+        this.evaluateBranchingLogic();
+      }
     },
     restart() {
       this.$emit('clearResponses');
       this.listShow = [0];
+    },
+    evaluateString(string, responseMapper) {
+      const keys = Object.keys(responseMapper);
+      let output = string;
+      _.map(keys, (k) => {
+        // grab the value of the key from responseMapper
+        const val = responseMapper[k].val;
+        output = output.replace(k, val);
+      });
+      // console.log(output, safeEval(output));
+      return safeEval(output);
+    },
+    responseMapper(responses) {
+      const keys = _.map(this.order, c => c['@id']); // Object.keys(this.responses);
+      const keyArr = _.map(keys, (key) => {
+        const val = responses[key];
+        const qId = (key.split(/\/items\//)[1]).split(/.jsonld/)[0];
+        return { key, val, qId };
+      });
+      const outMapper = {};
+      _.map(keyArr, (a) => {
+        outMapper[a.qId] = { val: a.val, ref: a.key };
+      });
+      return outMapper;
+    },
+    getVisibility(responses) {
+      const responseMapper = this.responseMapper(responses);
+      if (!_.isEmpty(this.activity['https://schema.repronim.org/visibility'])) {
+        const visibilityMapper = {};
+        _.map(this.activity['https://schema.repronim.org/visibility'], (a) => {
+          let val = a['@value'];
+          if (_.isString(a['@value'])) {
+            val = this.evaluateString(a['@value'], responseMapper);
+          }
+          if (responseMapper[a['@index']]) {
+            visibilityMapper[responseMapper[a['@index']].ref] = val;
+          }
+          // visibilityMapper[responseMapper[a['@index']].ref] = val;
+        });
+        return visibilityMapper;
+      }
+      return {};
     },
   },
   watch: {
@@ -272,10 +288,17 @@ export default {
       }
       return [{}];
     },
+    order() {
+      return this.activity['https://schema.repronim.org/order'][0]['@list'];
+    },
     context() {
       /* eslint-disable */
       if (this.activity['https://schema.repronim.org/order']) {
         const keys = this.activity['https://schema.repronim.org/order'][0]['@list'];
+
+        if (!_.isEmpty(this.visibility)) {
+          return _.filter(keys, k => this.visibility[k['@id']]);
+        }
         return keys;
       }
       /* eslint-enable */

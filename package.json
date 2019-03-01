@@ -23,6 +23,7 @@
     "jsonld": "^1.2.1",
     "lodash": "^4.17.11",
     "msr": "^1.3.4",
+    "safe-eval": "^0.4.1",
     "vue": "2.6.6",
     "vue-markdown": "^2.2.4",
     "vue-router": "^3.0.1",
