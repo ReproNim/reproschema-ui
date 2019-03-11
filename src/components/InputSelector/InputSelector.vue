@@ -16,10 +16,18 @@
         :init="init" :selected_language="selected_language" v-on:valueChanged="sendData"/>
     </div>
 
-    <!-- If type is audio -->
-    <!-- <div v-else-if="inputType==='audio'">
+    <!-- If type is audioRecord -->
+    <div v-else-if="inputType==='audioRecord'">
         <AudioRecord :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
-    </div> -->
+    </div>
+
+    <!-- If type is audioImageRecord -->
+    <div v-else-if="inputType==='audioImageRecord'">
+        <AudioRecord
+        :constraints="valueConstraints"
+        :init="init" v-on:valueChanged="sendData"
+        mode="audioImageRecord" />
+    </div>
 
     <!-- If type is text -->
     <div v-else-if="inputType==='text'">
@@ -54,11 +62,10 @@
 <style></style>
 
 <script>
-// import { bus } from '../main';
-import Radio from './Inputs/Radio';
-import AudioRecord from './Inputs/Audio';
-import TextInput from './Inputs/TextInput';
-import IntegerInput from './Inputs/IntegerInput';
+import Radio from '../Inputs/WebRadio/';
+import AudioRecord from '../Inputs/WebAudioRecord/';
+import TextInput from '../Inputs/WebTextInput/';
+import IntegerInput from '../Inputs/WebIntegerInput/';
 
 export default {
   name: 'InputSelector',

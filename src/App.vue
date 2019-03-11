@@ -12,9 +12,9 @@
             <option value="en">English</option>
           </select>
         </div>
-        <ul class="list-unstyled components" v-if="schema.ui">
+        <ul class="list-unstyled components">
             <!-- <p>Dummy Heading</p> -->
-            <li v-for="(ui, index) in schema.ui.order" :key="index">
+            <li v-for="(ui, index) in schemaOrder" :key="index">
                 <a @click="setActivity(index)" :class="{'current': index==activityIndex}">
                   <circleProgress
                    :radius="20"
@@ -22,7 +22,7 @@
                    :stroke="4"
                    strokeColor="#007bff" />
                    <span class="align-middle activityItem">
-                     {{ui}}
+                     {{getName(ui)}}
                    </span>
                 </a>
             </li>
@@ -44,7 +44,7 @@
                   </b-navbar-nav>
 
                   <b-navbar-nav class="float-right">
-                    <b-nav-item to="/" exact>Home</b-nav-item>
+                    <b-nav-item :to="{name: 'Landing', query: $route.query}" exact>Home</b-nav-item>
                   </b-navbar-nav>
               </div>
           </nav>
@@ -52,8 +52,10 @@
             <router-view
               :srcUrl="srcUrl" :responses="responses[activityIndex]"
               :selected_language="selected_language"
+              :progress="progress[activityIndex]"
               v-on:updateProgress="updateProgress"
               v-on:saveResponse="saveResponse"
+              v-on:clearResponses="clearResponses"
             />
           </b-container>
       </div>
@@ -65,22 +67,13 @@
 // import jsonld from 'jsonld/dist/jsonld.min';
 import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
-import axios from 'axios';
+import _ from 'lodash';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
-import circleProgress from './components/Circle';
-import config from './config';
-
+import circleProgress from './components/Circle/';
 
 Vue.use(BootstrapVue);
 Vue.filter('reverse', value => value.slice().reverse());
-
-const contextObj = {
-  nda_guid: 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/NDA/nda_guid.jsonld',
-  phq9_schema: 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/PHQ-9/phq9_schema.jsonld',
-  phq9a_schema: 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/PHQ-9a/phq9a_schema.jsonld',
-  phq8_schema: 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/PHQ-8/phq8_schema.jsonld',
-};
 
 export default {
   name: 'App',
@@ -91,10 +84,7 @@ export default {
     return {
       sidebarActive: true,
       selected_language: 'en',
-      schema: {},
-      activityIndex: null,
-      progress: [],
-      responses: {},
+      // responses: [],
     };
   },
   methods: {
@@ -106,54 +96,76 @@ export default {
       }
     },
     setActivity(index) {
-      this.activityIndex = index;
-      this.$router.push(`/activities/${index}`);
+      if (this.$route.query.url) {
+        this.$router.push(`/activities/${index}?url=${this.$route.query.url}`);
+      } else {
+        this.$router.push(`/activities/${index}`);
+      }
     },
     updateProgress(progress) {
-      this.progress[this.activityIndex] = progress;
+      this.$store.dispatch('updateProgress', progress);
       this.$forceUpdate();
     },
     saveResponse(key, value) {
-      this.responses[this.activityIndex][key] = value;
-      // eslint-disable-next-line
-      // console.log('TOTAL RESPONSE:', this.responses);
+      this.$store.dispatch('saveResponse', { key, value });
+    },
+    clearResponses() {
+      this.$store.dispatch('clearResponses', this.activityIndex);
       this.$forceUpdate();
+    },
+    getName(url) {
+      // TODO: this is a hack. the jsonld expander should give us this info.
+      if (url) {
+        const folders = url.split('/');
+        const N = folders.length;
+        return folders[N - 1].split('_schema')[0].split('.jsonld')[0];
+      }
+      return null;
     },
   },
   watch: {
     $route() {
-      if (this.$route.params.id) {
-        this.activityIndex = this.$route.params.id;
+      if (this.$route.params.id !== undefined) {
+        this.$store.dispatch('setActivityIndex', this.$route.params.id);
       }
     },
+    selected_language() {
+      this.$store.dispatch('setLanguage', this.selected_language);
+    },
+  },
+  created() {
+    const url = this.$route.query.url;
+    // console.log('url is', url);
+    this.$store.dispatch('getBaseSchema', url);
   },
   mounted() {
-    axios.get(config.githubSrc).then((resp) => {
-      this.schema = resp.data;
-      /* eslint-disable */
-      this.progress = _.map(this.schema.ui.order, () => 0);
-      this.responses = _.map(this.schema.ui.order, () => new Object());
-      // eslint-disable-next-line
-      // console.log('this.responses', this.responses);
-      /* eslint-enable */
-      if (this.$route.params.id) {
-        this.activityIndex = this.$route.params.id;
-      }
-    });
+    if (this.$route.params.id) {
+      this.$store.dispatch('setActivityIndex', this.$route.params.id);
+    }
   },
   computed: {
     srcUrl() {
-      /* eslint-disable */
-      if (this.schema.ui && this.activityIndex) {
-        // expand using URLs
-        /*jsonld.expand(this.schema, result => {
-          result[0]['https://schema.repronim.org/order'][0]['@list'][this.activityIndex]['@id'];
-        });*/
-        return contextObj[this.schema.ui.order[this.activityIndex]];
-        // return 'https://raw.githubusercontent.com/sanuann/schema-standardization/master/activities/PHQ-9/phq9_schema.jsonld';
+      return this.$store.getters.srcUrl;
+    },
+    schema() {
+      return this.$store.state.schema;
+    },
+    responses() {
+      return this.$store.state.responses;
+    },
+    activityIndex() {
+      return this.$store.state.activityIndex;
+    },
+    progress() {
+      return this.$store.state.progress;
+    },
+    schemaOrder() {
+      if (!_.isEmpty(this.$store.state.schema)) {
+        const order = _.map(this.$store.state.schema['https://schema.repronim.org/order'][0]['@list'],
+          u => u['@id']);
+        return order;
       }
-      /* eslint-enable */
-      return null;
+      return [];
     },
   },
 };

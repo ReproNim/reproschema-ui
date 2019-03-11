@@ -58,8 +58,8 @@
 // import axios from 'axios';
 import jsonld from 'jsonld/dist/jsonld.min';
 import _ from 'lodash';
-import InputSelector from './InputSelector';
-import Loader from './Loader';
+import InputSelector from '../InputSelector/';
+import Loader from '../Loader/';
 
 
 export default {
@@ -126,11 +126,9 @@ export default {
       }
       this.$emit('skip');
     },
-    sendDontKnow(doDontKnow) {
+    sendDontKnow() {
       // send the dont know answer to the parent
-      if (doDontKnow) {
-        this.variant = 'warning';
-      }
+      this.variant = 'info';
       this.$emit('dontKnow');
     },
     sendNext() {
@@ -145,8 +143,10 @@ export default {
   mounted() {
     this.getData();
     if (this.init) {
-      if (this.init.skipped) {
+      if (this.init === 'skipped') {
         this.variant = 'warning';
+      } else if (this.init === 'dontKnow') {
+        this.variant = 'info';
       }
     }
   },

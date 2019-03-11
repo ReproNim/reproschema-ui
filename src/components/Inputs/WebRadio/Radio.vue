@@ -12,6 +12,7 @@
                             stacked
                             class="text-left"
                             @change="sendData"
+                            ref="radiobutton"
         >
         </b-form-radio-group>
       </b-form-group>
@@ -48,7 +49,7 @@ export default {
   watch: {
     init: {
       handler() {
-        if (this.init) {
+        if (this.init != null) {
           this.selected = this.init.value;
         } else {
           this.selected = false;
@@ -58,11 +59,9 @@ export default {
     },
   },
   mounted() {
-    if (this.init) {
-      this.selected = this.init.value;
+    if (this.init !== undefined || this.init != null) {
+      this.selected = this.init;
     }
-    // console.log(65);
-    // bus.$on('resetChild', this.resetChildMethod);
   },
   methods: {
     sendData(val) {

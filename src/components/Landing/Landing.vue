@@ -14,10 +14,14 @@
 <script>
 import axios from 'axios';
 import VueMarkdown from 'vue-markdown';
-import config from '../config';
-import Loader from './Loader';
+import Loader from '../Loader';
 
 export default {
+  props: {
+    contentSrc: {
+      type: String,
+    },
+  },
   components: {
     VueMarkdown,
     Loader,
@@ -28,7 +32,7 @@ export default {
     };
   },
   mounted() {
-    axios.get(config.contentSrc).then((resp) => {
+    axios.get(this.contentSrc).then((resp) => {
       this.content = resp.data;
     });
   },
