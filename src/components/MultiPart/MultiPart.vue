@@ -19,7 +19,7 @@
     <transition-group name="list" tag="div" mode="in-out">
       <div v-for="(content, index) in contextReverse" :key="content['@id']+index" class="mt-3 mb-3">
         <transition name="list" :key="'t'+content['@id']">
-          <SurveyItem
+          <survey-item
             :key="'c' + content['@id']"
             v-if="shouldShow[index]"
             :item="content" :index="contextReverse.length - index - 1"

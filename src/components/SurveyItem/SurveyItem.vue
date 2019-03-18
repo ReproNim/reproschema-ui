@@ -3,7 +3,7 @@
     <!-- https://codepen.io/vikttor_/pen/jeqoPN?page=1& -->
     <div class="contextItem align-self-center center">
       <transition name="fade" mode="out-in">
-        <InputSelector v-if="status === 'ready'"
+        <InputSelector v-if="status === 'ready' && ui !== 'multipart'"
          :inputType="ui"
          :title="title"
          :valueConstraints="valueConstraints"
@@ -15,13 +15,15 @@
          v-on:next="sendNext"
          v-on:valueChanged="sendData"
          />
-        <div class="loader" v-else>
+
+        <div class="loader" v-else-if="status !== 'ready'">
           <!-- <b-progress :value="50"
           :max="100" animated variant="secondary" class="mb-3 align-middle">
           </b-progress>
           <span class="align-middle mt-3 text-muted">loading</span> -->
           <Loader />
         </div>
+        <multipart v-else :progress="mp_progress" :responses="mp_responses" :srcUrl="item['@id']"/>
       </transition>
     </div>
   </b-card>
@@ -60,13 +62,15 @@ import jsonld from 'jsonld/dist/jsonld.min';
 import _ from 'lodash';
 import InputSelector from '../InputSelector/';
 import Loader from '../Loader/';
+import MultiPart from '../MultiPart';
 
 
 export default {
-  name: 'contextItem',
+  name: 'SurveyItem',
   props: ['item', 'index', 'init', 'responses', 'score', 'selected_language'],
   components: {
     InputSelector,
+    multipart: MultiPart,
     Loader,
   },
   data() {
@@ -74,7 +78,8 @@ export default {
       data: [],
       valueC: [],
       status: 'loading',
-      progress: 0,
+      mp_responses: {},
+      mp_progress: 0,
       variant: null,
     };
   },
@@ -123,7 +128,7 @@ export default {
         } else {
           // console.log(this.data);
           // throw Error('This is not a properly formatted jsonld schema');
-          console.info('there are no value contraints');
+          console.info('there are no value constraints');
           this.valueC = {
             '@value': null,
           };
