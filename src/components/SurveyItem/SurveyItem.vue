@@ -10,6 +10,7 @@
          :init="init"
          :responses="responses"
          :selected_language="selected_language"
+         :showPassOptions="showPassOptions"
          v-on:skip="sendSkip"
          v-on:dontKnow="sendDontKnow"
          v-on:next="sendNext"
@@ -23,7 +24,13 @@
           <span class="align-middle mt-3 text-muted">loading</span> -->
           <Loader />
         </div>
-        <multipart v-else :progress="mp_progress" :responses="mp_responses" :srcUrl="item['@id']"/>
+        <multipart v-else
+         :progress="mp_progress"
+         :responses="mp_responses"
+         :srcUrl="item['@id']"
+         v-on:skip="sendSkip"
+         v-on:dontKnow="sendDontKnow"
+        />
       </transition>
     </div>
   </b-card>
@@ -67,7 +74,30 @@ import MultiPart from '../MultiPart';
 
 export default {
   name: 'SurveyItem',
-  props: ['item', 'index', 'init', 'responses', 'score', 'selected_language'],
+  props: {
+    item: {
+      type: Object,
+    },
+    index: {
+      type: Number,
+    },
+    init: {
+
+    },
+    responses: {
+      type: Object,
+    },
+    score: {
+      type: Number,
+    },
+    selected_language: {
+      type: String,
+    },
+    showPassOptions: {
+      type: Boolean,
+      default: true,
+    },
+  },
   components: {
     InputSelector,
     multipart: MultiPart,
@@ -116,24 +146,26 @@ export default {
           // so a progress bar won't work here.
         },
       }).then((resp) => {
-        this.data = resp[0];
-        if (this.data['https://schema.repronim.org/valueconstraints']) {
-          if (Object.keys(this.data['https://schema.repronim.org/valueconstraints'][0]).indexOf('@id') > -1) {
-            jsonld.expand(this.data['https://schema.repronim.org/valueconstraints'][0]['@id']).then((rsp) => {
-              this.valueC = rsp[0];
-            });
+        if (resp.length) {
+          this.data = resp[0];
+          if (this.data['https://schema.repronim.org/valueconstraints']) {
+            if (Object.keys(this.data['https://schema.repronim.org/valueconstraints'][0]).indexOf('@id') > -1) {
+              jsonld.expand(this.data['https://schema.repronim.org/valueconstraints'][0]['@id']).then((rsp) => {
+                this.valueC = rsp[0];
+              });
+            } else {
+              this.valueC = this.data['https://schema.repronim.org/valueconstraints'][0];
+            }
           } else {
-            this.valueC = this.data['https://schema.repronim.org/valueconstraints'][0];
+            // console.log(this.data);
+            // throw Error('This is not a properly formatted jsonld schema');
+            console.info('there are no value constraints');
+            this.valueC = {
+              '@value': null,
+            };
           }
-        } else {
-          // console.log(this.data);
-          // throw Error('This is not a properly formatted jsonld schema');
-          console.info('there are no value constraints');
-          this.valueC = {
-            '@value': null,
-          };
+          this.status = 'ready';
         }
-        this.status = 'ready';
       });
     },
     sendSkip(doSkip) {
