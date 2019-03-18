@@ -88,8 +88,11 @@ export default {
       /* eslint-enable */
     },
     title() {
-      const activeQuestion = _.filter(this.data['http://schema.org/question'], q => q['@language'] === this.selected_language);
-      return activeQuestion[0]['@value'];
+      if (this.data['http://schema.org/question']) {
+        const activeQuestion = _.filter(this.data['http://schema.org/question'], q => q['@language'] === this.selected_language);
+        return activeQuestion[0]['@value'];
+      }
+      return null;
     },
     valueConstraints() {
       if (this.data['https://schema.repronim.org/valueconstraints']) {
@@ -109,12 +112,21 @@ export default {
         },
       }).then((resp) => {
         this.data = resp[0];
-        if (Object.keys(this.data['https://schema.repronim.org/valueconstraints'][0]).indexOf('@id') > -1) {
-          jsonld.expand(this.data['https://schema.repronim.org/valueconstraints'][0]['@id']).then((rsp) => {
-            this.valueC = rsp[0];
-          });
+        if (this.data['https://schema.repronim.org/valueconstraints']) {
+          if (Object.keys(this.data['https://schema.repronim.org/valueconstraints'][0]).indexOf('@id') > -1) {
+            jsonld.expand(this.data['https://schema.repronim.org/valueconstraints'][0]['@id']).then((rsp) => {
+              this.valueC = rsp[0];
+            });
+          } else {
+            this.valueC = this.data['https://schema.repronim.org/valueconstraints'][0];
+          }
         } else {
-          this.valueC = this.data['https://schema.repronim.org/valueconstraints'][0];
+          // console.log(this.data);
+          // throw Error('This is not a properly formatted jsonld schema');
+          console.info('there are no value contraints');
+          this.valueC = {
+            '@value': null,
+          };
         }
         this.status = 'ready';
       });

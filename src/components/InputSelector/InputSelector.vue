@@ -39,6 +39,11 @@
         <IntegerInput :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
     </div>
 
+    <!-- If type is text -->
+    <div v-else-if="inputType==='multipart'">
+        <MultiPart :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData" />
+    </div>
+
     <!-- if we don't have a component built for this type, then show an error -->
     <div v-else>
       <b-alert show>
@@ -66,6 +71,7 @@ import Radio from '../Inputs/WebRadio/';
 import AudioRecord from '../Inputs/WebAudioRecord/';
 import TextInput from '../Inputs/WebTextInput/';
 import IntegerInput from '../Inputs/WebIntegerInput/';
+import MultiPart from '../MultiPart/';
 
 export default {
   name: 'InputSelector',
@@ -75,6 +81,7 @@ export default {
     AudioRecord,
     TextInput,
     IntegerInput,
+    MultiPart,
   },
   data() {
     return {
