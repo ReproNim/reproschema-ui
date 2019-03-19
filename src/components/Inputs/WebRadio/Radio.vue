@@ -55,7 +55,7 @@ export default {
           this.selected = false;
         }
       },
-      deep: true,
+      deep: true, // this watches all of the changes within an object. init: {value: 1}  not init: 1
     },
   },
   mounted() {
@@ -69,4 +69,8 @@ export default {
     },
   },
 };
+
+// init --> selected; on radio button change emit(valueChanged) -->
+// (in the parent, sets init) --> init has changed
+// so then change this.selected = this.init
 </script>
