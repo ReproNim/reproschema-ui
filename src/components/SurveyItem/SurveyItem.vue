@@ -31,6 +31,8 @@
          v-on:skip="sendSkip"
          v-on:dontKnow="sendDontKnow"
          v-on:saveResponse="setMPResponse"
+         v-on:updateProgress="setMPProgress"
+         v-on:valueChanged="sendData"
         />
       </transition>
     </div>
@@ -160,7 +162,7 @@ export default {
           } else {
             // console.log(this.data);
             // throw Error('This is not a properly formatted jsonld schema');
-            console.info('there are no value constraints');
+            // console.info('there are no value constraints');
             this.valueC = {
               '@value': null,
             };
@@ -190,7 +192,7 @@ export default {
       this.$emit('setData', val, this.index);
     },
     setMPResponse(index, value) {
-      console.log('setting response of multipart item', index, value);
+      // console.log('setting response of multipart item', index, value);
       this.mp_responses[index] = value;
     },
     setMPProgress(progress) {

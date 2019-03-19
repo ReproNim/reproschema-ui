@@ -220,7 +220,7 @@ export default {
       let totalQ = this.context.length;
       if (!_.isEmpty(this.visibility)) {
         totalQ = _.filter(this.visibility).length;
-        console.log(totalQ);
+        // console.log(totalQ);
       }
       const progress = ((Object.keys(this.responses).length) / totalQ) * 100;
       this.$emit('updateProgress', progress);

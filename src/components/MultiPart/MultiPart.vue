@@ -13,6 +13,7 @@
       <!-- <b-progress :value="progress" :max="100" class="mb-3"></b-progress> -->
       <div v-if="preambleText" class="preamble-text mb-2">
         <strong> {{ preambleText }} ({{currentIndex + 1}} / {{context.length}})</strong>
+        {{progress}}
       </div>
     </div>
       <survey-item
@@ -112,11 +113,9 @@ export default {
       return outMapper;
     },
     skip(val) {
-      console.log('skip');
       this.$emit('skip', val);
     },
     dontKnow() {
-      console.log('dn');
       this.$emit('dontKnow');
     },
     updateProgress() {
@@ -127,9 +126,11 @@ export default {
       // }
       const progress = ((Object.keys(this.responses).length) / totalQ) * 100;
       this.$emit('updateProgress', progress);
+      if (progress === 100) {
+        this.$emit('valueChanged', this.responses);
+      }
     },
     setResponse(value, index) {
-      console.log('saveresponse');
       this.$emit('saveResponse', this.context[index]['@id'], value);
       const currResponses = { ...this.responses };
       currResponses[this.context[index]['@id']] = value;
@@ -152,6 +153,7 @@ export default {
       if (dontKnow) {
         this.$emit('saveResponse', this.context[idx]['@id'], 'dontKnow');
       }
+      this.updateProgress();
       this.$forceUpdate();
     },
   },
