@@ -30,6 +30,7 @@
          :srcUrl="item['@id']"
          v-on:skip="sendSkip"
          v-on:dontKnow="sendDontKnow"
+         v-on:saveResponse="setMPResponse"
         />
       </transition>
     </div>
@@ -187,6 +188,13 @@ export default {
       this.variant = null;
       /* eslint-enable */
       this.$emit('setData', val, this.index);
+    },
+    setMPResponse(index, value) {
+      console.log('setting response of multipart item', index, value);
+      this.mp_responses[index] = value;
+    },
+    setMPProgress(progress) {
+      this.mp_progress = progress;
     },
   },
   mounted() {
