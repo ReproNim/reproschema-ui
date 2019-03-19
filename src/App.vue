@@ -116,9 +116,16 @@ export default {
     getName(url) {
       // TODO: this is a hack. the jsonld expander should give us this info.
       if (url) {
-        const folders = url.split('/');
-        const N = folders.length;
-        return folders[N - 1].split('_schema')[0].split('.jsonld')[0];
+        if (!_.isEmpty(this.$store.state.schema)) {
+          const nameMap = this.$store.state.schema['https://schema.repronim.org/activity_display_name'][0];
+          if (url in nameMap) {
+            // console.log(123, nameMap[url][0]['@id']);
+            const mappedUrl = nameMap[url][0]['@id'];
+            const folders = mappedUrl.split('/');
+            const N = folders.length;
+            return folders[N - 1].split('_schema')[0].split('.jsonld')[0];
+          }
+        }
       }
       return null;
     },
