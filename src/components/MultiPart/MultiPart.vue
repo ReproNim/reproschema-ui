@@ -13,7 +13,6 @@
       <!-- <b-progress :value="progress" :max="100" class="mb-3"></b-progress> -->
       <div v-if="preambleText" class="preamble-text mb-2">
         <strong> {{ preambleText }} ({{currentIndex + 1}} / {{context.length}})</strong>
-        {{progress}}
       </div>
     </div>
       <survey-item
