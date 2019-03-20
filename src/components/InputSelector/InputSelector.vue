@@ -52,7 +52,7 @@
     </div>
 
     <!-- you can skip this question if requiredValue is not true -->
-    <div class="row float-right">
+    <div class="row float-right" v-if="showPassOptions">
       <b-button class="" variant="default" @click="dontKnow">
         Don't Know
       </b-button>
@@ -72,16 +72,38 @@ import AudioRecord from '../Inputs/WebAudioRecord/';
 import TextInput from '../Inputs/WebTextInput/';
 import IntegerInput from '../Inputs/WebIntegerInput/';
 import DateInput from '../Inputs/DateInput/';
+import MultiPart from '../MultiPart/';
 
 export default {
   name: 'InputSelector',
-  props: ['inputType', 'title', 'valueConstraints', 'init', 'selected_language'],
+  props: {
+    inputType: {
+      type: String,
+    },
+    title: {
+      type: String,
+    },
+    valueConstraints: {
+      type: Object,
+    },
+    init: {
+
+    },
+    selected_language: {
+      type: String,
+    },
+    showPassOptions: {
+      type: Boolean,
+      default: true,
+    },
+  }, // ['inputType', 'title', 'valueConstraints', 'init', 'selected_language'],
   components: {
     Radio,
     AudioRecord,
     TextInput,
     IntegerInput,
     DateInput,
+    MultiPart,
   },
   data() {
     return {
@@ -93,8 +115,6 @@ export default {
       this.$emit('skip', val);
     },
     dontKnow() {
-      // this emits an event on the bus with optional 'data' param
-      // bus.$emit('resetChild', this.index);
       this.$emit('dontKnow');
     },
     sendData(val) {

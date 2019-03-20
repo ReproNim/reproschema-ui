@@ -133,32 +133,6 @@ export default {
         }
       }
     },
-    evaluateBranchingLogic() {
-      const branchLogic = this.activity['https://schema.repronim.org/branchLogic'][0]['@value'].split();
-      if (this.responses) {
-        let br = '';
-        _.forOwn(this.responses, (val, key) => {
-          const qId = (key.split(/\/items\//)[1]).split(/.jsonld/)[0];
-          if (branchLogic) {
-            if (isNaN(val)) {
-              br += `const ${qId}=0; `;
-            } else {
-              br += `const ${qId}=${val}; `;
-            }
-          }
-        });
-        try {
-          // console.log(`eval('${br} ${branchLogic}')`);
-          // console.log(this.responses);
-          // eslint-disable-next-line
-          // console.log('branch logic::::', eval(br+' '+ branchLogic));
-          // console.log('br', br);
-        } catch (e) {
-          // console.log('catch-br', br);
-          // Do nothing
-        }
-      }
-    },
     nextQuestion(idx, skip, dontKnow) {
       if (skip) {
         this.$emit('saveResponse', this.context[idx]['@id'], 'skipped');
@@ -213,7 +187,9 @@ export default {
       const keys = _.map(this.order, c => c['@id']); // Object.keys(this.responses);
       const keyArr = _.map(keys, (key) => {
         const val = responses[key];
-        const qId = (key.split(/\/items\//)[1]).split(/.jsonld/)[0];
+        const filenameParts = key.split('/');
+        const filename = filenameParts[filenameParts.length - 1];
+        const qId = filename.split('.jsonld')[0];
         return { key, val, qId };
       });
       const outMapper = {};
@@ -244,7 +220,7 @@ export default {
       let totalQ = this.context.length;
       if (!_.isEmpty(this.visibility)) {
         totalQ = _.filter(this.visibility).length;
-        console.log(totalQ);
+        // console.log(totalQ);
       }
       const progress = ((Object.keys(this.responses).length) / totalQ) * 100;
       this.$emit('updateProgress', progress);

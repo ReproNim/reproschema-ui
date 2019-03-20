@@ -3,25 +3,37 @@
     <!-- https://codepen.io/vikttor_/pen/jeqoPN?page=1& -->
     <div class="contextItem align-self-center center">
       <transition name="fade" mode="out-in">
-        <InputSelector v-if="status === 'ready'"
+        <InputSelector v-if="status === 'ready' && ui !== 'multipart'"
          :inputType="ui"
          :title="title"
          :valueConstraints="valueConstraints"
          :init="init"
          :responses="responses"
          :selected_language="selected_language"
+         :showPassOptions="showPassOptions"
          v-on:skip="sendSkip"
          v-on:dontKnow="sendDontKnow"
          v-on:next="sendNext"
          v-on:valueChanged="sendData"
          />
-        <div class="loader" v-else>
+
+        <div class="loader" v-else-if="status !== 'ready'">
           <!-- <b-progress :value="50"
           :max="100" animated variant="secondary" class="mb-3 align-middle">
           </b-progress>
           <span class="align-middle mt-3 text-muted">loading</span> -->
           <Loader />
         </div>
+        <multipart v-else
+         :progress="mp_progress"
+         :responses="mp_responses"
+         :srcUrl="item['@id']"
+         v-on:skip="sendSkip"
+         v-on:dontKnow="sendDontKnow"
+         v-on:saveResponse="setMPResponse"
+         v-on:updateProgress="setMPProgress"
+         v-on:valueChanged="sendData"
+        />
       </transition>
     </div>
   </b-card>
@@ -60,13 +72,38 @@ import jsonld from 'jsonld/dist/jsonld.min';
 import _ from 'lodash';
 import InputSelector from '../InputSelector/';
 import Loader from '../Loader/';
+import MultiPart from '../MultiPart';
 
 
 export default {
-  name: 'contextItem',
-  props: ['item', 'index', 'init', 'responses', 'score', 'selected_language'],
+  name: 'SurveyItem',
+  props: {
+    item: {
+      type: Object,
+    },
+    index: {
+      type: Number,
+    },
+    init: {
+
+    },
+    responses: {
+      type: Object,
+    },
+    score: {
+      type: Number,
+    },
+    selected_language: {
+      type: String,
+    },
+    showPassOptions: {
+      type: Boolean,
+      default: true,
+    },
+  },
   components: {
     InputSelector,
+    multipart: MultiPart,
     Loader,
   },
   data() {
@@ -74,7 +111,8 @@ export default {
       data: [],
       valueC: [],
       status: 'loading',
-      progress: 0,
+      mp_responses: {},
+      mp_progress: 0,
       variant: null,
     };
   },
@@ -88,8 +126,11 @@ export default {
       /* eslint-enable */
     },
     title() {
-      const activeQuestion = _.filter(this.data['http://schema.org/question'], q => q['@language'] === this.selected_language);
-      return activeQuestion[0]['@value'];
+      if (this.data['http://schema.org/question']) {
+        const activeQuestion = _.filter(this.data['http://schema.org/question'], q => q['@language'] === this.selected_language);
+        return activeQuestion[0]['@value'];
+      }
+      return null;
     },
     valueConstraints() {
       if (this.data['https://schema.repronim.org/valueconstraints']) {
@@ -108,15 +149,26 @@ export default {
           // so a progress bar won't work here.
         },
       }).then((resp) => {
-        this.data = resp[0];
-        if (Object.keys(this.data['https://schema.repronim.org/valueconstraints'][0]).indexOf('@id') > -1) {
-          jsonld.expand(this.data['https://schema.repronim.org/valueconstraints'][0]['@id']).then((rsp) => {
-            this.valueC = rsp[0];
-          });
-        } else {
-          this.valueC = this.data['https://schema.repronim.org/valueconstraints'][0];
+        if (resp.length) {
+          this.data = resp[0];
+          if (this.data['https://schema.repronim.org/valueconstraints']) {
+            if (Object.keys(this.data['https://schema.repronim.org/valueconstraints'][0]).indexOf('@id') > -1) {
+              jsonld.expand(this.data['https://schema.repronim.org/valueconstraints'][0]['@id']).then((rsp) => {
+                this.valueC = rsp[0];
+              });
+            } else {
+              this.valueC = this.data['https://schema.repronim.org/valueconstraints'][0];
+            }
+          } else {
+            // console.log(this.data);
+            // throw Error('This is not a properly formatted jsonld schema');
+            // console.info('there are no value constraints');
+            this.valueC = {
+              '@value': null,
+            };
+          }
+          this.status = 'ready';
         }
-        this.status = 'ready';
       });
     },
     sendSkip(doSkip) {
@@ -138,6 +190,13 @@ export default {
       this.variant = null;
       /* eslint-enable */
       this.$emit('setData', val, this.index);
+    },
+    setMPResponse(index, value) {
+      // console.log('setting response of multipart item', index, value);
+      this.mp_responses[index] = value;
+    },
+    setMPProgress(progress) {
+      this.mp_progress = progress;
     },
   },
   mounted() {
