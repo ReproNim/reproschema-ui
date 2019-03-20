@@ -62,11 +62,14 @@
 </style>
 
 <script>
+import Vue from 'vue';
 import jsonld from 'jsonld/dist/jsonld.min';
 import _ from 'lodash';
 import ContextItem from '../SurveyItem/';
 import Loader from '../Loader/';
 
+
+Vue.component('survey-item', ContextItem);
 const safeEval = require('safe-eval');
 
 export default {

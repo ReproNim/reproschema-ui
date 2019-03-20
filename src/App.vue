@@ -71,10 +71,10 @@ import _ from 'lodash';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import circleProgress from './components/Circle/';
-import SurveyItem from './components/SurveyItem';
+// import SurveyItem from './components/SurveyItem';
 
 Vue.use(BootstrapVue);
-Vue.component('survey-item', SurveyItem);
+// Vue.component('survey-item', SurveyItem);
 Vue.filter('reverse', value => value.slice().reverse());
 
 export default {
