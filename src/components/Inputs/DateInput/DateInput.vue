@@ -1,11 +1,9 @@
 <template>
   <div class="DateInput">
-    <!-- TODO: when the input value changes, make sure we tell our parent component that
-    the value changed. -->
-
     <!-- TODO: some sort of validation on date (make sure its not a future date.)
     and this should be encoded in the jsonld -- in valueConstraints -->
-    <datepicker v-model="input"></datepicker>
+    <datepicker v-model="input" lang="en" :not-before="new Date()" @change="sendData"></datepicker>
+
   </div>
 </template>
 
@@ -27,10 +25,8 @@ export default {
     },
   },
   methods: {
-    onSubmit(e) {
-      e.preventDefault();
-      // this emit needs to be called whenever the input changes.
-      this.$emit('valueChanged', this.input);
+    sendData(val) {
+      this.$emit('valueChanged', val);
     },
   },
   computed: {
@@ -42,7 +38,7 @@ export default {
     return {
       // a proxy. It should initialize to this.init. when its changed,
       // we should tell the parent that its changed, with then changes this.input
-      input: new Date(2016, 9, 16),
+      input: new Date(),
       a: 1,
       b: 2,
     };
