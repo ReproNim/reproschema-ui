@@ -19,7 +19,7 @@
     <transition-group name="list" tag="div" mode="in-out">
       <div v-for="(content, index) in contextReverse" :key="content['@id']+index" class="mt-3 mb-3">
         <transition name="list" :key="'t'+content['@id']">
-          <ContextItem
+          <survey-item
             :key="'c' + content['@id']"
             v-if="shouldShow[index]"
             :item="content" :index="contextReverse.length - index - 1"
@@ -65,11 +65,11 @@
 import Vue from 'vue';
 import jsonld from 'jsonld/dist/jsonld.min';
 import _ from 'lodash';
-import ContextItem from '../SurveyItem/';
+import SurveyItem from '../SurveyItem/';
 import Loader from '../Loader/';
 
 
-Vue.component('survey-item', ContextItem);
+Vue.component('survey-item', SurveyItem);
 const safeEval = require('safe-eval');
 
 export default {
@@ -85,7 +85,6 @@ export default {
     };
   },
   components: {
-    ContextItem,
     Loader,
   },
   methods: {
