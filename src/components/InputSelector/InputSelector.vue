@@ -1,9 +1,9 @@
 <template>
   <div class="inputContent">
-    <div class="lead" v-if="title">
-      <perfect-scrollbar>
-        {{ title }}
-      </perfect-scrollbar>
+    <div class="lead scroll mb-3 pr-3 pl-3" v-if="title">
+      <!-- <perfect-scrollbar> -->
+        <p :class="{'text-justify': inputType==='audioPassageRecord'}">{{ title }}</p>
+      <!-- </perfect-scrollbar> -->
       <span v-if="valueConstraints.requiredValue" class="text-danger">*</span>
     </div>
 
@@ -75,7 +75,6 @@
 </template>
 
 <script>
-import { PerfectScrollbar } from 'vue2-perfect-scrollbar';
 import Radio from '../Inputs/WebRadio/';
 import AudioRecord from '../Inputs/WebAudioRecord/';
 import TextInput from '../Inputs/WebTextInput/';
@@ -116,7 +115,6 @@ export default {
     DateInput,
     DocumentUpload,
     MultiPart,
-    PerfectScrollbar,
   },
   data() {
     return {
@@ -138,4 +136,25 @@ export default {
 };
 </script>
 
-<style src="vue2-perfect-scrollbar/dist/vue2-perfect-scrollbar.css"></style>
+<style>
+  .scroll {
+    position: relative;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .scroll::-webkit-scrollbar {
+    width: 0.5em;
+  }
+
+  .scroll::-webkit-scrollbar-track {
+      -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  }
+
+  .scroll::-webkit-scrollbar-thumb {
+    background-color: darkgrey;
+    outline: 1px solid slategrey;
+    margin-left: 0.2em;
+  }
+
+</style>
