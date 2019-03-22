@@ -15,7 +15,9 @@
         <ul class="list-unstyled components">
             <!-- <p>Dummy Heading</p> -->
             <li v-for="(ui, index) in schemaOrder" :key="index">
-                <a @click="setActivity(index)" :class="{'current': index==activityIndex}">
+                <a @click="setActivity(index)"
+                v-if="visibility[index]"
+                :class="{'current': index==activityIndex}">
                   <circleProgress
                    :radius="20"
                    :progress="progress[index]"
@@ -67,6 +69,7 @@
 // import jsonld from 'jsonld/dist/jsonld.min';
 import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
+import axios from 'axios';
 import _ from 'lodash';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
@@ -77,6 +80,17 @@ Vue.use(BootstrapVue);
 // Vue.component('survey-item', SurveyItem);
 Vue.filter('reverse', value => value.slice().reverse());
 
+function getFilename(s) {
+  const folders = s.split('/');
+  const N = folders.length;
+  const filename = folders[N - 1].split('.')[0];
+  return filename;
+}
+
+function getCoffee() {
+  return new Promise(resolve => setTimeout(() => resolve('☕'), 2000)); // it takes 2 seconds to make coffee);
+}
+
 export default {
   name: 'App',
   components: {
@@ -86,6 +100,8 @@ export default {
     return {
       sidebarActive: true,
       selected_language: 'en',
+      visibility: {},
+      cache: {},
       // responses: [],
     };
   },
@@ -105,8 +121,18 @@ export default {
       }
     },
     updateProgress(progress) {
+      this.checkProgressDiff(this.progress[this.activityIndex], progress);
       this.$store.dispatch('updateProgress', progress);
       this.$forceUpdate();
+    },
+    checkProgressDiff(oldP, newP) {
+      // TODO: check for an already completed activity. Progress won't change,
+      // but there will be a change in responses that needs to trigger
+      // this.setVisibility().
+      if ((oldP !== newP) && newP === 100) {
+        console.log('time to check for branching activities!');
+        this.setVisbility();
+      }
     },
     saveResponse(key, value) {
       this.$store.dispatch('saveResponse', { key, value });
@@ -131,6 +157,58 @@ export default {
       }
       return null;
     },
+    async computeVisibilityCondition(cond, index) {
+      if (_.isObject(cond)) {
+        const request = {
+          method: cond.method,
+          url: cond.url,
+          data: cond.payload,
+          headers: {
+            'content-type': 'application/json',
+          },
+        };
+        const cacheKey = JSON.stringify(request);
+        if (Object.keys(this.cache).indexOf(cacheKey) > -1) {
+          // this.visibility[index] = this.cache[cacheKey];
+          return this.cache[cacheKey];
+        }
+        if (this.visibility[index] == null || this.visibility[index] === undefined) {
+          // if there is a request and it hasn't been run yet, then
+          // default to false
+          this.visibility[index] = false;
+        }
+        console.log('making request', request, 'cache', this.cache);
+        const resp = await axios(request);
+
+        // this.visibility[index] = resp.data;
+        this.cache[cacheKey] = resp.data;
+
+        return resp.data;
+      } else if (_.isString(cond)) {
+        // todo: implement client-side evaluation!
+        Error('Client-side branching at activity set level is not implemented yet');
+      }
+      // this.visibility[index] = cond;
+      return cond;
+    },
+    visibilityChain(conditionList) {
+      if (!conditionList[0]) {
+        return 0;
+      }
+      return this.computeVisibilityCondition(conditionList[0].condition,
+        conditionList[0].index)
+        .then((resp) => {
+          this.visibility[conditionList[0].index] = resp;
+          this.$forceUpdate();
+          const newConditionList = [...conditionList];
+          newConditionList.shift();
+          this.visibilityChain(newConditionList);
+        });
+    },
+    setVisbility() {
+      const values = _.map(this.visibilityConditions, (condition, index) => ({ condition, index }));
+      this.visibilityChain(values);
+    },
   },
   watch: {
     $route() {
@@ -140,6 +218,13 @@ export default {
     },
     selected_language() {
       this.$store.dispatch('setLanguage', this.selected_language);
+    },
+    visibilityConditions: {
+      handler(newC) {
+        if (!_.isEmpty(newC)) {
+          this.setVisbility();
+        }
+      },
     },
   },
   created() {
@@ -175,6 +260,64 @@ export default {
         return order;
       }
       return [];
+    },
+    schemaNameMapper() {
+      const output = {};
+      if (this.schemaOrder) {
+        _.map(this.schemaOrder, (s) => {
+          const fname = getFilename(s);
+          output[fname] = s;
+        });
+      }
+      return output;
+    },
+    visibilityConditions() {
+      if (this.schema['https://schema.repronim.org/visibility']) {
+        return _.map(this.schemaOrder, (s) => {
+          // TODO: don't assume the key name is the same as the ending of the filename.
+          const keyName = getFilename(s);
+
+          // look through the "https://schema.repronim.org/visibility" field
+          // and reformat nicely
+
+          let condition = _.filter(this.schema['https://schema.repronim.org/visibility'], (c) => {
+            return c['@index'] === keyName;
+          });
+          if (condition.length === 1) {
+            condition = condition[0];
+
+            // check which keys are in this condition:
+
+            const conditionKeys = Object.keys(condition);
+            if (conditionKeys.indexOf('@value') > -1) {
+              return condition['@value'];
+            }
+
+            if (conditionKeys.indexOf('http://schema.org/httpMethod') > -1 &&
+              conditionKeys.indexOf('http://schema.org/url') > -1 &&
+              conditionKeys.indexOf('https://schema.repronim.org/payload') > -1
+            ) {
+              // lets fill the payload here.
+              const payload = {};
+              const payloadList = condition['https://schema.repronim.org/payload'];
+              _.map(payloadList, (p) => {
+                const item = p['@value'];
+                const index = this.schemaOrder.indexOf(this.schemaNameMapper[item]);
+                payload[this.schemaNameMapper[item]] = this.responses[index];
+              });
+              return {
+                url: condition['http://schema.org/url'][0]['@value'],
+                method: condition['http://schema.org/httpMethod'][0]['@value'],
+                payload,
+              };
+            }
+          }
+          // if something is up with the schema, just default to true.
+          return true;
+        });
+      }
+      // return all true's:
+      return _.mapValues(this.schemaOrder, () => true);
     },
   },
 };
