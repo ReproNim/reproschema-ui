@@ -115,7 +115,6 @@ export default {
     DateInput,
     DocumentUpload,
     MultiPart,
-    PerfectScrollbar,
   },
   data() {
     return {
