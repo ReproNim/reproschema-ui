@@ -1,10 +1,11 @@
 <template>
   <div class="inputContent">
-
-    <p class="lead" v-if="title">
-      {{title}}
+    <div class="lead" v-if="title">
+      <perfect-scrollbar>
+        {{ title }}
+      </perfect-scrollbar>
       <span v-if="valueConstraints.requiredValue" class="text-danger">*</span>
-    </p>
+    </div>
 
     <b-alert variant="danger" show v-else>
       This item does not have a title defined
@@ -19,6 +20,10 @@
     <!-- If type is audioRecord -->
     <div v-else-if="inputType==='audioRecord'">
         <AudioRecord :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
+    </div>
+
+    <div v-else-if="inputType==='audioPassageRecord'">
+      <AudioRecord :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
     </div>
 
     <!-- If type is audioImageRecord -->
@@ -64,15 +69,15 @@
   </div>
 </template>
 
-<style></style>
-
 <script>
+import { PerfectScrollbar } from 'vue2-perfect-scrollbar';
 import Radio from '../Inputs/WebRadio/';
 import AudioRecord from '../Inputs/WebAudioRecord/';
 import TextInput from '../Inputs/WebTextInput/';
 import IntegerInput from '../Inputs/WebIntegerInput/';
 import DateInput from '../Inputs/DateInput/';
 import MultiPart from '../MultiPart/';
+
 
 export default {
   name: 'InputSelector',
@@ -104,6 +109,7 @@ export default {
     IntegerInput,
     DateInput,
     MultiPart,
+    PerfectScrollbar,
   },
   data() {
     return {
@@ -124,3 +130,5 @@ export default {
   },
 };
 </script>
+
+<style src="vue2-perfect-scrollbar/dist/vue2-perfect-scrollbar.css"></style>

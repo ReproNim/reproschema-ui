@@ -239,6 +239,8 @@ export default {
     font-size: 1.1em;
     display: block;
     cursor: pointer;
+    text-align: left;
+
 }
 #sidebar ul li a:hover {
   background-color: #17a2b8;
