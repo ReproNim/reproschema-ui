@@ -1,10 +1,9 @@
 <template>
   <div class="inputContent">
-
-    <p class="lead" v-if="title">
-      {{title}}
+    <div class="lead scroll mb-3 pr-3 pl-3" v-if="title">
+      <p :class="{'text-justify': inputType==='audioPassageRecord'}">{{ title }}</p>
       <span v-if="valueConstraints.requiredValue" class="text-danger">*</span>
-    </p>
+    </div>
 
     <b-alert variant="danger" show v-else>
       This item does not have a title defined
@@ -21,6 +20,10 @@
         <AudioRecord :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
     </div>
 
+    <div v-else-if="inputType==='audioPassageRecord'">
+      <AudioRecord :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
+    </div>
+
     <!-- If type is audioImageRecord -->
     <div v-else-if="inputType==='audioImageRecord'">
         <AudioRecord
@@ -34,14 +37,19 @@
         <TextInput :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
     </div>
 
-    <!-- If type is text -->
+    <!-- If type is number -->
     <div v-else-if="inputType==='number'">
         <IntegerInput :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
     </div>
 
-    <!-- If type is text -->
+    <!-- If type is date -->
     <div v-else-if="inputType==='date'">
         <DateInput :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
+    </div>
+
+    <!-- If type is document upload -->
+    <div v-else-if="inputType==='documentUpload'">
+      <DocumentUpload :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
     </div>
 
     <!-- if we don't have a component built for this type, then show an error -->
@@ -64,8 +72,6 @@
   </div>
 </template>
 
-<style></style>
-
 <script>
 import Radio from '../Inputs/WebRadio/';
 import AudioRecord from '../Inputs/WebAudioRecord/';
@@ -73,6 +79,8 @@ import TextInput from '../Inputs/WebTextInput/';
 import IntegerInput from '../Inputs/WebIntegerInput/';
 import DateInput from '../Inputs/DateInput/';
 import MultiPart from '../MultiPart/';
+import DocumentUpload from '../Inputs/DocumentUpload';
+
 
 export default {
   name: 'InputSelector',
@@ -103,6 +111,7 @@ export default {
     TextInput,
     IntegerInput,
     DateInput,
+    DocumentUpload,
     MultiPart,
   },
   data() {
@@ -124,3 +133,26 @@ export default {
   },
 };
 </script>
+
+<style>
+  .scroll {
+    position: relative;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .scroll::-webkit-scrollbar {
+    width: 0.5em;
+  }
+
+  .scroll::-webkit-scrollbar-track {
+      -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  }
+
+  .scroll::-webkit-scrollbar-thumb {
+    background-color: darkgrey;
+    outline: 1px solid slategrey;
+    margin-left: 0.2em;
+  }
+
+</style>
