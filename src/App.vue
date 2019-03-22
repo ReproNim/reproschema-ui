@@ -130,12 +130,20 @@ export default {
       // but there will be a change in responses that needs to trigger
       // this.setVisibility().
       if ((oldP !== newP) && newP === 100) {
-        console.log('time to check for branching activities!');
+        // console.log('time to check for branching activities!');
         this.setVisbility();
       }
     },
     saveResponse(key, value) {
+      let needsVizUpdate = false;
+      if (this.currentResponse[key] !== value && this.progress[this.activityIndex] === 100) {
+        // there has been a change in an already completed activity
+        needsVizUpdate = true;
+      }
       this.$store.dispatch('saveResponse', { key, value });
+      if (needsVizUpdate) {
+        this.setVisbility();
+      }
     },
     clearResponses() {
       this.$store.dispatch('clearResponses', this.activityIndex);
@@ -177,7 +185,7 @@ export default {
           // default to false
           this.visibility[index] = false;
         }
-        console.log('making request', request, 'cache', this.cache);
+        // console.log('making request', request, 'cache', this.cache);
         const resp = await axios(request);
 
         // this.visibility[index] = resp.data;
@@ -225,6 +233,7 @@ export default {
           this.setVisbility();
         }
       },
+      deep: true,
     },
   },
   created() {
@@ -252,6 +261,12 @@ export default {
     },
     progress() {
       return this.$store.state.progress;
+    },
+    currentActivityProgress() {
+      return this.progress[this.activityIndex];
+    },
+    currentResponse() {
+      return this.responses[this.activityIndex];
     },
     schemaOrder() {
       if (!_.isEmpty(this.$store.state.schema)) {
