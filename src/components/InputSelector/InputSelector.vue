@@ -1,9 +1,7 @@
 <template>
   <div class="inputContent">
     <div class="lead scroll mb-3 pr-3 pl-3" v-if="title">
-      <!-- <perfect-scrollbar> -->
-        <p :class="{'text-justify': inputType==='audioPassageRecord'}">{{ title }}</p>
-      <!-- </perfect-scrollbar> -->
+      <p :class="{'text-justify': inputType==='audioPassageRecord'}">{{ title }}</p>
       <span v-if="valueConstraints.requiredValue" class="text-danger">*</span>
     </div>
 
@@ -39,7 +37,7 @@
         <TextInput :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
     </div>
 
-    <!-- If type is text -->
+    <!-- If type is number -->
     <div v-else-if="inputType==='number'">
         <IntegerInput :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
     </div>
