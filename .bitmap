@@ -145,7 +145,25 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/input-selector@0.0.10": {
+    "akeshavan.mindlogger-web/date-input@0.0.1": {
+        "files": [
+            {
+                "relativePath": "src/components/Inputs/DateInput/DateInput.vue",
+                "test": false,
+                "name": "DateInput.vue"
+            },
+            {
+                "relativePath": "src/components/Inputs/DateInput/index.js",
+                "test": false,
+                "name": "index.js"
+            }
+        ],
+        "mainFile": "src/components/Inputs/DateInput/index.js",
+        "trackDir": "src/components/Inputs/DateInput",
+        "origin": "AUTHORED",
+        "exported": true
+    },
+    "akeshavan.mindlogger-web/input-selector@0.0.11": {
         "files": [
             {
                 "relativePath": "src/components/InputSelector/InputSelector.vue",
@@ -163,7 +181,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/survey@0.0.17": {
+    "akeshavan.mindlogger-web/survey@0.0.18": {
         "files": [
             {
                 "relativePath": "src/components/Survey/Survey.vue",
@@ -181,7 +199,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/survey-item@0.0.10": {
+    "akeshavan.mindlogger-web/survey-item@0.0.11": {
         "files": [
             {
                 "relativePath": "src/components/SurveyItem/SurveyItem.vue",
@@ -199,21 +217,21 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/date-input@0.0.1": {
+    "akeshavan.mindlogger-web/document-upload@0.0.1": {
         "files": [
             {
-                "relativePath": "src/components/Inputs/DateInput/DateInput.vue",
+                "relativePath": "src/components/Inputs/DocumentUpload/DocumentUpload.vue",
                 "test": false,
-                "name": "DateInput.vue"
+                "name": "DocumentUpload.vue"
             },
             {
-                "relativePath": "src/components/Inputs/DateInput/index.js",
+                "relativePath": "src/components/Inputs/DocumentUpload/index.js",
                 "test": false,
                 "name": "index.js"
             }
         ],
-        "mainFile": "src/components/Inputs/DateInput/index.js",
-        "trackDir": "src/components/Inputs/DateInput",
+        "mainFile": "src/components/Inputs/DocumentUpload/index.js",
+        "trackDir": "src/components/Inputs/DocumentUpload",
         "origin": "AUTHORED",
         "exported": true
     },
