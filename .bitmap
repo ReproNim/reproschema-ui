@@ -163,7 +163,25 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/input-selector@0.0.11": {
+    "akeshavan.mindlogger-web/document-upload@0.0.1": {
+        "files": [
+            {
+                "relativePath": "src/components/Inputs/DocumentUpload/DocumentUpload.vue",
+                "test": false,
+                "name": "DocumentUpload.vue"
+            },
+            {
+                "relativePath": "src/components/Inputs/DocumentUpload/index.js",
+                "test": false,
+                "name": "index.js"
+            }
+        ],
+        "mainFile": "src/components/Inputs/DocumentUpload/index.js",
+        "trackDir": "src/components/Inputs/DocumentUpload",
+        "origin": "AUTHORED",
+        "exported": true
+    },
+    "akeshavan.mindlogger-web/input-selector@0.0.12": {
         "files": [
             {
                 "relativePath": "src/components/InputSelector/InputSelector.vue",
@@ -181,7 +199,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/survey@0.0.18": {
+    "akeshavan.mindlogger-web/survey@0.0.19": {
         "files": [
             {
                 "relativePath": "src/components/Survey/Survey.vue",
@@ -199,7 +217,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/survey-item@0.0.11": {
+    "akeshavan.mindlogger-web/survey-item@0.0.12": {
         "files": [
             {
                 "relativePath": "src/components/SurveyItem/SurveyItem.vue",
@@ -214,24 +232,6 @@
         ],
         "mainFile": "src/components/SurveyItem/index.js",
         "trackDir": "src/components/SurveyItem",
-        "origin": "AUTHORED",
-        "exported": true
-    },
-    "akeshavan.mindlogger-web/document-upload@0.0.1": {
-        "files": [
-            {
-                "relativePath": "src/components/Inputs/DocumentUpload/DocumentUpload.vue",
-                "test": false,
-                "name": "DocumentUpload.vue"
-            },
-            {
-                "relativePath": "src/components/Inputs/DocumentUpload/index.js",
-                "test": false,
-                "name": "index.js"
-            }
-        ],
-        "mainFile": "src/components/Inputs/DocumentUpload/index.js",
-        "trackDir": "src/components/Inputs/DocumentUpload",
         "origin": "AUTHORED",
         "exported": true
     },

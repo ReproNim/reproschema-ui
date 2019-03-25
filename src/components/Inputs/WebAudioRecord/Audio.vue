@@ -33,12 +33,13 @@
 
 <script>
 const MediaStreamRecorder = require('msr');
+import _ from 'lodash';
 
 export default {
   name: 'audioRecord',
   props: {
     init: {
-      type: String,
+      type: [String, Blob],
     },
     mode: {
       type: String,
@@ -98,7 +99,7 @@ export default {
       this.isRecording = false;
       clearInterval(this.interval);
       this.timeRemaining = this.recordingTime / 1000;
-      this.$emit('valueChanged', this.recording.src);
+      this.$emit('valueChanged', this.recording.blob);
     },
     reset(e) {
       e.preventDefault();
@@ -114,6 +115,7 @@ export default {
       this.mediaRecorder.ondataavailable = (e) => {
         const blobURL = URL.createObjectURL(e);
         self.recording.src = blobURL;
+        self.recording.blob = e;
         self.stop();
       };
     },
@@ -136,8 +138,17 @@ export default {
       this.supported = true;
       navigator.mediaDevices.getUserMedia(this.audioConstraints).then(this.initialize, this.error);
       if (this.init) {
-        if (this.init.startsWith('blob')) {
-          this.recording.src = this.init;
+        if (_.isString(this.init)) {
+          if (this.init.startsWith('blob')) {
+            this.recording.src = this.init;
+            this.hasRecording = true;
+          } else {
+            this.hasRecording = false;
+          }
+        } else if (this.init instanceof Blob) {
+          const blobURL = URL.createObjectURL(this.init);
+          this.recording.src = blobURL;
+          this.recording.blob = this.init;
           this.hasRecording = true;
         } else {
           this.hasRecording = false;
