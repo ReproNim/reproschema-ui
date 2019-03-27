@@ -1,7 +1,11 @@
 <template>
-  <div class="SliderInput">
+  <div class="SliderInput ml-3 mr-3 pl-3 pr-3">
     <vue-slider v-model="input" :lazy="true" :data="interval"
                 :marks="true" @change="sendData"></vue-slider>
+    <b-row class="mt-3 pt-3">
+      <div class="col text-left">MinLabel</div>
+      <div class="col text-right">MaxLabel</div>
+    </b-row>
   </div>
 </template>
 
