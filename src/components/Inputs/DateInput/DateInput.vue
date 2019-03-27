@@ -2,7 +2,9 @@
   <div class="DateInput">
     <!-- TODO: some sort of validation on date (make sure its not a future date.)
     and this should be encoded in the jsonld -- in valueConstraints -->
-    <datepicker v-model="input" lang="en" :not-before="new Date()" @change="sendData"></datepicker>
+    <datepicker v-model="input" lang="en" :not-before="new Date()"
+                :minimumView="'day'" :maximumView="'year'" :initialView="'year'"
+                @change="sendData"></datepicker>
 
   </div>
 </template>
