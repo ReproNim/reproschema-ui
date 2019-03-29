@@ -36,7 +36,6 @@ export default {
     onSubmit(e) {
       e.preventDefault();
       const name = { first_name: this.input1, middle_name: this.input2, last_name: this.input3 };
-      console.log(24, name);
       this.$emit('valueChanged', name);
     },
   },

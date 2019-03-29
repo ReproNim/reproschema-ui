@@ -23,7 +23,6 @@ export default {
     },
     onSubmit(e) {
       e.preventDefault();
-      console.log(26, this.selectedFile);
       this.$emit('valueChanged', this.selectedFile);
     },
   },
