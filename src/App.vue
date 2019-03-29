@@ -29,6 +29,9 @@
                 </a>
             </li>
         </ul>
+        <div>
+          <b-button class="align-middle" @click="downloadZipData">Export</b-button>
+        </div>
       </nav>
 
       <!-- Page Content -->
@@ -216,6 +219,22 @@ export default {
     setVisbility() {
       const values = _.map(this.visibilityConditions, (condition, index) => ({ condition, index }));
       this.visibilityChain(values);
+    },
+    downloadZipData() {
+      const totalResponse = this.$store.state.responses;
+      console.log('download data file', totalResponse);
+      // const dirPaths = config.dirPaths;
+      // const pathToDb = path.join(userData, dirPaths[0]);
+      // var zip = new easyzip.EasyZip();
+      // zip.zipFolder(pathToDb, function (err) {
+      //   if (err) {
+      //     console.log(err);
+      //     throw err;
+      //   }
+      //   console.log('success zipping');
+      //   zip.writeToResponse(res, 'myUploads');
+      //   res.end();
+      // });
     },
   },
   watch: {
