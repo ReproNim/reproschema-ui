@@ -87,10 +87,6 @@ function getFilename(s) {
   return filename;
 }
 
-function getCoffee() {
-  return new Promise(resolve => setTimeout(() => resolve('☕'), 2000)); // it takes 2 seconds to make coffee);
-}
-
 export default {
   name: 'App',
   components: {
@@ -295,9 +291,7 @@ export default {
           // look through the "https://schema.repronim.org/visibility" field
           // and reformat nicely
 
-          let condition = _.filter(this.schema['https://schema.repronim.org/visibility'], (c) => {
-            return c['@index'] === keyName;
-          });
+          let condition = _.filter(this.schema['https://schema.repronim.org/visibility'], c => c['@index'] === keyName);
           if (condition.length === 1) {
             condition = condition[0];
 
