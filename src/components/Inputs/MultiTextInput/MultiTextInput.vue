@@ -49,9 +49,9 @@ export default {
   },
   mounted() {
     if (this.init) {
-      this.input1 = this.init;
-      this.input2 = this.init;
-      this.input3 = this.init;
+      this.input1 = this.init.first_name;
+      this.input2 = this.init.middle_name;
+      this.input3 = this.init.last_name;
     }
   },
 };
