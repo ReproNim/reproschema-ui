@@ -49,6 +49,11 @@
           :init="init" v-on:valueChanged="sendData"/>
     </div>
 
+    <!-- If type is text -->
+    <div v-else-if="inputType==='multitext'">
+      <MultiTextInput :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
+    </div>
+
     <!-- If type is number -->
     <div v-else-if="inputType==='number'">
         <IntegerInput
@@ -109,6 +114,7 @@ import IntegerInput from '../Inputs/WebIntegerInput/';
 import DateInput from '../Inputs/DateInput/';
 import MultiPart from '../MultiPart/';
 import DocumentUpload from '../Inputs/DocumentUpload';
+import MultiTextInput from '../Inputs/MultiTextInput';
 import SliderInput from '../Inputs/SliderInput';
 
 
@@ -142,6 +148,7 @@ export default {
     IntegerInput,
     DateInput,
     DocumentUpload,
+    MultiTextInput,
     SliderInput,
     MultiPart,
   },
