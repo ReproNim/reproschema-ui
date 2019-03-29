@@ -32,8 +32,9 @@
 </style>
 
 <script>
-const MediaStreamRecorder = require('msr');
 import _ from 'lodash';
+
+const MediaStreamRecorder = require('msr');
 
 export default {
   name: 'audioRecord',
