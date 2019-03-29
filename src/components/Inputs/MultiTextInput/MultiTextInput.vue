@@ -1,11 +1,25 @@
 <template>
   <div class="textInput">
     <b-form @submit="onSubmit">
-      <b-form-group>
-        <b-form-input v-model="input1"></b-form-input>
-        <b-form-input v-model="input2"></b-form-input>
-        <b-form-input v-model="input3"></b-form-input>
-      </b-form-group>
+      <b-row>
+        <b-col lg="4">
+          <b-input-group>
+            <b-form-input placeholder="first name" v-model="input1" required></b-form-input>
+          </b-input-group>
+        </b-col>
+
+        <b-col lg="4">
+          <b-input-group>
+            <b-form-input placeholder="middle name" v-model="input2"></b-form-input>
+          </b-input-group>
+        </b-col>
+        <b-col lg="4">
+          <b-input-group>
+            <b-form-input placeholder="family name" v-model="input3" required></b-form-input>
+          </b-input-group>
+        </b-col>
+      </b-row>
+      <br>
       <b-btn type="submit">Submit</b-btn>
     </b-form>
   </div>
@@ -21,8 +35,9 @@ export default {
   methods: {
     onSubmit(e) {
       e.preventDefault();
-      console.log(24, [this.input1, this.input2, this.input3]);
-      this.$emit('valueChanged', [this.input1, this.input2, this.input3]);
+      const name = { first_name: this.input1, middle_name: this.input2, last_name: this.input3 };
+      console.log(24, name);
+      this.$emit('valueChanged', name);
     },
   },
   data() {
