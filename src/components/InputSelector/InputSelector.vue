@@ -11,45 +11,74 @@
 
     <!-- If type is radio -->
     <div v-if="inputType==='radio'">
-        <Radio :constraints="valueConstraints"
-        :init="init" :selected_language="selected_language" v-on:valueChanged="sendData"/>
+        <Radio
+          :constraints="valueConstraints"
+          :selected_language="selected_language"
+        :init="init" v-on:valueChanged="sendData"/>
     </div>
 
     <!-- If type is audioRecord -->
     <div v-else-if="inputType==='audioRecord'">
-        <AudioRecord :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
+        <AudioRecord
+          :constraints="valueConstraints"
+          :selected_language="selected_language"
+          :init="init" v-on:valueChanged="sendData"/>
     </div>
 
     <div v-else-if="inputType==='audioPassageRecord'">
-      <AudioRecord :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
+      <AudioRecord
+        :constraints="valueConstraints"
+        :selected_language="selected_language"
+        :init="init" v-on:valueChanged="sendData"/>
     </div>
 
     <!-- If type is audioImageRecord -->
     <div v-else-if="inputType==='audioImageRecord'">
         <AudioRecord
         :constraints="valueConstraints"
+        :selected_language="selected_language"
         :init="init" v-on:valueChanged="sendData"
         mode="audioImageRecord" />
     </div>
 
     <!-- If type is text -->
     <div v-else-if="inputType==='text'">
-        <TextInput :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
+        <TextInput
+          :constraints="valueConstraints"
+          :selected_language="selected_language"
+          :init="init" v-on:valueChanged="sendData"/>
     </div>
 
     <!-- If type is number -->
     <div v-else-if="inputType==='number'">
-        <IntegerInput :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
+        <IntegerInput
+          :constraints="valueConstraints"
+          :selected_language="selected_language"
+          :init="init" v-on:valueChanged="sendData"/>
     </div>
 
     <!-- If type is date -->
     <div v-else-if="inputType==='date'">
-        <DateInput :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
+        <DateInput
+          :constraints="valueConstraints"
+          :selected_language="selected_language"
+          :init="init" v-on:valueChanged="sendData"/>
     </div>
 
     <!-- If type is document upload -->
     <div v-else-if="inputType==='documentUpload'">
-      <DocumentUpload :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
+      <DocumentUpload
+        :constraints="valueConstraints"
+        :selected_language="selected_language"
+        :init="init" v-on:valueChanged="sendData"/>
+    </div>
+
+    <!-- If type is document upload -->
+    <div v-else-if="inputType==='slider'">
+      <SliderInput
+        :constraints="valueConstraints"
+        :selected_language="selected_language"
+        :init="init" v-on:valueChanged="sendData"/>
     </div>
 
     <!-- if we don't have a component built for this type, then show an error -->
@@ -80,6 +109,7 @@ import IntegerInput from '../Inputs/WebIntegerInput/';
 import DateInput from '../Inputs/DateInput/';
 import MultiPart from '../MultiPart/';
 import DocumentUpload from '../Inputs/DocumentUpload';
+import SliderInput from '../Inputs/SliderInput';
 
 
 export default {
@@ -112,6 +142,7 @@ export default {
     IntegerInput,
     DateInput,
     DocumentUpload,
+    SliderInput,
     MultiPart,
   },
   data() {
