@@ -40,12 +40,10 @@ export default {
     },
     getMinLabel() {
       const activeMinLabel = _.filter(this.constraints['http://schema.org/minValue'], labels => labels['@language'] === this.selected_language);
-      console.log(activeMinLabel[0]['@value']);
       return activeMinLabel[0]['@value'];
     },
     getMaxLabel() {
       const activeMaxLabel = _.filter(this.constraints['http://schema.org/maxValue'], labels => labels['@language'] === this.selected_language);
-      console.log(activeMaxLabel[0]['@value']);
       return activeMaxLabel[0]['@value'];
     },
   },
