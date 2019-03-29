@@ -218,7 +218,7 @@ export default {
     },
     downloadZipData() {
       const totalResponse = this.$store.state.responses;
-      console.log('download data file', totalResponse);
+      console.log('download data file', typeof totalResponse, totalResponse);
       // const dirPaths = config.dirPaths;
       // const pathToDb = path.join(userData, dirPaths[0]);
       // var zip = new easyzip.EasyZip();
