@@ -58,6 +58,15 @@
           :init="init" v-on:valueChanged="sendData"/>
     </div>
 
+    <!-- If type is time rnage -->
+    <div v-else-if="inputType==='timeRange'">
+        <TimeRange
+          :constraints="valueConstraints"
+          :selected_language="selected_language"
+          :id="'timeRange' + Math.floor(Math.random()*1000)"
+          :init="init" v-on:valueChanged="sendData"/>
+    </div>
+
     <!-- If type is text -->
     <div v-else-if="inputType==='multitext'">
       <MultiTextInput :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
@@ -125,6 +134,7 @@ import MultiPart from '../MultiPart/';
 import DocumentUpload from '../Inputs/DocumentUpload';
 import MultiTextInput from '../Inputs/MultiTextInput';
 import SliderInput from '../Inputs/SliderInput';
+import TimeRange from '../Inputs/TimeRange';
 
 
 export default {
@@ -160,6 +170,7 @@ export default {
     MultiTextInput,
     SliderInput,
     MultiPart,
+    TimeRange,
   },
   data() {
     return {
