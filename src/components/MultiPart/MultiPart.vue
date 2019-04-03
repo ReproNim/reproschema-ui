@@ -144,7 +144,7 @@ export default {
     },
     nextQuestion(idx, skip, dontKnow) {
       if (this.currentIndex < this.context.length - 1) {
-        this.currentIndex += 1;
+        this.currentIndex = Object.keys(this.responses).length;
       }
       if (skip) {
         this.$emit('saveResponse', this.context[idx]['@id'], 'skipped');
