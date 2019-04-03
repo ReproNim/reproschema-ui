@@ -163,78 +163,6 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/web-audio-record@0.0.9": {
-        "files": [
-            {
-                "relativePath": "src/components/Inputs/WebAudioRecord/Audio.vue",
-                "test": false,
-                "name": "Audio.vue"
-            },
-            {
-                "relativePath": "src/components/Inputs/WebAudioRecord/index.js",
-                "test": false,
-                "name": "index.js"
-            }
-        ],
-        "mainFile": "src/components/Inputs/WebAudioRecord/index.js",
-        "trackDir": "src/components/Inputs/WebAudioRecord",
-        "origin": "AUTHORED",
-        "exported": true
-    },
-    "akeshavan.mindlogger-web/input-selector@0.0.14": {
-        "files": [
-            {
-                "relativePath": "src/components/InputSelector/InputSelector.vue",
-                "test": false,
-                "name": "InputSelector.vue"
-            },
-            {
-                "relativePath": "src/components/InputSelector/index.js",
-                "test": false,
-                "name": "index.js"
-            }
-        ],
-        "mainFile": "src/components/InputSelector/index.js",
-        "trackDir": "src/components/InputSelector",
-        "origin": "AUTHORED",
-        "exported": true
-    },
-    "akeshavan.mindlogger-web/survey@0.0.21": {
-        "files": [
-            {
-                "relativePath": "src/components/Survey/Survey.vue",
-                "test": false,
-                "name": "Survey.vue"
-            },
-            {
-                "relativePath": "src/components/Survey/index.js",
-                "test": false,
-                "name": "index.js"
-            }
-        ],
-        "mainFile": "src/components/Survey/index.js",
-        "trackDir": "src/components/Survey",
-        "origin": "AUTHORED",
-        "exported": true
-    },
-    "akeshavan.mindlogger-web/survey-item@0.0.14": {
-        "files": [
-            {
-                "relativePath": "src/components/SurveyItem/SurveyItem.vue",
-                "test": false,
-                "name": "SurveyItem.vue"
-            },
-            {
-                "relativePath": "src/components/SurveyItem/index.js",
-                "test": false,
-                "name": "index.js"
-            }
-        ],
-        "mainFile": "src/components/SurveyItem/index.js",
-        "trackDir": "src/components/SurveyItem",
-        "origin": "AUTHORED",
-        "exported": true
-    },
     "akeshavan.mindlogger-web/multi-text-input@0.0.1": {
         "files": [
             {
@@ -268,6 +196,78 @@
         ],
         "mainFile": "src/components/Inputs/SliderInput/index.js",
         "trackDir": "src/components/Inputs/SliderInput",
+        "origin": "AUTHORED",
+        "exported": true
+    },
+    "akeshavan.mindlogger-web/web-audio-record@0.0.10": {
+        "files": [
+            {
+                "relativePath": "src/components/Inputs/WebAudioRecord/Audio.vue",
+                "test": false,
+                "name": "Audio.vue"
+            },
+            {
+                "relativePath": "src/components/Inputs/WebAudioRecord/index.js",
+                "test": false,
+                "name": "index.js"
+            }
+        ],
+        "mainFile": "src/components/Inputs/WebAudioRecord/index.js",
+        "trackDir": "src/components/Inputs/WebAudioRecord",
+        "origin": "AUTHORED",
+        "exported": true
+    },
+    "akeshavan.mindlogger-web/input-selector@0.0.15": {
+        "files": [
+            {
+                "relativePath": "src/components/InputSelector/InputSelector.vue",
+                "test": false,
+                "name": "InputSelector.vue"
+            },
+            {
+                "relativePath": "src/components/InputSelector/index.js",
+                "test": false,
+                "name": "index.js"
+            }
+        ],
+        "mainFile": "src/components/InputSelector/index.js",
+        "trackDir": "src/components/InputSelector",
+        "origin": "AUTHORED",
+        "exported": true
+    },
+    "akeshavan.mindlogger-web/survey@0.0.22": {
+        "files": [
+            {
+                "relativePath": "src/components/Survey/Survey.vue",
+                "test": false,
+                "name": "Survey.vue"
+            },
+            {
+                "relativePath": "src/components/Survey/index.js",
+                "test": false,
+                "name": "index.js"
+            }
+        ],
+        "mainFile": "src/components/Survey/index.js",
+        "trackDir": "src/components/Survey",
+        "origin": "AUTHORED",
+        "exported": true
+    },
+    "akeshavan.mindlogger-web/survey-item@0.0.15": {
+        "files": [
+            {
+                "relativePath": "src/components/SurveyItem/SurveyItem.vue",
+                "test": false,
+                "name": "SurveyItem.vue"
+            },
+            {
+                "relativePath": "src/components/SurveyItem/index.js",
+                "test": false,
+                "name": "index.js"
+            }
+        ],
+        "mainFile": "src/components/SurveyItem/index.js",
+        "trackDir": "src/components/SurveyItem",
         "origin": "AUTHORED",
         "exported": true
     },

@@ -157,7 +157,8 @@ export default {
         // update the listShow with the next index in case this one we added isn't visible
         for (let i = nextQuestionIdx; i < this.context.length; i += 1) {
           const id = this.order[i]['@id'];
-          const isVisible = this.visibility[id];
+          const isVisible = this.visibility[id] || true;
+
           if (!isVisible) {
             this.listShow.push(i + 1);
           } else {
