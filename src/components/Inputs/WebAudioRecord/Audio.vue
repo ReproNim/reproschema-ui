@@ -73,7 +73,7 @@ export default {
       return this.constraints['http://schema.org/maxValue'][0]['@value'];
     },
     generateNumber() {
-      return 100000000 + Math.floor(Math.random() * 900000000); // random number of length 9
+      return 100000 + Math.floor(Math.random() * 900000); // random number of length 6
     },
   },
   methods: {
