@@ -1,11 +1,23 @@
 <template>
   <div class="TimeRangeInput container ml-3 pl-3">
+    <b-row class="mt-2 mb-2">
+      <b-col class="mt-2 mb-2">
+        went to bed:
+        {{yesterday}}
+        <vue-timepicker v-model="slept" format="hh:mm A"></vue-timepicker>
+      </b-col>
+      <b-col class="mt-2 mb-2">
+        woke up:
+        {{today}}
+        <vue-timepicker v-model="woke" format="hh:mm A"></vue-timepicker>
+      </b-col>
+    </b-row>
 
-    <svg :id="id">
-
-    </svg>
-    <div>
-      <b-button>Submit</b-button>
+    <div class="mt-2 mb-2" v-if="timeSlept != null">
+      <div class="mt-2 mb-2" v-if="timeSlept < 0">
+        <b-alert show variant="danger">You can't sleep negative hours!</b-alert>
+      </div>
+      <b-button v-else @click="sendData">Submit {{timeSlept}} hours</b-button>
     </div>
   </div>
 </template>
@@ -34,14 +46,18 @@
 </style>
 
 <script>
-import { event as currentEvent } from 'd3-selection';
-
-const d3 = Object.assign({}, require('d3-selection'), require('d3-drag'), require('d3-scale'), require('d3-time'));
-
-window.d3 = d3;
+// import VueClockPicker from '@pencilpix/vue2-clock-picker';
+// import '@pencilpix/vue2-clock-picker/dist/vue2-clock-picker.min.css';
 
 // import _ from 'lodash';
 // import { bus } from '../../main';
+
+import VueTimepicker from 'vue2-timepicker';
+import moment from 'moment';
+import _ from 'lodash';
+
+window.moment = moment;
+// var VueTimepicker = require('vue2-timepicker')
 
 
 export default {
@@ -49,105 +65,77 @@ export default {
   props: ['constraints', 'init', 'selected_language', 'id'],
   data() {
     return {
-      selected: null,
-      width: 250,
-      height: 250,
-      circumference_r: 100,
-      container: null,
-      coords: [{
-        x: 0,
-        y: -100,
+      slept: {
+        hh: '08',
+        mm: '00',
+        A: 'PM',
       },
-      {
-        x: 0,
-        y: 100,
-      }],
+      woke: {
+        A: 'AM',
+        hh: '06',
+        mm: '00',
+      },
+      today: null,
+      yesterday: null,
     };
   },
+  components: {
+    VueTimepicker,
+  },
   computed: {
-    timeTransform() {
-      const today = new Date();
-      const yday = today.getDate() - 1;
-      return d3.scaleTime()
-        .domain([yday, today])
-        .range([0, 2 * Math.PI]);
+    timeSlept() {
+      const startTime = this.sleptAt;
+      const endTime = this.wokeAt;
+
+      const res = endTime.diff(startTime, 'hours');
+
+      if (!isNaN(res)) {
+        return parseInt(res, 0);
+      }
+      return null;
+    },
+    sleptAt() {
+      const startTime = moment(`${this.slept.hh}:${this.slept.mm} ${this.slept.A}`, 'hh:mm A');
+      const today = moment(new Date());
+      const yesterday = moment(new Date()).add(-1, 'days');
+
+      if (this.slept.A === 'AM') {
+        // then its actually the next day
+        startTime.set('date', today.get('date'));
+        startTime.set('month', today.get('month'));
+        startTime.set('year', today.get('year'));
+      } else {
+        startTime.set('date', yesterday.get('date'));
+        startTime.set('month', yesterday.get('month'));
+        startTime.set('year', yesterday.get('year'));
+      }
+      return startTime;
+    },
+    wokeAt() {
+      const today = moment(new Date());
+      const endTime = moment(`${this.woke.hh}:${this.woke.mm} ${this.woke.A}`, 'hh:mm A');
+      endTime.set('date', today.get('date'));
+      endTime.set('month', today.get('month'));
+      endTime.set('year', today.get('year'));
+      return endTime;
     },
   },
   methods: {
-    dragstarted(elem) {
-      currentEvent.sourceEvent.stopPropagation();
-      d3.select(elem)
-        .classed('dragging', true);
-    },
-    dragged(d, elem) {
-      // eslint-disable-next-line
-      const d_from_origin = Math.sqrt((currentEvent.x ** 2) + (currentEvent.y ** 2));
-
-      // eslint-disable-next-line
-      const alpha = Math.acos(currentEvent.x / d_from_origin);
-
-      const newX = this.circumference_r * Math.cos(alpha);
-
-      // eslint-disable-next-line
-      const newY = currentEvent.y < 0 ? -this.circumference_r * Math.sin(alpha) : this.circumference_r * Math.sin(alpha);
-
-      // eslint-disable-next-line
-      d.x = newX;
-      // eslint-disable-next-line
-      d.y = newY;
-
-      this.coords = this.container.data();
-
-      // eslint-disable-next-line
-      d3.select(elem)
-        .attr('cx', newX)
-        // eslint-disable-next-line
-        .attr('cy', newY);
-    },
-    dragended(d, elem) {
-      d3.select(elem)
-        .classed('dragging', false);
-    },
-    initialize() {
-      const svg = d3.select(`#${this.id}`)
-        .attr('width', this.width)
-        .attr('height', this.height)
-        .append('g')
-        .attr('transform', `translate(${this.width / 2}, ${this.height / 2})`);
-      const container = svg.append('g');
-      container.append('circle')
-        .attr('r', this.circumference_r)
-        .attr('class', 'circumference');
-
-      const self = this;
-      const drag = d3.drag()
-        // .origin(d => d)
-        .on('start', function foo() { self.dragstarted(this); })
-        .on('drag', function dragged(d) { self.dragged(d, this); })
-        .on('end', function end(d) { self.dragended(d, this); });
-
-      this.container = container.append('g')
-        .attr('class', 'dot start')
-        .selectAll('circle')
-        .data(this.coords)
-        .enter()
-        .append('circle')
-        .attr('r', 5)
-        .attr('cx', d => d.x)
-        .attr('cy', d => d.y)
-        .call(drag);
-    },
-    sendData(val) {
-      this.$emit('valueChanged', val);
+    sendData() {
+      this.$emit('valueChanged', {
+        startTime: this.sleptAt.toISOString(),
+        endTime: this.wokeAt.toISOString(),
+        difference: this.timeSlept,
+      });
     },
   },
   watch: {
     init: {
       handler() {
         if (this.init != null) {
-          this.selected = this.init.value;
+          // TODO: parse the input correctly
         } else {
-          this.selected = false;
+          // TODO: parse the input correctly
         }
       },
       deep: true, // this watches all of the changes within an object. init: {value: 1}  not init: 1
@@ -155,9 +143,16 @@ export default {
   },
   mounted() {
     if (this.init !== undefined || this.init != null) {
-      this.selected = this.init;
+      // TODO: parse the input correctly
+      const startTime = moment(this.init.startTime).format('hh:mm A');
+      const endTime = moment(this.init.endTime).format('hh:mm A');
+      this.slept.A = startTime.split(' ')[1];
+      this.slept.hh = startTime.split(':')[0];
+      this.slept.mm = startTime.split(':')[1].split(' ')[0];
+      this.woke.A = endTime.split(' ')[1];
+      this.woke.hh = endTime.split(':')[0];
+      this.woke.mm = endTime.split(':')[1].split(' ')[0];
     }
-    this.initialize();
   },
 };
 
