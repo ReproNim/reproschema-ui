@@ -127,7 +127,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/date-input@0.0.1": {
+    "akeshavan.mindlogger-web/date-input@0.0.2": {
         "files": [
             {
                 "relativePath": "src/components/Inputs/DateInput/DateInput.vue",
@@ -145,7 +145,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/document-upload@0.0.1": {
+    "akeshavan.mindlogger-web/document-upload@0.0.2": {
         "files": [
             {
                 "relativePath": "src/components/Inputs/DocumentUpload/DocumentUpload.vue",
@@ -163,7 +163,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/web-audio-record@0.0.8": {
+    "akeshavan.mindlogger-web/web-audio-record@0.0.9": {
         "files": [
             {
                 "relativePath": "src/components/Inputs/WebAudioRecord/Audio.vue",
@@ -181,7 +181,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/input-selector@0.0.13": {
+    "akeshavan.mindlogger-web/input-selector@0.0.14": {
         "files": [
             {
                 "relativePath": "src/components/InputSelector/InputSelector.vue",
@@ -199,7 +199,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/survey@0.0.20": {
+    "akeshavan.mindlogger-web/survey@0.0.21": {
         "files": [
             {
                 "relativePath": "src/components/Survey/Survey.vue",
@@ -217,7 +217,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/survey-item@0.0.13": {
+    "akeshavan.mindlogger-web/survey-item@0.0.14": {
         "files": [
             {
                 "relativePath": "src/components/SurveyItem/SurveyItem.vue",
@@ -232,6 +232,42 @@
         ],
         "mainFile": "src/components/SurveyItem/index.js",
         "trackDir": "src/components/SurveyItem",
+        "origin": "AUTHORED",
+        "exported": true
+    },
+    "akeshavan.mindlogger-web/multi-text-input@0.0.1": {
+        "files": [
+            {
+                "relativePath": "src/components/Inputs/MultiTextInput/MultiTextInput.vue",
+                "test": false,
+                "name": "MultiTextInput.vue"
+            },
+            {
+                "relativePath": "src/components/Inputs/MultiTextInput/index.js",
+                "test": false,
+                "name": "index.js"
+            }
+        ],
+        "mainFile": "src/components/Inputs/MultiTextInput/index.js",
+        "trackDir": "src/components/Inputs/MultiTextInput",
+        "origin": "AUTHORED",
+        "exported": true
+    },
+    "akeshavan.mindlogger-web/slider-input@0.0.1": {
+        "files": [
+            {
+                "relativePath": "src/components/Inputs/SliderInput/SliderInput.vue",
+                "test": false,
+                "name": "SliderInput.vue"
+            },
+            {
+                "relativePath": "src/components/Inputs/SliderInput/index.js",
+                "test": false,
+                "name": "index.js"
+            }
+        ],
+        "mainFile": "src/components/Inputs/SliderInput/index.js",
+        "trackDir": "src/components/Inputs/SliderInput",
         "origin": "AUTHORED",
         "exported": true
     },

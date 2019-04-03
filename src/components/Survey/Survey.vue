@@ -149,12 +149,36 @@ export default {
         // }
       }
       this.$forceUpdate();
+
       if (idx === this.listShow.length - 1) {
-        this.listShow.push(_.max(this.listShow) + 1);
+        const nextQuestionIdx = _.max(this.listShow) + 1;
+        this.listShow.push(nextQuestionIdx);
+
+        // update the listShow with the next index in case this one we added isn't visible
+        for (let i = nextQuestionIdx; i < this.context.length; i += 1) {
+          const id = this.order[i]['@id'];
+          const isVisible = this.visibility[id];
+          if (!isVisible) {
+            this.listShow.push(i + 1);
+          } else {
+            break;
+          }
+        }
+
         if (this.$store) {
           this.$store.dispatch('updateListShow', this.listShow);
         }
       }
+    },
+    computeNewShow(listShow) {
+      return _.map(this.contextReverse, (o, index) => {
+        const criteria1 = listShow.indexOf(this.contextReverse.length - index - 1) >= 0;
+        let criteria2 = true;
+        if (!_.isEmpty(this.visibility)) {
+          criteria2 = this.visibility[o['@id']];
+        }
+        return criteria1 && criteria2;
+      });
     },
     setResponse(value, index) {
       this.$emit('saveResponse', this.context[index]['@id'], value);
