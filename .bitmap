@@ -91,24 +91,6 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/multi-part@0.0.1": {
-        "files": [
-            {
-                "relativePath": "src/components/MultiPart/MultiPart.vue",
-                "test": false,
-                "name": "MultiPart.vue"
-            },
-            {
-                "relativePath": "src/components/MultiPart/index.js",
-                "test": false,
-                "name": "index.js"
-            }
-        ],
-        "mainFile": "src/components/MultiPart/index.js",
-        "trackDir": "src/components/MultiPart",
-        "origin": "AUTHORED",
-        "exported": true
-    },
     "akeshavan.mindlogger-web/web-radio@0.0.2": {
         "files": [
             {
@@ -217,25 +199,25 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/input-selector@0.0.15": {
+    "akeshavan.mindlogger-web/multi-part@0.0.2": {
         "files": [
             {
-                "relativePath": "src/components/InputSelector/InputSelector.vue",
+                "relativePath": "src/components/MultiPart/MultiPart.vue",
                 "test": false,
-                "name": "InputSelector.vue"
+                "name": "MultiPart.vue"
             },
             {
-                "relativePath": "src/components/InputSelector/index.js",
+                "relativePath": "src/components/MultiPart/index.js",
                 "test": false,
                 "name": "index.js"
             }
         ],
-        "mainFile": "src/components/InputSelector/index.js",
-        "trackDir": "src/components/InputSelector",
+        "mainFile": "src/components/MultiPart/index.js",
+        "trackDir": "src/components/MultiPart",
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/survey@0.0.22": {
+    "akeshavan.mindlogger-web/survey@0.0.23": {
         "files": [
             {
                 "relativePath": "src/components/Survey/Survey.vue",
@@ -253,7 +235,25 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/survey-item@0.0.15": {
+    "akeshavan.mindlogger-web/input-selector@0.0.16": {
+        "files": [
+            {
+                "relativePath": "src/components/InputSelector/InputSelector.vue",
+                "test": false,
+                "name": "InputSelector.vue"
+            },
+            {
+                "relativePath": "src/components/InputSelector/index.js",
+                "test": false,
+                "name": "index.js"
+            }
+        ],
+        "mainFile": "src/components/InputSelector/index.js",
+        "trackDir": "src/components/InputSelector",
+        "origin": "AUTHORED",
+        "exported": true
+    },
+    "akeshavan.mindlogger-web/survey-item@0.0.16": {
         "files": [
             {
                 "relativePath": "src/components/SurveyItem/SurveyItem.vue",
