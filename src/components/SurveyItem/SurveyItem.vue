@@ -4,18 +4,18 @@
     <div class="contextItem align-self-center center">
       <transition name="fade" mode="out-in">
         <InputSelector v-if="status === 'ready' && ui !== 'multipart'"
-         :inputType="ui"
-         :title="title"
-         :valueConstraints="valueConstraints"
-         :init="init"
-         :responses="responses"
-         :selected_language="selected_language"
-         :showPassOptions="showPassOptions"
-         v-on:skip="sendSkip"
-         v-on:dontKnow="sendDontKnow"
-         v-on:next="sendNext"
-         v-on:valueChanged="sendData"
-         />
+                       :inputType="ui"
+                       :title="title"
+                       :valueConstraints="valueConstraints"
+                       :init="init"
+                       :responses="responses"
+                       :selected_language="selected_language"
+                       :showPassOptions="findPassOptions"
+                       v-on:skip="sendSkip"
+                       v-on:dontKnow="sendDontKnow"
+                       v-on:next="sendNext"
+                       v-on:valueChanged="sendData"
+        />
 
         <div class="loader" v-else-if="status !== 'ready'">
           <!-- <b-progress :value="50"
@@ -25,14 +25,14 @@
           <Loader />
         </div>
         <multipart v-else
-         :progress="mp_progress"
-         :responses="mp_responses"
-         :srcUrl="item['@id']"
-         v-on:skip="sendSkip"
-         v-on:dontKnow="sendDontKnow"
-         v-on:saveResponse="setMPResponse"
-         v-on:updateProgress="setMPProgress"
-         v-on:valueChanged="sendData"
+                   :progress="mp_progress"
+                   :responses="mp_responses"
+                   :srcUrl="item['@id']"
+                   v-on:skip="sendSkip"
+                   v-on:dontKnow="sendDontKnow"
+                   v-on:saveResponse="setMPResponse"
+                   v-on:updateProgress="setMPProgress"
+                   v-on:valueChanged="sendData"
         />
       </transition>
     </div>
@@ -96,10 +96,6 @@ export default {
     selected_language: {
       type: String,
     },
-    showPassOptions: {
-      type: Boolean,
-      default: true,
-    },
   },
   components: {
     InputSelector,
@@ -119,11 +115,11 @@ export default {
   computed: {
     ui() {
       /* eslint-disable */
-      if (this.data['https://schema.repronim.org/inputType']) {
-        return this.data['https://schema.repronim.org/inputType'][0]['@value'];
-      }
-      return 'N/A';
-      /* eslint-enable */
+        if (this.data['https://schema.repronim.org/inputType']) {
+          return this.data['https://schema.repronim.org/inputType'][0]['@value'];
+        }
+        return 'N/A';
+        /* eslint-enable */
     },
     title() {
       if (this.data['http://schema.org/question']) {
@@ -135,13 +131,24 @@ export default {
     valueConstraints() {
       if (this.data['https://schema.repronim.org/valueconstraints']) {
         // eslint-disable-next-line
-        return this.valueC;
+          return this.valueC;
       }
       /* eslint-enable */
       return { requiredValue: false };
     },
+    findPassOptions() {
+      if (Object.keys(this.data['https://schema.repronim.org/valueconstraints'][0]).indexOf('@id') > -1) {
+        return this.ValueCUrl();
+      }
+      // eslint-disable-next-line
+        console.log(148, this.data['https://schema.repronim.org/valueconstraints'][0]['http://schema.repronim.org/requiredValue'][0]['@value']);
+      return this.data['https://schema.repronim.org/valueconstraints'][0]['http://schema.repronim.org/requiredValue'][0]['@value'];
+    },
   },
   methods: {
+    ValueCUrl() {
+      jsonld.expand(this.data['https://schema.repronim.org/valueconstraints'][0]['@id']).then(rsp => rsp[0]['http://schema.repronim.org/requiredValue'][0]['@value']);
+    },
     getData() {
       jsonld.expand(this.item['@id'], {
         onDownloadProgress() {
