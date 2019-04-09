@@ -103,8 +103,8 @@
     </div>
 
     <!-- you can skip this question if requiredValue is not true -->
-    <div class="row float-right" v-if="showPassOptions">
-      <b-button class="" variant="default" @click="dontKnow">
+    <div class="row float-right">
+      <b-button class="" variant="default" v-if="!showPassOptions" @click="dontKnow">
         Don't Know
       </b-button>
       <b-button class="" variant="default" v-if="!valueConstraints.requiredValue" @click="skip">

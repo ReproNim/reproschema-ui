@@ -110,6 +110,7 @@ export default {
       mp_responses: {},
       mp_progress: 0,
       variant: null,
+      requireVal: false,
     };
   },
   computed: {
@@ -137,17 +138,25 @@ export default {
       return { requiredValue: false };
     },
     findPassOptions() {
-      if (Object.keys(this.data['https://schema.repronim.org/valueconstraints'][0]).indexOf('@id') > -1) {
-        return this.ValueCUrl();
+      if (this.data['https://schema.repronim.org/valueconstraints']) {
+        // when valueConstraints is a remote object
+        if (Object.keys(this.data['https://schema.repronim.org/valueconstraints'][0]).indexOf('@id') > -1) {
+          this.getRequiredVal();
+          return this.requireVal;
+        }
+        // when valueConstraints in embedded in item object itself
+        return this.data['https://schema.repronim.org/valueconstraints'][0]['http://schema.repronim.org/requiredValue'][0]['@value'];
       }
-      // eslint-disable-next-line
-        console.log(148, this.data['https://schema.repronim.org/valueconstraints'][0]['http://schema.repronim.org/requiredValue'][0]['@value']);
-      return this.data['https://schema.repronim.org/valueconstraints'][0]['http://schema.repronim.org/requiredValue'][0]['@value'];
+      return false;
     },
   },
   methods: {
-    ValueCUrl() {
-      jsonld.expand(this.data['https://schema.repronim.org/valueconstraints'][0]['@id']).then(rsp => rsp[0]['http://schema.repronim.org/requiredValue'][0]['@value']);
+    getRequiredVal() {
+      jsonld.expand(this.data['https://schema.repronim.org/valueconstraints'][0]['@id'])
+        .then((rsp) => {
+          this.requireVal = rsp[0]['http://schema.repronim.org/requiredValue'][0]['@value'];
+          // console.log(143, this.requireVal);
+        });
     },
     getData() {
       jsonld.expand(this.item['@id'], {
