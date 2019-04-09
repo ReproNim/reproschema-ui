@@ -43,11 +43,9 @@
 
 <script>
 import _ from 'lodash';
-import Vue from 'vue';
-import VueSelectImage from './SelectImage';
+import VueSelectImage from '../Utils/SelectImage';
 
 // add stylesheet
-require('vue-select-image/dist/vue-select-image.css');
 // import { bus } from '../../main';
 
 export default {
