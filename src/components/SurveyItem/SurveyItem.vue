@@ -145,7 +145,12 @@ export default {
           return this.requireVal;
         }
         // when valueConstraints in embedded in item object itself
-        return this.data['https://schema.repronim.org/valueconstraints'][0]['http://schema.repronim.org/requiredValue'][0]['@value'];
+        if (this.data['https://schema.repronim.org/valueconstraints'][0]) {
+          // make sure the requiredValue key is defined
+          if (this.data['https://schema.repronim.org/valueconstraints'][0]['http://schema.repronim.org/requiredValue']) {
+            return this.data['https://schema.repronim.org/valueconstraints'][0]['http://schema.repronim.org/requiredValue'][0]['@value'];
+          }
+        }
       }
       return false;
     },
