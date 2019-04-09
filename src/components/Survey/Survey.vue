@@ -138,12 +138,14 @@ export default {
     nextQuestion(idx, skip, dontKnow) {
       if (skip) {
         this.$emit('saveResponse', this.context[idx]['@id'], 'skipped');
+        this.setResponse('skipped', idx);
         // if (!_.isEmpty(this.activity['https://schema.repronim.org/scoringLogic'])) {
         //   this.evaluateScoringLogic();
         // }
       }
       if (dontKnow) {
         this.$emit('saveResponse', this.context[idx]['@id'], 'dontKnow');
+        this.setResponse('dontknow', idx);
         // if (!_.isEmpty(this.activity['https://schema.repronim.org/scoringLogic'])) {
         //   this.evaluateScoringLogic();
         // }
@@ -207,9 +209,12 @@ export default {
       _.map(keys, (k) => {
         // grab the value of the key from responseMapper
         const val = responseMapper[k].val;
-        output = output.replace(k, val);
+        if (val !== 'skipped' && val !== 'dontknow') {
+          output = output.replace(k, val);
+        } else {
+          output = output.replace(k, 0);
+        }
       });
-      // console.log(output, safeEval(output));
       return safeEval(output);
     },
     responseMapper(responses) {
