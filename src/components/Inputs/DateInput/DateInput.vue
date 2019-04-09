@@ -1,6 +1,7 @@
 <template>
   <div class="DateInput">
-    <datepicker v-model="input" lang="en" :not-before="new Date()"
+    <datepicker placeholder="Select Date" v-model="input" lang="en"
+                :disabledDates="dateParam.disabledDates"
                 :minimumView="'day'" :maximumView="'year'" :initialView="'year'"
                 @change="sendData"></datepicker>
   </div>
@@ -32,7 +33,12 @@ export default {
     return {
       // a proxy. It should initialize to this.init. when its changed,
       // we should tell the parent that its changed, with then changes this.input
-      input: new Date(),
+      input: null,
+      dateParam: {
+        disabledDates: {
+          from: new Date(), // Disable all dates after today
+        },
+      },
     };
   },
   mounted() {
