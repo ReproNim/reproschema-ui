@@ -30,6 +30,7 @@
             v-on:setData="setResponse"
             :responses="responses"
             :selected_language="selected_language"
+            :showPassOptions="findPassOptions"
             :score="score"
           />
         </transition>
@@ -82,6 +83,8 @@ export default {
       parsedJSONLD: {},
       visibility: {},
       score: 0,
+      isSkip: false,
+      isDontKnow: false,
     };
   },
   components: {
@@ -348,13 +351,31 @@ export default {
       return '';
     },
     /**
-     * we need to keep an eye on the store. 
+     * we need to keep an eye on the store.
      */
     readyForActivity() {
       if (this.$store) {
         return this.$store.getters.readyForActivity;
       }
     },
+    findPassOptions() {
+      if (this.activity['https://schema.repronim.org/allow']) {
+        let isSkip = false;
+        let isDontKnow = false;
+        _.map(this.activity['https://schema.repronim.org/allow'][0]['@list'], s => {
+          if (s['@id'] === "https://schema.repronim.org/refused_to_answer") {
+            isSkip = true;
+          } else if (s['@id'] === "https://schema.repronim.org/dont") {
+            isDontKnow = true;
+          }
+        });
+        return {
+          'skip': isSkip,
+          'dontKnow': isDontKnow
+        };
+      }
+      else return null;
+    }
   },
   mounted() {
     if (this.srcUrl) {
