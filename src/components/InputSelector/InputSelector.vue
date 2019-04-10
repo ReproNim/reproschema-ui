@@ -103,11 +103,12 @@
     </div>
 
     <!-- you can skip this question if requiredValue is not true -->
-    <div class="row float-right">
-      <b-button class="" variant="default" v-if="!showPassOptions" @click="dontKnow">
+    <div class="row float-right" v-if="showPassOptions !== null ">
+      <b-button class="" variant="default" v-if="showPassOptions['dontKnow'] === true"
+                @click="dontKnow">
         Don't Know
       </b-button>
-      <b-button class="" variant="default" v-if="!valueConstraints.requiredValue" @click="skip">
+      <b-button class="" variant="default" v-if="showPassOptions['skip'] === true" @click="skip">
         Skip
       </b-button>
     </div>
@@ -146,10 +147,9 @@ export default {
       type: String,
     },
     showPassOptions: {
-      type: Boolean,
-      default: true,
+      type: Object,
     },
-  }, // ['inputType', 'title', 'valueConstraints', 'init', 'selected_language'],
+  },
   components: {
     Radio,
     AudioRecord,

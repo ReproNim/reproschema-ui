@@ -10,7 +10,7 @@
                        :init="init"
                        :responses="responses"
                        :selected_language="selected_language"
-                       :showPassOptions="findPassOptions"
+                       :showPassOptions="showPassOptions"
                        v-on:skip="sendSkip"
                        v-on:dontKnow="sendDontKnow"
                        v-on:next="sendNext"
@@ -95,6 +95,9 @@ export default {
     },
     selected_language: {
       type: String,
+    },
+    showPassOptions: {
+      type: Object,
     },
   },
   components: {
