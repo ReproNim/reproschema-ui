@@ -184,6 +184,15 @@ export default {
   float: left;
 }
 
+.vue-select-image__thumbnail {
+  cursor: pointer;
+}
+
+.vue-select-image__thumbnail:hover {
+  background: #c7c7c7d0;
+  color: white;
+}
+
 .vue-select-image__thumbnail{
   padding: 6px;
   border: 1px solid #dddddd;
