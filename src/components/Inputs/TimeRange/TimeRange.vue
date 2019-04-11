@@ -195,6 +195,8 @@ export default {
         if (startAngle > endAngle) {
           startAngle -= Math.PI * 2;
         }
+      } else if (startAngle > 0 && endAngle < 0) {
+        endAngle += (Math.PI * 2);
       }
       // startAngle = startAngle < 0 ? startAngle + Math.PI * 2 : startAngle;
       // const startAngle = Math.PI;
