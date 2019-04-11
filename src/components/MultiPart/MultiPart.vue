@@ -146,19 +146,19 @@ export default {
       //   this.evaluateScoringLogic();
       // }
       this.updateProgress();
+      this.$forceUpdate();
     },
     nextQuestion(idx, skip, dontKnow) {
+      if (skip) {
+        this.setResponse('skipped', idx);
+      }
+      if (dontKnow) {
+        this.setResponse('dontKnow', idx);
+      }
+
       if (this.currentIndex < this.context.length - 1) {
         this.currentIndex = Object.keys(this.responses).length;
       }
-      if (skip) {
-        this.$emit('saveResponse', this.context[idx]['@id'], 'skipped');
-      }
-      if (dontKnow) {
-        this.$emit('saveResponse', this.context[idx]['@id'], 'dontKnow');
-      }
-      this.updateProgress();
-      this.$forceUpdate();
     },
   },
   watch: {
