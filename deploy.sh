@@ -36,7 +36,7 @@ else if [[ $TRAVIS_BRANCH == "expose-all-questions" && $TRAVIS_PULL_REQUEST == "
  echo "Starting to update gh-pages from feature branch\n"
 
  #create a folder named after the branch
- mkdir expose-all-questions
+ mkdir -p expose-all-questions
 
 #go into directory and copy data we're interested in to that directory
  cd expose-all-questions
