@@ -28,8 +28,8 @@
   }
 
   .dot circle.dragging {
-    fill: red;
-    stroke: brown;
+    fill: steelblue;
+    stroke: darkblue;
   }
 </style>
 
@@ -65,8 +65,8 @@ export default {
         y: -100,
       },
       {
-        x: 0,
-        y: 100,
+        x: 100,
+        y: 0,
       }],
     };
   },
@@ -122,7 +122,6 @@ export default {
       this.arc12
         .data([this.startEndAngles])
         .attr('d', (d, i) => {
-          console.log('redoing!');
           return this.drawArc12(d);
         })
         .attr('class', 'arc12')
@@ -167,7 +166,7 @@ export default {
         .attr('class', 'arc12')
         .style('fill', 'steelblue');
 
-      const colors = ['green', 'red'];
+      const colors = ['green', 'orange'];
 
       this.container = container.append('g')
         .attr('class', 'dot start')
@@ -185,10 +184,10 @@ export default {
       this.$emit('valueChanged', val);
     },
     getStartEndAngles(coords) {
-      let startAngle = Math.atan2(coords[1].x, coords[1].y);
-      let endAngle = Math.atan2(coords[0].x, coords[0].y);
+      let startAngle = Math.atan2(coords[0].x, -coords[0].y);
+      let endAngle = Math.atan2(coords[1].x, -coords[1].y);
       endAngle = endAngle < 0 ? endAngle + Math.PI * 2 : endAngle;
-      startAngle = startAngle < 0 ? startAngle + Math.PI * 2 : startAngle;
+      // startAngle = startAngle < 0 ? startAngle + Math.PI * 2 : startAngle;
       // const startAngle = Math.PI;
       // const endAngle = Math.PI / 2;
       return { startAngle, endAngle, padAngle: 0 };
