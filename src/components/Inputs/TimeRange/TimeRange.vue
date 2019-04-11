@@ -79,12 +79,12 @@ export default {
         .range([0, 2 * Math.PI]);
     },
     startEndAngles() {
-        return this.getStartEndAngles(this.coords);
+      return this.getStartEndAngles(this.coords);
     },
     drawArc12() {
       return d3.arc()
         .outerRadius(this.circumference_r + 2.5)
-        .innerRadius(this.circumference_r - 2.5)
+        .innerRadius(this.circumference_r - 2.5);
     },
   },
   methods: {
@@ -118,12 +118,9 @@ export default {
         // eslint-disable-next-line
         .attr('cy', newY);
 
-      const self = this;
       this.arc12
         .data([this.startEndAngles])
-        .attr('d', (d, i) => {
-          return this.drawArc12(d);
-        })
+        .attr('d', da => this.drawArc12(da))
         .attr('class', 'arc12')
         .style('fill', 'steelblue');
     },
@@ -156,13 +153,12 @@ export default {
       const arc12 = container.selectAll('.arc12')
         .data([this.startEndAngles])
         .attr('class', 'arc12')
-        .enter().append('path');
-        
+        .enter()
+        .append('path');
+
       this.arc12 = arc12;
 
-      arc12.attr('d', (d, i) => {
-        return drawArc12(d);
-      })
+      arc12.attr('d', da => drawArc12(da))
         .attr('class', 'arc12')
         .style('fill', 'steelblue');
 
@@ -177,7 +173,7 @@ export default {
         .attr('r', 10)
         .attr('cx', d => d.x)
         .attr('cy', d => d.y)
-        .attr('fill', (d, i) => { return colors[i]; })
+        .attr('fill', (d, i) => colors[i])
         .call(drag);
     },
     sendData(val) {
@@ -186,12 +182,25 @@ export default {
     getStartEndAngles(coords) {
       let startAngle = Math.atan2(coords[0].x, -coords[0].y);
       let endAngle = Math.atan2(coords[1].x, -coords[1].y);
-      endAngle = endAngle < 0 ? endAngle + Math.PI * 2 : endAngle;
+      // endAngle = endAngle < 0 ? endAngle + (Math.PI * 2) : endAngle;
+      // startAngle = startAngle < 0 ? startAngle + (Math.PI * 2) : startAngle;
+
+      if (startAngle < 0 && endAngle < 0) {
+        if (startAngle > endAngle) {
+          // const tmp = endAngle;
+          endAngle += (Math.PI * 2); // startAngle;
+          // startAngle = tmp;
+        }
+      } else if (startAngle > 0 && endAngle > 0) {
+        if (startAngle > endAngle) {
+          startAngle -= Math.PI * 2;
+        }
+      }
       // startAngle = startAngle < 0 ? startAngle + Math.PI * 2 : startAngle;
       // const startAngle = Math.PI;
       // const endAngle = Math.PI / 2;
       return { startAngle, endAngle, padAngle: 0 };
-    }
+    },
   },
   watch: {
     init: {
