@@ -16,7 +16,6 @@
             <!-- <p>Dummy Heading</p> -->
             <li v-for="(ui, index) in schemaOrder" :key="index">
                 <a @click="setActivity(index)"
-                v-if="visibility[index]"
                 :class="{'current': index==activityIndex}">
                   <circleProgress
                    :radius="20"
