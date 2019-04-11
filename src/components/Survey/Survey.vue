@@ -16,26 +16,20 @@
       </div>
     </div>
 
-    <transition-group name="list" tag="div" mode="in-out">
-      <div v-for="(content, index) in contextReverse" :key="content['@id']+index" class="mt-3 mb-3">
-        <transition name="list" :key="'t'+content['@id']">
+    <ul>
+      <li v-for="(content, index) in contextReverse" :key="content['@id']+index" class="mt-3 mb-3">
           <survey-item
             :key="'c' + content['@id']"
-            v-if="shouldShow[index]"
             :item="content" :index="contextReverse.length - index - 1"
             :init="responses[content['@id']]"
-            v-on:skip="nextQuestion(contextReverse.length - index - 1, 1, 0)"
-            v-on:dontKnow="nextQuestion(contextReverse.length - index - 1, 0, 1)"
-            v-on:next="nextQuestion(contextReverse.length - index - 1, 0)"
             v-on:setData="setResponse"
             :responses="responses"
             :selected_language="selected_language"
             :showPassOptions="findPassOptions"
             :score="score"
           />
-        </transition>
-      </div>
-    </transition-group>
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -339,7 +333,7 @@ export default {
     contextReverse() {
       /* eslint-disable */
       if(this.context.length >0) {
-        return this.context.slice().reverse();
+        return this.context.slice();
       }
       return {};
     },
