@@ -1,6 +1,6 @@
 <template>
   <div class="TimeRangeInput container ml-3 pl-3">
-
+    <p>{{startEndAngles}}</p>
     <svg :id="id">
 
     </svg>
@@ -14,7 +14,7 @@
   .circumference {
     fill: #fff;
     stroke: #f2f2f2;
-    stroke-width: 5px;
+    stroke-width: 10px;
   }
 
   .dot circle:hover {
@@ -22,7 +22,7 @@
   }
 
   .dot circle {
-    fill: lightsteelblue;
+    /* fill: lightsteelblue; */
     stroke: steelblue;
     stroke-width: 1.5px;
   }
@@ -36,7 +36,12 @@
 <script>
 import { event as currentEvent } from 'd3-selection';
 
-const d3 = Object.assign({}, require('d3-selection'), require('d3-drag'), require('d3-scale'), require('d3-time'));
+const d3 = Object.assign({},
+  require('d3-selection'),
+  require('d3-drag'),
+  require('d3-scale'),
+  require('d3-time'),
+  require('d3-shape'));
 
 window.d3 = d3;
 
@@ -54,6 +59,7 @@ export default {
       height: 250,
       circumference_r: 100,
       container: null,
+      arc12: null,
       coords: [{
         x: 0,
         y: -100,
@@ -71,6 +77,14 @@ export default {
       return d3.scaleTime()
         .domain([yday, today])
         .range([0, 2 * Math.PI]);
+    },
+    startEndAngles() {
+        return this.getStartEndAngles(this.coords);
+    },
+    drawArc12() {
+      return d3.arc()
+        .outerRadius(this.circumference_r + 2.5)
+        .innerRadius(this.circumference_r - 2.5)
     },
   },
   methods: {
@@ -103,6 +117,16 @@ export default {
         .attr('cx', newX)
         // eslint-disable-next-line
         .attr('cy', newY);
+
+      const self = this;
+      this.arc12
+        .data([this.startEndAngles])
+        .attr('d', (d, i) => {
+          console.log('redoing!');
+          return this.drawArc12(d);
+        })
+        .attr('class', 'arc12')
+        .style('fill', 'steelblue');
     },
     dragended(d, elem) {
       d3.select(elem)
@@ -126,20 +150,49 @@ export default {
         .on('drag', function dragged(d) { self.dragged(d, this); })
         .on('end', function end(d) { self.dragended(d, this); });
 
+      const drawArc12 = d3.arc()
+        .outerRadius(this.circumference_r + 2.5)
+        .innerRadius(this.circumference_r - 2.5);
+
+      const arc12 = container.selectAll('.arc12')
+        .data([this.startEndAngles])
+        .attr('class', 'arc12')
+        .enter().append('path');
+        
+      this.arc12 = arc12;
+
+      arc12.attr('d', (d, i) => {
+        return drawArc12(d);
+      })
+        .attr('class', 'arc12')
+        .style('fill', 'steelblue');
+
+      const colors = ['green', 'red'];
+
       this.container = container.append('g')
         .attr('class', 'dot start')
         .selectAll('circle')
         .data(this.coords)
         .enter()
         .append('circle')
-        .attr('r', 5)
+        .attr('r', 10)
         .attr('cx', d => d.x)
         .attr('cy', d => d.y)
+        .attr('fill', (d, i) => { return colors[i]; })
         .call(drag);
     },
     sendData(val) {
       this.$emit('valueChanged', val);
     },
+    getStartEndAngles(coords) {
+      let startAngle = Math.atan2(coords[1].x, coords[1].y);
+      let endAngle = Math.atan2(coords[0].x, coords[0].y);
+      endAngle = endAngle < 0 ? endAngle + Math.PI * 2 : endAngle;
+      startAngle = startAngle < 0 ? startAngle + Math.PI * 2 : startAngle;
+      // const startAngle = Math.PI;
+      // const endAngle = Math.PI / 2;
+      return { startAngle, endAngle, padAngle: 0 };
+    }
   },
   watch: {
     init: {
