@@ -1,6 +1,7 @@
 <template>
   <div class="TimeRangeInput container ml-3 pl-3">
-    <p>{{startEndAngles}}</p>
+    <p>{{startEndAngles.startTime}}</p>
+    <p>{{startEndAngles.endTime}}</p>
     <svg :id="id">
 
     </svg>
@@ -41,7 +42,8 @@ const d3 = Object.assign({},
   require('d3-drag'),
   require('d3-scale'),
   require('d3-time'),
-  require('d3-shape'));
+  require('d3-shape'),
+);
 
 window.d3 = d3;
 
@@ -71,13 +73,6 @@ export default {
     };
   },
   computed: {
-    timeTransform() {
-      const today = new Date();
-      const yday = today.getDate() - 1;
-      return d3.scaleTime()
-        .domain([yday, today])
-        .range([0, 2 * Math.PI]);
-    },
     startEndAngles() {
       return this.getStartEndAngles(this.coords);
     },
@@ -88,6 +83,27 @@ export default {
     },
   },
   methods: {
+    angleToTime(alpha) {
+      // const today = new Date();
+      // const yday = today.getDate() - 1;
+      let xfm;
+      if (alpha < 0) {
+        xfm = d3.scaleLinear().domain([-Math.PI, 0]).range([6, 12]);
+      } else {
+        xfm = d3.scaleLinear().domain([0, Math.PI]).range([0, 6]);
+      }
+      return xfm(alpha);
+    },
+    timeToAngle(time) {
+      // time is in terms of hours + seconds/3600
+      let xfm;
+      if (time > 6) {
+        xfm = d3.scaleLinear().range([-Math.PI, 0]).domain([6, 12]);
+      } else {
+        xfm = d3.scaleLinear().range([0, Math.PI]).domain([0, 6]);
+      }
+      return xfm(time);
+    },
     dragstarted(elem) {
       currentEvent.sourceEvent.stopPropagation();
       d3.select(elem)
@@ -182,6 +198,9 @@ export default {
     getStartEndAngles(coords) {
       let startAngle = Math.atan2(coords[0].x, -coords[0].y);
       let endAngle = Math.atan2(coords[1].x, -coords[1].y);
+
+      const originalStart = startAngle;
+      const originalEnd = endAngle;
       // endAngle = endAngle < 0 ? endAngle + (Math.PI * 2) : endAngle;
       // startAngle = startAngle < 0 ? startAngle + (Math.PI * 2) : startAngle;
 
@@ -195,13 +214,13 @@ export default {
         if (startAngle > endAngle) {
           startAngle -= Math.PI * 2;
         }
-      } else if (startAngle > 0 && endAngle < 0) {
+      } else if (startAngle >= 0 && endAngle < 0) {
         endAngle += (Math.PI * 2);
       }
       // startAngle = startAngle < 0 ? startAngle + Math.PI * 2 : startAngle;
       // const startAngle = Math.PI;
       // const endAngle = Math.PI / 2;
-      return { startAngle, endAngle, padAngle: 0 };
+      return { startAngle, endAngle, padAngle: 0, startTime: this.angleToTime(originalStart), endTime: this.angleToTime(originalEnd) };
     },
   },
   watch: {
