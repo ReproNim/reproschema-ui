@@ -6,6 +6,7 @@
         <InputSelector v-if="status === 'ready' && ui !== 'multipart'"
                        :inputType="ui"
                        :title="title"
+                       :preamble="itemPreamble"
                        :valueConstraints="valueConstraints"
                        :init="init"
                        :responses="responses"
@@ -28,6 +29,7 @@
                    :progress="mp_progress"
                    :responses="mp_responses"
                    :srcUrl="item['@id']"
+                   :showPassOptions="showPassOptions"
                    v-on:skip="sendSkip"
                    v-on:dontKnow="sendDontKnow"
                    v-on:saveResponse="setMPResponse"
@@ -129,6 +131,13 @@ export default {
       if (this.data['http://schema.org/question']) {
         const activeQuestion = _.filter(this.data['http://schema.org/question'], q => q['@language'] === this.selected_language);
         return activeQuestion[0]['@value'];
+      }
+      return null;
+    },
+    itemPreamble() {
+      if (this.data['http://schema.repronim.org/preamble']) {
+        const activePreamble = _.filter(this.data['http://schema.repronim.org/preamble'], q => q['@language'] === this.selected_language);
+        return activePreamble[0]['@value'];
       }
       return null;
     },
