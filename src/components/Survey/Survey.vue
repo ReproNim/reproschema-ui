@@ -365,7 +365,7 @@ export default {
         _.map(this.activity['https://schema.repronim.org/allow'][0]['@list'], s => {
           if (s['@id'] === "https://schema.repronim.org/refused_to_answer") {
             isSkip = true;
-          } else if (s['@id'] === "https://schema.repronim.org/dont") {
+          } else if (s['@id'] === "https://schema.repronim.org/dont_know_answer") {
             isDontKnow = true;
           }
         });

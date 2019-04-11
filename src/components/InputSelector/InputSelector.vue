@@ -1,5 +1,8 @@
 <template>
   <div class="inputContent">
+    <div class="lead scroll mb-3 pr-3 pl-3" v-if="preamble">
+      <p :class="{'text-justify': inputType==='audioPassageRecord'}">{{ preamble }}</p>
+    </div>
     <div class="lead scroll mb-3 pr-3 pl-3" v-if="title">
       <p :class="{'text-justify': inputType==='audioPassageRecord'}">{{ title }}</p>
       <span v-if="valueConstraints.requiredValue" class="text-danger">*</span>
@@ -113,11 +116,11 @@
 
     <!-- you can skip this question if requiredValue is not true -->
     <div class="row float-right" v-if="showPassOptions !== null ">
-      <b-button class="" variant="default" v-if="showPassOptions['dontKnow'] === true"
+      <b-button class="" variant="default" v-if="showPassOptions['dontKnow']"
                 @click="dontKnow">
         Don't Know
       </b-button>
-      <b-button class="" variant="default" v-if="showPassOptions['skip'] === true" @click="skip">
+      <b-button class="" variant="default" v-if="showPassOptions['skip']" @click="skip">
         Skip
       </b-button>
     </div>
@@ -158,6 +161,9 @@ export default {
     },
     showPassOptions: {
       type: Object,
+    },
+    preamble: {
+      type: String,
     },
   },
   components: {
