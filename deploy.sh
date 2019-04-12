@@ -34,7 +34,7 @@ echo "Done updating gh-pages\n"
 elif [[ $TRAVIS_BRANCH == "expose-all-questions" && $TRAVIS_PULL_REQUEST == "false" ]]; then
 
 echo "Starting to update gh-pages from feature branch\n"
-
+pwd
  #copy data we're interested in to other place
  cp -R dist $HOME/dist
 
@@ -44,19 +44,20 @@ echo "copy data to home dist\n"
  mkdir -p expose-all-questions
 
 echo "create folder\n"
-
+pwd
 #go into directory and copy data we're interested in to that directory
  cd expose-all-questions
  cp -Rf $HOME/dist/* .
 
  echo "move to new dir and copy\n"
-
+pwd
  #go to home and setup git
  cd $HOME
  git config --global user.email "travis@travis-ci.org"
  git config --global user.name "Travis"
 
 echo "setup git\n"
+pwd
 
  #using token clone gh-pages branch
  git clone --quiet --branch=expose-all-questions https://${GH_TOKEN}@github.com/${GH_USER}/${GH_REPO}.git expose-all-questions > /dev/null
