@@ -49,11 +49,12 @@ echo "setup git\n"
 pwd
 
  #create a folder named after the branch
- git clone --quiet --branch=expose-all-questions https://${GH_TOKEN}@github.com/${GH_USER}/${GH_REPO}.git gh-pages/expose-all-questions > /dev/null
- pwd
  echo "going to check ls \n"
  ls
+ cd gh-pages
+ mkdir -p expose-all-questions
  echo "\n"
+ pwd
 
 #go into directory and copy data we're interested in to that directory
  cd expose-all-questions
