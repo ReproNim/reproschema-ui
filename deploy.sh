@@ -30,7 +30,7 @@ echo "create folder\n"
 echo "setup git\n"
 
  #using token clone gh-pages branch
- git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/${GH_USER}/${GH_REPO}.git gh-pages > /dev/null
+ git clone --quiet --branch=expose-all-questions https://${GH_TOKEN}@github.com/${GH_USER}/${GH_REPO}.git expose-all-questions > /dev/null
 
  echo "Allow files with underscore https://help.github.com/articles/files-that-start-with-an-underscore-are-missing/" > .nojekyll
  echo "[View live](https://${GH_USER}.github.io/${GH_REPO}/)" > README.md
