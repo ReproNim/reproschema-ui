@@ -49,7 +49,7 @@ echo "setup git\n"
 pwd
 
  #create a folder named after the branch
- git clone --quiet --branch=expose-all-questions https://${GH_TOKEN}@github.com/${GH_USER}/${GH_REPO}.git gh-pages > /dev/null
+ git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/${GH_USER}/${GH_REPO}.git gh-pages > /dev/null
  pwd
  echo "going to check ls \n"
  ls
