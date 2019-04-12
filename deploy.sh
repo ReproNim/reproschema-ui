@@ -27,6 +27,8 @@ echo "create folder\n"
  git config --global user.email "travis@travis-ci.org"
  git config --global user.name "Travis"
 
+echo "setup git\n"
+
  #using token clone gh-pages branch
  git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/${GH_USER}/${GH_REPO}.git gh-pages > /dev/null
 
