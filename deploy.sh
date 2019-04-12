@@ -9,12 +9,18 @@ echo "Starting to update gh-pages from feature branch\n"
  #copy data we're interested in to other place
  cp -R dist $HOME/dist
 
+echo "copy data to home dist\n"
+
  #create a folder named after the branch
  mkdir -p expose-all-questions
+
+echo "create folder\n"
 
 #go into directory and copy data we're interested in to that directory
  cd expose-all-questions
  cp -Rf $HOME/dist/* .
+
+ echo "move to new dir and copy\n"
 
  #go to home and setup git
  cd $HOME
@@ -35,5 +41,5 @@ echo "Starting to update gh-pages from feature branch\n"
  echo "Done updating gh-pages with build triggered from feature branch\n"
 
 else
- echo "Skipped updating gh-pages, because build is not triggered from the feature branch."
+ echo "Skipped updating gh-pages, because build is not triggered from the master branch."
 fi;
