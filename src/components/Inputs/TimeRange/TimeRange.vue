@@ -2,6 +2,9 @@
   <div class="TimeRangeInput container ml-3 pl-3">
     <p>{{startEndAngles.startTime}}</p>
     <p>{{startEndAngles.endTime}}</p>
+    <p>{{startEndAngles.diffTime}}</p>
+    <p>{{startEndAngles.diffRevTime}}</p>
+    <p>{{revolutions}}</p>
     <svg :id="id">
 
     </svg>
@@ -62,13 +65,18 @@ export default {
       circumference_r: 100,
       container: null,
       arc12: null,
+      prevVector: null,
+      prevCoords: [],
+      prevAngles: {},
+      prevDelta: {},
+      revolutions: 0,
       coords: [{
-        x: 0,
-        y: -100,
+        x: -100,
+        y: 0,
       },
       {
-        x: 100,
-        y: 0,
+        x: 0,
+        y: 100,
       }],
     };
   },
@@ -104,12 +112,28 @@ export default {
       }
       return xfm(time);
     },
+    timeToHourMin(time) {
+      // time is in hours and decimal places are seconds after the hour.
+      const hour = Math.floor(time);
+      const secondsFrac = time - hour;
+      const minutes = Math.floor(secondsFrac * 60);
+      return { hour, minutes };
+    },
+    hourMinToTime(hourObj) {
+      return hourObj.hour + (hourObj.minutes / 60);
+    },
+    timeRangeToDateRange() {
+
+    },
     dragstarted(elem) {
       currentEvent.sourceEvent.stopPropagation();
       d3.select(elem)
         .classed('dragging', true);
     },
     dragged(d, elem) {
+      const prevAngles = { ...this.getStartEndAngles(this.coords) };
+      const prevHour = prevAngles.diffTime.hour;
+
       // eslint-disable-next-line
       const d_from_origin = Math.sqrt((currentEvent.x ** 2) + (currentEvent.y ** 2));
 
@@ -128,6 +152,15 @@ export default {
 
       this.coords = this.container.data();
 
+      const newStartEndAngles = this.startEndAngles;
+
+
+      if (prevHour === 11 && newStartEndAngles.diffTime.hour === 0) {
+        this.revolutions = this.revolutions ? 0 : 1;
+      } else if (prevHour === 0 && newStartEndAngles.diffTime.hour === 11) {
+        this.revolutions = this.revolutions ? 0 : 1;
+      }
+
       // eslint-disable-next-line
       d3.select(elem)
         .attr('cx', newX)
@@ -135,7 +168,7 @@ export default {
         .attr('cy', newY);
 
       this.arc12
-        .data([this.startEndAngles])
+        .data([newStartEndAngles])
         .attr('d', da => this.drawArc12(da))
         .attr('class', 'arc12')
         .style('fill', 'steelblue');
@@ -220,7 +253,27 @@ export default {
       // startAngle = startAngle < 0 ? startAngle + Math.PI * 2 : startAngle;
       // const startAngle = Math.PI;
       // const endAngle = Math.PI / 2;
-      return { startAngle, endAngle, padAngle: 0, startTime: this.angleToTime(originalStart), endTime: this.angleToTime(originalEnd) };
+      const startTime = this.angleToTime(originalStart);
+      const endTime = this.angleToTime(originalEnd);
+      let diff = endTime - startTime;
+      if (diff < 0) {
+        diff += 12;
+      }
+      const diffTime = this.timeToHourMin(diff);
+      const diffRevTime = { ...diffTime };
+      if (this.revolutions) {
+        diffRevTime.hour += 12;
+      }
+
+      return {
+        startAngle,
+        endAngle,
+        padAngle: 0,
+        startTime,
+        endTime,
+        diffTime,
+        diffRevTime,
+      };
     },
   },
   watch: {
