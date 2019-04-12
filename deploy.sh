@@ -40,6 +40,15 @@ pwd
 
 echo "copy data to home dist\n"
 
+ #go to home and setup git
+ cd $HOME
+ git config --global user.email "travis@travis-ci.org"
+ git config --global user.name "Travis"
+
+echo "setup git\n"
+pwd
+ls
+
  #create a folder named after the branch
  mkdir -p expose-all-questions
 
@@ -50,13 +59,6 @@ pwd
  cp -Rf $HOME/dist/* .
 
  echo "move to new dir and copy\n"
-pwd
- #go to home and setup git
- cd $HOME
- git config --global user.email "travis@travis-ci.org"
- git config --global user.name "Travis"
-
-echo "setup git\n"
 pwd
 
  #using token clone gh-pages branch
