@@ -7,7 +7,6 @@ cache:
   - node_modules
 branches:
   only:
-  - master
   - expose-all-questions
 notifications:
   email: false
