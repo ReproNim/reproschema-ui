@@ -69,7 +69,9 @@ pwd
 
  #add, commit and push files
  git add -f .
+ git status
  git commit -m "Travis build $TRAVIS_BUILD_NUMBER"
+ git branch -v
  git push -fq origin gh-pages > /dev/null
 
  echo "Done updating gh-pages with build triggered from feature branch\n"
