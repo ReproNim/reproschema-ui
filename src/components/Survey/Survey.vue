@@ -16,8 +16,8 @@
       </div>
     </div>
 
-    <ul>
-      <li v-for="(content, index) in contextReverse" :key="content['@id']+index" class="mt-3 mb-3">
+    <transition-group name="list" tag="div" mode="in-out">
+      <div v-for="(content, index) in contextReverse" :key="content['@id']+index" class="mt-3 mb-3">
           <survey-item
             :key="'c' + content['@id']"
             :item="content" :index="contextReverse.length - index - 1"
@@ -28,8 +28,8 @@
             :showPassOptions="findPassOptions"
             :score="score"
           />
-      </li>
-    </ul>
+      </div>
+    </transition-group>
   </div>
 </template>
 
