@@ -8,6 +8,7 @@ cache:
 branches:
   only:
   - master
+  - expose-all-questions
 notifications:
   email: false
 before_script:
