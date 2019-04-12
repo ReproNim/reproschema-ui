@@ -57,11 +57,15 @@ pwd
 
 #go into directory and copy data we're interested in to that directory
 cd gh-pages
+echo "see that we are in the gh-pages branch\n\n"
+git branch -v
+echo "\n\ncreating a directory\n\n"
 mkdir -p expose-all-questions
 pwd
  cd expose-all-questions
  cp -Rf $HOME/dist/* .
 
+echo "printing the current working dir"
 pwd
 
  echo "Allow files with underscore https://help.github.com/articles/files-that-start-with-an-underscore-are-missing/" > .nojekyll
@@ -69,7 +73,9 @@ pwd
 
  #add, commit and push files
  git add -f .
+ git status
  git commit -m "Travis build $TRAVIS_BUILD_NUMBER"
+ git branch -v
  git push -fq origin gh-pages > /dev/null
 
  echo "Done updating gh-pages with build triggered from feature branch\n"
