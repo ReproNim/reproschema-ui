@@ -31,7 +31,7 @@ git push -fq origin gh-pages > /dev/null
 
 echo "Done updating gh-pages\n"
 
-else if [[ $TRAVIS_BRANCH == "expose-all-questions" && $TRAVIS_PULL_REQUEST == "false" ]]; then
+elif [[ $TRAVIS_BRANCH == "expose-all-questions" && $TRAVIS_PULL_REQUEST == "false" ]]; then
 
 echo "Starting to update gh-pages from feature branch\n"
 
