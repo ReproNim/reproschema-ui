@@ -1,14 +1,10 @@
 <template>
   <div class="TimeRangeInput container ml-3 pl-3">
-    <p>{{startEndAngles.startTime}}</p>
-    <p>{{startEndAngles.endTime}}</p>
-    <p>{{startEndAngles.diffTime}}</p>
-    <p>{{startEndAngles.diffRevTime}}</p>
-    <p>{{revolutions}}</p>
+
     <svg :id="id">
 
     </svg>
-    <div>
+    <div class="mt-3">
       <b-button>Submit</b-button>
     </div>
   </div>
@@ -39,6 +35,7 @@
 
 <script>
 import { event as currentEvent } from 'd3-selection';
+import _ from 'lodash';
 
 const d3 = Object.assign({},
   require('d3-selection'),
@@ -93,6 +90,11 @@ export default {
     },
   },
   methods: {
+    angleToCoord(alpha, r) {
+      const x = r * Math.sin(alpha);
+      const y = -r * Math.cos(-alpha);
+      return { x, y };
+    },
     angleToTime(alpha) {
       // const today = new Date();
       // const yday = today.getDate() - 1;
@@ -198,10 +200,11 @@ export default {
 
       const self = this;
       const drag = d3.drag()
-        // .origin(d => d)
         .on('start', function foo() { self.dragstarted(this); })
         .on('drag', function dragged(d) { self.dragged(d, this); })
         .on('end', function end(d) { self.dragended(d, this); });
+
+      // the arc
 
       const drawArc12 = d3.arc()
         .outerRadius(this.circumference_r + 2.5)
@@ -220,6 +223,8 @@ export default {
         .style('fill', 'steelblue');
 
       const colors = ['green', 'orange'];
+
+      // center time difference label
 
       const diff = this.startEndAngles.diffRevTime;
 
@@ -261,6 +266,31 @@ export default {
         .append('tspan')
         .text('min');
 
+
+      /*
+        Now lets do the clock face labels.
+      */
+
+      const hourTimes = _.map([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        t => this.hourMinToTime({ hour: t, minutes: 0 }));
+      const hourAngles = _.map(hourTimes, t => this.timeToAngle(t));
+      const hourCoords = _.map(hourAngles, a => this.angleToCoord(a, this.circumference_r * 0.8));
+      console.log(hourAngles);
+
+      container.selectAll('.clockLabel')
+        .data(hourCoords)
+        .enter()
+        .append('text')
+        .attr('class', 'clockLabel')
+        .attr('text-anchor', 'middle')
+        .attr('fill', '#404040')
+        .attr('alignment-baseline', 'middle')
+        .attr('x', d => d.x)
+        .attr('y', d => d.y)
+        .text((d, i) => i + 1);
+
+
+      //  here are the markers
       this.container = container.append('g')
         .attr('class', 'dot start')
         .selectAll('circle')
