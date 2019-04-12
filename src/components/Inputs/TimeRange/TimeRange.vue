@@ -66,6 +66,8 @@ export default {
       container: null,
       arc12: null,
       prevVector: null,
+      hourLabel: null,
+      minLabel: null,
       prevCoords: [],
       prevAngles: {},
       prevDelta: {},
@@ -172,6 +174,12 @@ export default {
         .attr('d', da => this.drawArc12(da))
         .attr('class', 'arc12')
         .style('fill', 'steelblue');
+
+      this.hourLabel
+        .text(`${newStartEndAngles.diffRevTime.hour}`);
+
+      this.minLabel
+        .text(`${newStartEndAngles.diffRevTime.minutes}`);
     },
     dragended(d, elem) {
       d3.select(elem)
@@ -212,6 +220,46 @@ export default {
         .style('fill', 'steelblue');
 
       const colors = ['green', 'orange'];
+
+      const diff = this.startEndAngles.diffRevTime;
+
+      const timeGroup = container.selectAll('.timeLabelGroup')
+        .data([diff])
+        .enter()
+        .append('text')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('text-anchor', 'middle')
+        .attr('class', 'timeLabelGroup');
+
+      const foo = timeGroup
+        .append('tspan')
+        .style('font-size', '34px');
+
+      foo
+        .attr('class', 'hourLabel')
+        .attr('dy', '.35em')
+        .text(`${diff.hour}`);
+
+      timeGroup
+        .append('tspan')
+        .text('hr');
+
+      const bar = timeGroup
+        .append('tspan')
+        .attr('dx', '0.25em')
+        .style('font-size', '24px');
+
+      bar
+        .attr('class', 'minLabel')
+        .text(`${diff.minutes}`);
+
+      this.hourLabel = foo;
+      this.minLabel = bar;
+
+      timeGroup
+        .append('tspan')
+        .text('min');
 
       this.container = container.append('g')
         .attr('class', 'dot start')
