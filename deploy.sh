@@ -49,20 +49,20 @@ echo "setup git\n"
 pwd
 
  #create a folder named after the branch
- git clone --quiet --branch=expose-all-questions https://${GH_TOKEN}@github.com/${GH_USER}/${GH_REPO}.git gh-pages/expose-all-questions > /dev/null
+ git clone --quiet --branch=expose-all-questions https://${GH_TOKEN}@github.com/${GH_USER}/${GH_REPO}.git gh-pages > /dev/null
  pwd
  echo "going to check ls \n"
  ls
  echo "\n"
 
 #go into directory and copy data we're interested in to that directory
+cd gh-pages
+mkdir -p expose-all-questions
+pwd
  cd expose-all-questions
  cp -Rf $HOME/dist/* .
 
 pwd
-
- #using token clone gh-pages branch
- git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/${GH_USER}/${GH_REPO}.git gh-pages > /dev/null
 
  echo "Allow files with underscore https://help.github.com/articles/files-that-start-with-an-underscore-are-missing/" > .nojekyll
  echo "[View live](https://${GH_USER}.github.io/${GH_REPO}/)" > README.md
