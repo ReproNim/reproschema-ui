@@ -3,11 +3,17 @@
     <b-row>
       <b-col>
         <span>Bedtime</span>
-        <h4>{{bedtime.format('hh:mm A')}}</h4>
+        <h4>{{bedtime.format('hh:mm')}}
+        <span v-if="startAM"> AM </span>
+        <span v-else> PM </span>
+        </h4>
       </b-col>
       <b-col>
         <span>Wake</span>
-        <h4>{{waketime.format('hh:mm A')}}</h4>
+        <h4>{{waketime.format('hh:mm')}}
+        <span v-if="endAM"> AM </span>
+        <span v-else> PM </span>
+        </h4>
       </b-col>
     </b-row>
     <svg :id="id">
@@ -81,6 +87,8 @@ export default {
       prevVector: null,
       hourLabel: null,
       minLabel: null,
+      startAM: false, // default bedtime is PM
+      endAM: true, // default waketime is AM
       prevCoords: [],
       prevAngles: {},
       prevDelta: {},
@@ -171,6 +179,10 @@ export default {
       const prevAngles = { ...this.getStartEndAngles(this.coords) };
       const prevHour = prevAngles.diffTime.hour;
 
+      // TODO: store the previous hours of the start and endtimes here
+      const prevStartHour = this.timeToHourMin(prevAngles.startTime).hour;
+      const prevEndHour = this.timeToHourMin(prevAngles.endTime).hour;
+
       // eslint-disable-next-line
       const d_from_origin = Math.sqrt((currentEvent.x ** 2) + (currentEvent.y ** 2));
 
@@ -190,8 +202,21 @@ export default {
       this.coords = this.container.data();
 
       const newStartEndAngles = this.startEndAngles;
+      const newStartHour = this.timeToHourMin(newStartEndAngles.startTime).hour;
+      const newEndHour = this.timeToHourMin(newStartEndAngles.endTime).hour;
 
+      // TODO: check for a pass around 12 and calculate AM/PM
+      if ((prevStartHour === 11 && newStartHour === 0)
+        || (prevStartHour === 0 && newStartHour === 11)) {
+        this.startAM = !this.startAM;
+      }
 
+      if ((prevEndHour === 11 && newEndHour === 0)
+        || (prevEndHour === 0 && newEndHour === 11)) {
+        this.endAM = !this.endAM;
+      }
+
+      // look for an overlap here.
       if (prevHour === 11 && newStartEndAngles.diffTime.hour === 0) {
         this.revolutions = this.revolutions ? 0 : 1;
       } else if (prevHour === 0 && newStartEndAngles.diffTime.hour === 11) {
