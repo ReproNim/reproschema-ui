@@ -1,6 +1,15 @@
 <template>
   <div class="TimeRangeInput container ml-3 pl-3">
-
+    <b-row>
+      <b-col>
+        <span>Bedtime</span>
+        <h4>{{bedtime.format('hh:mm A')}}</h4>
+      </b-col>
+      <b-col>
+        <span>Wake</span>
+        <h4>{{waketime.format('hh:mm A')}}</h4>
+      </b-col>
+    </b-row>
     <svg :id="id">
 
     </svg>
@@ -40,6 +49,9 @@
 <script>
 import { event as currentEvent } from 'd3-selection';
 import _ from 'lodash';
+import moment from 'moment';
+
+window.moment = moment;
 
 const d3 = Object.assign({},
   require('d3-selection'),
@@ -91,6 +103,23 @@ export default {
       return d3.arc()
         .outerRadius(this.circumference_r + 2.5)
         .innerRadius(this.circumference_r - 2.5);
+    },
+    bedtime() {
+      const output = this.waketime.clone();
+      output
+        .subtract(this.startEndAngles.diffRevTime.hour, 'hours')
+        .subtract(this.startEndAngles.diffRevTime.minutes, 'minutes');
+
+      return output;
+    },
+    waketime() {
+      const timeObj = this.timeToHourMin(this.startEndAngles.endTime);
+      let hour = timeObj.hour;
+      const minute = timeObj.minutes;
+      // if (this.revolutions) {
+      //   hour += 12;
+      // }
+      return moment().hour(hour).minute(minute);
     },
   },
   methods: {
@@ -338,9 +367,8 @@ export default {
           return emoji[i];
         })
         .attr('dy', '0.35em')
-        .style('font-size', '24px')
+        .style('font-size', '28px')
         .call(drag);
-
     },
     sendData(val) {
       this.$emit('valueChanged', val);
