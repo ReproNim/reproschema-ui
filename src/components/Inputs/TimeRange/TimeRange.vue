@@ -21,6 +21,10 @@
     cursor: pointer;
   }
 
+  .timeDotText:hover {
+    cursor: pointer;
+  }
+
   .dot circle {
     /* fill: lightsteelblue; */
     stroke: steelblue;
@@ -168,8 +172,10 @@ export default {
       // eslint-disable-next-line
       d3.select(elem)
         .attr('cx', newX)
+        .attr('x', newX)
         // eslint-disable-next-line
-        .attr('cy', newY);
+        .attr('cy', newY)
+        .attr('y', newY);
 
       this.arc12
         .data([newStartEndAngles])
@@ -275,7 +281,6 @@ export default {
         t => this.hourMinToTime({ hour: t, minutes: 0 }));
       const hourAngles = _.map(hourTimes, t => this.timeToAngle(t));
       const hourCoords = _.map(hourAngles, a => this.angleToCoord(a, this.circumference_r * 0.8));
-      console.log(hourAngles);
 
       container.selectAll('.clockLabel')
         .data(hourCoords)
@@ -290,18 +295,52 @@ export default {
         .text((d, i) => i + 1);
 
 
+      // container.selectAll('.timeDotText')
+      //   .data(this.coords)
+      //   .enter()
+      //   .append('text')
+      //   .attr('x', d => d.x)
+      //   .attr('y', d => d.y)
+      //   .attr('text-anchor', 'middle')
+      //   .attr('class', 'timeDotText')
+      //   .text((d, i) => {
+      //     const emoji = [String.fromCodePoint(0x1F354), String.fromCodePoint(0x1F354)];
+      //     return emoji[i];
+      //   })
+      //   .attr('dy', '0.35em')
+      //   .style('font-size', '24px')
+      //   .call(drag);
+
       //  here are the markers
-      this.container = container.append('g')
-        .attr('class', 'dot start')
-        .selectAll('circle')
+      // this.container = container.append('g')
+      //   .attr('class', 'dot')
+      //   .selectAll('circle')
+      //   .data(this.coords)
+      //   .enter()
+      //   .append('circle')
+      //   .attr('class', 'timeDot')
+      //   .attr('r', 10)
+      //   .attr('cx', d => d.x)
+      //   .attr('cy', d => d.y)
+      //   .attr('fill', (d, i) => colors[i])
+      //   .call(drag);
+
+      this.container = container.selectAll('.timeDotText')
         .data(this.coords)
         .enter()
-        .append('circle')
-        .attr('r', 10)
-        .attr('cx', d => d.x)
-        .attr('cy', d => d.y)
-        .attr('fill', (d, i) => colors[i])
+        .append('text')
+        .attr('x', d => d.x)
+        .attr('y', d => d.y)
+        .attr('text-anchor', 'middle')
+        .attr('class', 'timeDotText')
+        .text((d, i) => {
+          const emoji = [String.fromCodePoint(0x1F318), String.fromCodePoint(0x1F31E)];
+          return emoji[i];
+        })
+        .attr('dy', '0.35em')
+        .style('font-size', '24px')
         .call(drag);
+
     },
     sendData(val) {
       this.$emit('valueChanged', val);
