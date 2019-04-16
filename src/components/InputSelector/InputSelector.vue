@@ -107,6 +107,14 @@
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
+    <!-- If type is select input -->
+    <div v-else-if="inputType==='select'">
+      <SelectInput
+        :constraints="valueConstraints"
+        :selected_language="selected_language"
+        :init="init" v-on:valueChanged="sendData"/>
+    </div>
+
     <!-- if we don't have a component built for this type, then show an error -->
     <div v-else>
       <b-alert show>
@@ -139,6 +147,7 @@ import DocumentUpload from '../Inputs/DocumentUpload';
 import MultiTextInput from '../Inputs/MultiTextInput';
 import SliderInput from '../Inputs/SliderInput';
 import TimeRange from '../Inputs/TimeRange';
+import SelectInput from '../Inputs/SelectInput';
 
 
 export default {
@@ -177,6 +186,7 @@ export default {
     SliderInput,
     MultiPart,
     TimeRange,
+    SelectInput,
   },
   data() {
     return {
