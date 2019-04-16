@@ -54,7 +54,6 @@
 
 import VueTimepicker from 'vue2-timepicker';
 import moment from 'moment';
-import _ from 'lodash';
 
 window.moment = moment;
 // var VueTimepicker = require('vue2-timepicker')
