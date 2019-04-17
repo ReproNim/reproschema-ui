@@ -7,6 +7,7 @@
 
 <script>
 import _ from 'lodash';
+import axios from 'axios';
 
 export default {
   name: 'SelectInput',
@@ -44,7 +45,7 @@ export default {
         });
       }
       // TODO: else get from api
-      return this.options;
+      return this.options; // temporary
     },
   },
 };
