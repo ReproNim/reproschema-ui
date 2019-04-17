@@ -113,20 +113,21 @@ export default {
         .innerRadius(this.circumference_r - 2.5);
     },
     bedtime() {
-      const output = this.waketime.clone();
-      output
-        .subtract(this.startEndAngles.diffRevTime.hour, 'hours')
-        .subtract(this.startEndAngles.diffRevTime.minutes, 'minutes');
+      // const output = this.waketime.clone();
+      // output
+      //   .subtract(this.startEndAngles.diffRevTime.hour, 'hours')
+      //   .subtract(this.startEndAngles.diffRevTime.minutes, 'minutes');
 
-      return output;
+      // return output;
+      const timeObj = this.timeToHourMin(this.startEndAngles.startTime);
+      const hour = timeObj.hour;
+      const minute = timeObj.minutes;
+      return moment().hour(hour).minute(minute);
     },
     waketime() {
       const timeObj = this.timeToHourMin(this.startEndAngles.endTime);
-      let hour = timeObj.hour;
+      const hour = timeObj.hour;
       const minute = timeObj.minutes;
-      // if (this.revolutions) {
-      //   hour += 12;
-      // }
       return moment().hour(hour).minute(minute);
     },
   },
