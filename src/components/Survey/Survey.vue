@@ -222,6 +222,25 @@ export default {
     },
     responseMapper(responses) {
       const keys = _.map(this.order, c => c['@id']); // Object.keys(this.responses);
+
+      // a variable map is defined! great
+      if (this.activity['https://schema.repronim.org/variableMap']) {
+        const vmap = this.activity['https://schema.repronim.org/variableMap'][0]['@list'];
+        const keyArr = _.map(vmap, (v) => {
+          const key = v['https://schema.repronim.org/isAbout'][0]['@id'];
+          const qId = v['https://schema.repronim.org/variableName'][0]['@value'];
+          const val = responses[key];
+          return { key, val, qId };
+        });
+        const outMapper = {};
+        _.map(keyArr, (a) => {
+          outMapper[a.qId] = { val: a.val, ref: a.key };
+        });
+        return outMapper;
+      }
+
+      // TODO: delete the code below once the schema is set!
+      // we keep this for compatibility until everything is fixed.
       const keyArr = _.map(keys, (key) => {
         const val = responses[key];
         const filenameParts = key.split('/');
@@ -229,10 +248,12 @@ export default {
         const qId = filename.split('.jsonld')[0];
         return { key, val, qId };
       });
+
       const outMapper = {};
       _.map(keyArr, (a) => {
         outMapper[a.qId] = { val: a.val, ref: a.key };
       });
+
       return outMapper;
     },
     getVisibility(responses) {
