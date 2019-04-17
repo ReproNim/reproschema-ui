@@ -31,6 +31,8 @@
 
 
     <div class="text-right mt-3" v-if="showPassOptions !== null ">
+      <b-button variant="default"
+                @click="restart">Restart</b-button>
       <b-button variant="default" v-if="showPassOptions['dontKnow']"
                 @click="dontKnow">Don't Know</b-button>
       <b-button variant="default" v-if="showPassOptions['skip']"
@@ -100,6 +102,11 @@ export default {
           // this.visibility = this.getVisibility(this.responses);
         });
       });
+    },
+    restart() {
+      this.currentIndex = 0;
+      this.listShow = [0];
+      this.$emit('clearResponses');
     },
     responseMapper(responses) {
       const keys = _.map(this.order, c => c['@id']); // Object.keys(this.responses);
