@@ -34,7 +34,7 @@
                    v-on:dontKnow="sendDontKnow"
                    v-on:saveResponse="setMPResponse"
                    v-on:updateProgress="setMPProgress"
-                   v-on:valueChanged="sendData"
+                   v-on:valueChanged="sendDataAndGoNext"
         />
       </transition>
     </div>
@@ -223,6 +223,12 @@ export default {
       this.variant = null;
       /* eslint-enable */
       this.$emit('setData', val, this.index);
+    },
+    sendDataAndGoNext(val) {
+      this.variant = null;
+      /* eslint-enable */
+      this.$emit('setData', val, this.index);
+      this.sendNext();
     },
     setMPResponse(index, value) {
       // console.log('setting response of multipart item', index, value);
