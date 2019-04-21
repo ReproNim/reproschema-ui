@@ -30,6 +30,7 @@
             v-on:setData="setResponse"
             :responses="responses"
             :selected_language="selected_language"
+            :showPassOptions="findPassOptions"
             :score="score"
           />
         </transition>
@@ -82,6 +83,8 @@ export default {
       parsedJSONLD: {},
       visibility: {},
       score: 0,
+      isSkip: false,
+      isDontKnow: false,
     };
   },
   components: {
@@ -138,23 +141,52 @@ export default {
     nextQuestion(idx, skip, dontKnow) {
       if (skip) {
         this.$emit('saveResponse', this.context[idx]['@id'], 'skipped');
+        this.setResponse('skipped', idx);
         // if (!_.isEmpty(this.activity['https://schema.repronim.org/scoringLogic'])) {
         //   this.evaluateScoringLogic();
         // }
       }
       if (dontKnow) {
         this.$emit('saveResponse', this.context[idx]['@id'], 'dontKnow');
+        this.setResponse('dontknow', idx);
         // if (!_.isEmpty(this.activity['https://schema.repronim.org/scoringLogic'])) {
         //   this.evaluateScoringLogic();
         // }
       }
       this.$forceUpdate();
+
       if (idx === this.listShow.length - 1) {
-        this.listShow.push(_.max(this.listShow) + 1);
+        const nextQuestionIdx = _.max(this.listShow) + 1;
+        this.listShow.push(nextQuestionIdx);
+
+        // update the listShow with the next index in case this one we added isn't visible
+        for (let i = nextQuestionIdx; i < this.context.length; i += 1) {
+          const id = this.order[i]['@id'];
+          let isVisible = this.visibility[id];
+          if (isVisible === undefined) {
+            isVisible = true;
+          }
+          if (!isVisible) {
+            this.listShow.push(i + 1);
+          } else {
+            break;
+          }
+        }
+
         if (this.$store) {
           this.$store.dispatch('updateListShow', this.listShow);
         }
       }
+    },
+    computeNewShow(listShow) {
+      return _.map(this.contextReverse, (o, index) => {
+        const criteria1 = listShow.indexOf(this.contextReverse.length - index - 1) >= 0;
+        let criteria2 = true;
+        if (!_.isEmpty(this.visibility)) {
+          criteria2 = this.visibility[o['@id']];
+        }
+        return criteria1 && criteria2;
+      });
     },
     setResponse(value, index) {
       this.$emit('saveResponse', this.context[index]['@id'], value);
@@ -180,9 +212,12 @@ export default {
       _.map(keys, (k) => {
         // grab the value of the key from responseMapper
         const val = responseMapper[k].val;
-        output = output.replace(k, val);
+        if (val !== 'skipped' && val !== 'dontknow') {
+          output = output.replace(k, val);
+        } else {
+          output = output.replace(k, 0);
+        }
       });
-      // console.log(output, safeEval(output));
       return safeEval(output);
     },
     responseMapper(responses) {
@@ -316,13 +351,31 @@ export default {
       return '';
     },
     /**
-     * we need to keep an eye on the store. 
+     * we need to keep an eye on the store.
      */
     readyForActivity() {
       if (this.$store) {
         return this.$store.getters.readyForActivity;
       }
     },
+    findPassOptions() {
+      if (this.activity['https://schema.repronim.org/allow']) {
+        let isSkip = false;
+        let isDontKnow = false;
+        _.map(this.activity['https://schema.repronim.org/allow'][0]['@list'], s => {
+          if (s['@id'] === "https://schema.repronim.org/refused_to_answer") {
+            isSkip = true;
+          } else if (s['@id'] === "https://schema.repronim.org/dont_know_answer") {
+            isDontKnow = true;
+          }
+        });
+        return {
+          'skip': isSkip,
+          'dontKnow': isDontKnow
+        };
+      }
+      else return null;
+    }
   },
   mounted() {
     if (this.srcUrl) {

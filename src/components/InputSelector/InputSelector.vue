@@ -1,5 +1,8 @@
 <template>
   <div class="inputContent">
+    <div class="lead scroll mb-3 pr-3 pl-3" v-if="preamble">
+      <p :class="{'text-justify': inputType==='audioPassageRecord'}">{{ preamble }}</p>
+    </div>
     <div class="lead scroll mb-3 pr-3 pl-3" v-if="title">
       <p :class="{'text-justify': inputType==='audioPassageRecord'}">{{ title }}</p>
       <span v-if="valueConstraints.requiredValue" class="text-danger">*</span>
@@ -41,12 +44,35 @@
         mode="audioImageRecord" />
     </div>
 
+    <!-- If type is audioRecordNumberTask -->
+    <div v-else-if="inputType==='audioRecordNumberTask'">
+      <AudioRecord
+        :constraints="valueConstraints"
+        :selected_language="selected_language"
+        :init="init" v-on:valueChanged="sendData"
+        mode="audioRecordNumberTask" />
+    </div>
+
     <!-- If type is text -->
     <div v-else-if="inputType==='text'">
         <TextInput
           :constraints="valueConstraints"
           :selected_language="selected_language"
           :init="init" v-on:valueChanged="sendData"/>
+    </div>
+
+    <!-- If type is time rnage -->
+    <div v-else-if="inputType==='timeRange'">
+        <TimeRange
+          :constraints="valueConstraints"
+          :selected_language="selected_language"
+          :id="'timeRange' + Math.floor(Math.random()*1000)"
+          :init="init" v-on:valueChanged="sendData"/>
+    </div>
+
+    <!-- If type is text -->
+    <div v-else-if="inputType==='multitext'">
+      <MultiTextInput :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
     </div>
 
     <!-- If type is number -->
@@ -81,6 +107,15 @@
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
+    <!-- If type is select input -->
+    <div v-else-if="inputType==='select' || inputType==='language' || inputType==='city'">
+      <SelectInput
+        :constraints="valueConstraints"
+        :selected_language="selected_language"
+        :inputType="inputType"
+        :init="init" v-on:valueChanged="sendData"/>
+    </div>
+
     <!-- if we don't have a component built for this type, then show an error -->
     <div v-else>
       <b-alert show>
@@ -89,11 +124,12 @@
     </div>
 
     <!-- you can skip this question if requiredValue is not true -->
-    <div class="row float-right" v-if="showPassOptions">
-      <b-button class="" variant="default" @click="dontKnow">
+    <div class="row float-right" v-if="showPassOptions !== null ">
+      <b-button class="" variant="default" v-if="showPassOptions['dontKnow']"
+                @click="dontKnow">
         Don't Know
       </b-button>
-      <b-button class="" variant="default" v-if="!valueConstraints.requiredValue" @click="skip">
+      <b-button class="" variant="default" v-if="showPassOptions['skip']" @click="skip">
         Skip
       </b-button>
     </div>
@@ -109,7 +145,10 @@ import IntegerInput from '../Inputs/WebIntegerInput/';
 import DateInput from '../Inputs/DateInput/';
 import MultiPart from '../MultiPart/';
 import DocumentUpload from '../Inputs/DocumentUpload';
+import MultiTextInput from '../Inputs/MultiTextInput';
 import SliderInput from '../Inputs/SliderInput';
+import TimeRange from '../Inputs/TimeRange';
+import SelectInput from '../Inputs/SelectInput';
 
 
 export default {
@@ -131,10 +170,12 @@ export default {
       type: String,
     },
     showPassOptions: {
-      type: Boolean,
-      default: true,
+      type: Object,
     },
-  }, // ['inputType', 'title', 'valueConstraints', 'init', 'selected_language'],
+    preamble: {
+      type: String,
+    },
+  },
   components: {
     Radio,
     AudioRecord,
@@ -142,8 +183,11 @@ export default {
     IntegerInput,
     DateInput,
     DocumentUpload,
+    MultiTextInput,
     SliderInput,
     MultiPart,
+    TimeRange,
+    SelectInput,
   },
   data() {
     return {

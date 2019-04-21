@@ -26,13 +26,17 @@
         :responses="responses"
         :selected_language="selected_language"
         :score="score"
-        :showPassOptions="true"
+        :showPassOptions="showPassOptions"
       />
 
 
-    <div class="text-right mt-3">
-      <b-button variant="default" @click="dontKnow">Don't Know</b-button>
-      <b-button variant="default" @click="skip">Skip</b-button>
+    <div class="text-right mt-3" v-if="showPassOptions !== null ">
+      <b-button variant="default"
+                @click="restart">Restart</b-button>
+      <b-button variant="default" v-if="showPassOptions['dontKnow']"
+                @click="dontKnow">Don't Know</b-button>
+      <b-button variant="default" v-if="showPassOptions['skip']"
+                @click="skip">Skip</b-button>
     </div>
   </div>
 </template>
@@ -57,6 +61,9 @@ export default {
     selected_language: {
       type: String,
       default: 'en',
+    },
+    showPassOptions: {
+      type: Object,
     },
   },
   data() {
@@ -95,6 +102,11 @@ export default {
           // this.visibility = this.getVisibility(this.responses);
         });
       });
+    },
+    restart() {
+      this.currentIndex = 0;
+      this.listShow = [0];
+      this.$emit('clearResponses');
     },
     responseMapper(responses) {
       const keys = _.map(this.order, c => c['@id']); // Object.keys(this.responses);
@@ -141,19 +153,19 @@ export default {
       //   this.evaluateScoringLogic();
       // }
       this.updateProgress();
+      this.$forceUpdate();
     },
     nextQuestion(idx, skip, dontKnow) {
-      if (this.currentIndex < this.context.length - 1) {
-        this.currentIndex += 1;
-      }
       if (skip) {
-        this.$emit('saveResponse', this.context[idx]['@id'], 'skipped');
+        this.setResponse('skipped', idx);
       }
       if (dontKnow) {
-        this.$emit('saveResponse', this.context[idx]['@id'], 'dontKnow');
+        this.setResponse('dontKnow', idx);
       }
-      this.updateProgress();
-      this.$forceUpdate();
+
+      if (this.currentIndex < this.context.length - 1) {
+        this.currentIndex = Object.keys(this.responses).length;
+      }
     },
   },
   watch: {

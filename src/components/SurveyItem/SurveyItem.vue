@@ -4,18 +4,19 @@
     <div class="contextItem align-self-center center">
       <transition name="fade" mode="out-in">
         <InputSelector v-if="status === 'ready' && ui !== 'multipart'"
-         :inputType="ui"
-         :title="title"
-         :valueConstraints="valueConstraints"
-         :init="init"
-         :responses="responses"
-         :selected_language="selected_language"
-         :showPassOptions="showPassOptions"
-         v-on:skip="sendSkip"
-         v-on:dontKnow="sendDontKnow"
-         v-on:next="sendNext"
-         v-on:valueChanged="sendData"
-         />
+                       :inputType="ui"
+                       :title="title"
+                       :preamble="itemPreamble"
+                       :valueConstraints="valueConstraints"
+                       :init="init"
+                       :responses="responses"
+                       :selected_language="selected_language"
+                       :showPassOptions="showPassOptions"
+                       v-on:skip="sendSkip"
+                       v-on:dontKnow="sendDontKnow"
+                       v-on:next="sendNext"
+                       v-on:valueChanged="sendData"
+        />
 
         <div class="loader" v-else-if="status !== 'ready'">
           <!-- <b-progress :value="50"
@@ -25,14 +26,16 @@
           <Loader />
         </div>
         <multipart v-else
-         :progress="mp_progress"
-         :responses="mp_responses"
-         :srcUrl="item['@id']"
-         v-on:skip="sendSkip"
-         v-on:dontKnow="sendDontKnow"
-         v-on:saveResponse="setMPResponse"
-         v-on:updateProgress="setMPProgress"
-         v-on:valueChanged="sendData"
+                   :progress="mp_progress"
+                   :responses="mp_responses"
+                   :srcUrl="item['@id']"
+                   :showPassOptions="showPassOptions"
+                   v-on:skip="sendSkip"
+                   v-on:dontKnow="sendDontKnow"
+                   v-on:saveResponse="setMPResponse"
+                   v-on:updateProgress="setMPProgress"
+                   v-on:valueChanged="sendDataAndGoNext"
+                   v-on:clearResponses="clearMPResponses"
         />
       </transition>
     </div>
@@ -97,8 +100,7 @@ export default {
       type: String,
     },
     showPassOptions: {
-      type: Boolean,
-      default: true,
+      type: Object,
     },
   },
   components: {
@@ -114,16 +116,17 @@ export default {
       mp_responses: {},
       mp_progress: 0,
       variant: null,
+      requireVal: false,
     };
   },
   computed: {
     ui() {
       /* eslint-disable */
-      if (this.data['https://schema.repronim.org/inputType']) {
-        return this.data['https://schema.repronim.org/inputType'][0]['@value'];
-      }
-      return 'N/A';
-      /* eslint-enable */
+        if (this.data['https://schema.repronim.org/inputType']) {
+          return this.data['https://schema.repronim.org/inputType'][0]['@value'];
+        }
+        return 'N/A';
+        /* eslint-enable */
     },
     title() {
       if (this.data['http://schema.org/question']) {
@@ -132,16 +135,47 @@ export default {
       }
       return null;
     },
+    itemPreamble() {
+      if (this.data['http://schema.repronim.org/preamble']) {
+        const activePreamble = _.filter(this.data['http://schema.repronim.org/preamble'], q => q['@language'] === this.selected_language);
+        return activePreamble[0]['@value'];
+      }
+      return null;
+    },
     valueConstraints() {
       if (this.data['https://schema.repronim.org/valueconstraints']) {
         // eslint-disable-next-line
-        return this.valueC;
+          return this.valueC;
       }
       /* eslint-enable */
       return { requiredValue: false };
     },
+    findPassOptions() {
+      if (this.data['https://schema.repronim.org/valueconstraints']) {
+        // when valueConstraints is a remote object
+        if (Object.keys(this.data['https://schema.repronim.org/valueconstraints'][0]).indexOf('@id') > -1) {
+          this.getRequiredVal();
+          return this.requireVal;
+        }
+        // when valueConstraints in embedded in item object itself
+        if (this.data['https://schema.repronim.org/valueconstraints'][0]) {
+          // make sure the requiredValue key is defined
+          if (this.data['https://schema.repronim.org/valueconstraints'][0]['http://schema.repronim.org/requiredValue']) {
+            return this.data['https://schema.repronim.org/valueconstraints'][0]['http://schema.repronim.org/requiredValue'][0]['@value'];
+          }
+        }
+      }
+      return false;
+    },
   },
   methods: {
+    getRequiredVal() {
+      jsonld.expand(this.data['https://schema.repronim.org/valueconstraints'][0]['@id'])
+        .then((rsp) => {
+          this.requireVal = rsp[0]['http://schema.repronim.org/requiredValue'][0]['@value'];
+          // console.log(143, this.requireVal);
+        });
+    },
     getData() {
       jsonld.expand(this.item['@id'], {
         onDownloadProgress() {
@@ -191,9 +225,20 @@ export default {
       /* eslint-enable */
       this.$emit('setData', val, this.index);
     },
+    sendDataAndGoNext(val) {
+      this.variant = null;
+      /* eslint-enable */
+      this.$emit('setData', val, this.index);
+      this.sendNext();
+    },
     setMPResponse(index, value) {
       // console.log('setting response of multipart item', index, value);
       this.mp_responses[index] = value;
+    },
+    clearMPResponses() {
+      this.mp_responses = {};
+      this.mp_progress = 0;
+      this.$emit('setData', {}, this.index);
     },
     setMPProgress(progress) {
       this.mp_progress = progress;

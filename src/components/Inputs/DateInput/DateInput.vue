@@ -1,13 +1,15 @@
 <template>
   <div class="DateInput">
-    <datepicker v-model="input" lang="en" :not-before="new Date()"
-                :minimumView="'day'" :maximumView="'year'" :initialView="'year'"
+    <datepicker placeholder="Select Year" v-model="input" lang="en"
+                :disabledDates="dateParam.disabledDates" :format="customFormatter"
+                :minimumView="'year'" :maximumView="'year'" :initialView="'year'"
                 @change="sendData"></datepicker>
   </div>
 </template>
 
 <script>
 import Datepicker from 'vuejs-datepicker';
+import moment from 'moment';
 
 export default {
   name: 'DateInput',
@@ -27,12 +29,20 @@ export default {
     sendData(val) {
       this.$emit('valueChanged', val);
     },
+    customFormatter(date) {
+      return moment(date).format('YYYY');
+    },
   },
   data() {
     return {
       // a proxy. It should initialize to this.init. when its changed,
       // we should tell the parent that its changed, with then changes this.input
-      input: new Date(),
+      input: null,
+      dateParam: {
+        disabledDates: {
+          from: new Date(), // Disable all dates after today
+        },
+      },
     };
   },
   mounted() {

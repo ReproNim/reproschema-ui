@@ -91,61 +91,7 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/multi-part@0.0.1": {
-        "files": [
-            {
-                "relativePath": "src/components/MultiPart/MultiPart.vue",
-                "test": false,
-                "name": "MultiPart.vue"
-            },
-            {
-                "relativePath": "src/components/MultiPart/index.js",
-                "test": false,
-                "name": "index.js"
-            }
-        ],
-        "mainFile": "src/components/MultiPart/index.js",
-        "trackDir": "src/components/MultiPart",
-        "origin": "AUTHORED",
-        "exported": true
-    },
-    "akeshavan.mindlogger-web/web-radio@0.0.2": {
-        "files": [
-            {
-                "relativePath": "src/components/Inputs/WebRadio/Radio.vue",
-                "test": false,
-                "name": "Radio.vue"
-            },
-            {
-                "relativePath": "src/components/Inputs/WebRadio/index.js",
-                "test": false,
-                "name": "index.js"
-            }
-        ],
-        "mainFile": "src/components/Inputs/WebRadio/index.js",
-        "trackDir": "src/components/Inputs/WebRadio",
-        "origin": "AUTHORED",
-        "exported": true
-    },
-    "akeshavan.mindlogger-web/date-input@0.0.1": {
-        "files": [
-            {
-                "relativePath": "src/components/Inputs/DateInput/DateInput.vue",
-                "test": false,
-                "name": "DateInput.vue"
-            },
-            {
-                "relativePath": "src/components/Inputs/DateInput/index.js",
-                "test": false,
-                "name": "index.js"
-            }
-        ],
-        "mainFile": "src/components/Inputs/DateInput/index.js",
-        "trackDir": "src/components/Inputs/DateInput",
-        "origin": "AUTHORED",
-        "exported": true
-    },
-    "akeshavan.mindlogger-web/document-upload@0.0.1": {
+    "akeshavan.mindlogger-web/document-upload@0.0.2": {
         "files": [
             {
                 "relativePath": "src/components/Inputs/DocumentUpload/DocumentUpload.vue",
@@ -163,7 +109,43 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/web-audio-record@0.0.8": {
+    "akeshavan.mindlogger-web/multi-text-input@0.0.1": {
+        "files": [
+            {
+                "relativePath": "src/components/Inputs/MultiTextInput/MultiTextInput.vue",
+                "test": false,
+                "name": "MultiTextInput.vue"
+            },
+            {
+                "relativePath": "src/components/Inputs/MultiTextInput/index.js",
+                "test": false,
+                "name": "index.js"
+            }
+        ],
+        "mainFile": "src/components/Inputs/MultiTextInput/index.js",
+        "trackDir": "src/components/Inputs/MultiTextInput",
+        "origin": "AUTHORED",
+        "exported": true
+    },
+    "akeshavan.mindlogger-web/date-input@0.0.3": {
+        "files": [
+            {
+                "relativePath": "src/components/Inputs/DateInput/DateInput.vue",
+                "test": false,
+                "name": "DateInput.vue"
+            },
+            {
+                "relativePath": "src/components/Inputs/DateInput/index.js",
+                "test": false,
+                "name": "index.js"
+            }
+        ],
+        "mainFile": "src/components/Inputs/DateInput/index.js",
+        "trackDir": "src/components/Inputs/DateInput",
+        "origin": "AUTHORED",
+        "exported": true
+    },
+    "akeshavan.mindlogger-web/web-audio-record@0.0.11": {
         "files": [
             {
                 "relativePath": "src/components/Inputs/WebAudioRecord/Audio.vue",
@@ -181,7 +163,79 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/input-selector@0.0.13": {
+    "akeshavan.mindlogger-web/slider-input@0.0.3": {
+        "files": [
+            {
+                "relativePath": "src/components/Inputs/SliderInput/SliderInput.vue",
+                "test": false,
+                "name": "SliderInput.vue"
+            },
+            {
+                "relativePath": "src/components/Inputs/SliderInput/index.js",
+                "test": false,
+                "name": "index.js"
+            }
+        ],
+        "mainFile": "src/components/Inputs/SliderInput/index.js",
+        "trackDir": "src/components/Inputs/SliderInput",
+        "origin": "AUTHORED",
+        "exported": true
+    },
+    "akeshavan.mindlogger-web/multi-part@0.0.4": {
+        "files": [
+            {
+                "relativePath": "src/components/MultiPart/MultiPart.vue",
+                "test": false,
+                "name": "MultiPart.vue"
+            },
+            {
+                "relativePath": "src/components/MultiPart/index.js",
+                "test": false,
+                "name": "index.js"
+            }
+        ],
+        "mainFile": "src/components/MultiPart/index.js",
+        "trackDir": "src/components/MultiPart",
+        "origin": "AUTHORED",
+        "exported": true
+    },
+    "akeshavan.mindlogger-web/time-range@0.0.2": {
+        "files": [
+            {
+                "relativePath": "src/components/Inputs/TimeRange/TimeRange.vue",
+                "test": false,
+                "name": "TimeRange.vue"
+            },
+            {
+                "relativePath": "src/components/Inputs/TimeRange/index.js",
+                "test": false,
+                "name": "index.js"
+            }
+        ],
+        "mainFile": "src/components/Inputs/TimeRange/TimeRange.vue",
+        "trackDir": "src/components/Inputs/TimeRange",
+        "origin": "AUTHORED",
+        "exported": true
+    },
+    "akeshavan.mindlogger-web/select-image@0.0.4": {
+        "files": [
+            {
+                "relativePath": "src/components/Inputs/Utils/SelectImage/SelectImage.vue",
+                "test": false,
+                "name": "SelectImage.vue"
+            },
+            {
+                "relativePath": "src/components/Inputs/Utils/SelectImage/index.js",
+                "test": false,
+                "name": "index.js"
+            }
+        ],
+        "mainFile": "src/components/Inputs/Utils/SelectImage/index.js",
+        "trackDir": "src/components/Inputs/Utils/SelectImage",
+        "origin": "AUTHORED",
+        "exported": true
+    },
+    "akeshavan.mindlogger-web/input-selector@0.0.21": {
         "files": [
             {
                 "relativePath": "src/components/InputSelector/InputSelector.vue",
@@ -199,7 +253,25 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/survey@0.0.20": {
+    "akeshavan.mindlogger-web/survey-item@0.0.21": {
+        "files": [
+            {
+                "relativePath": "src/components/SurveyItem/SurveyItem.vue",
+                "test": false,
+                "name": "SurveyItem.vue"
+            },
+            {
+                "relativePath": "src/components/SurveyItem/index.js",
+                "test": false,
+                "name": "index.js"
+            }
+        ],
+        "mainFile": "src/components/SurveyItem/index.js",
+        "trackDir": "src/components/SurveyItem",
+        "origin": "AUTHORED",
+        "exported": true
+    },
+    "akeshavan.mindlogger-web/survey@0.0.29": {
         "files": [
             {
                 "relativePath": "src/components/Survey/Survey.vue",
@@ -217,21 +289,39 @@
         "origin": "AUTHORED",
         "exported": true
     },
-    "akeshavan.mindlogger-web/survey-item@0.0.13": {
+    "akeshavan.mindlogger-web/web-radio@0.0.6": {
         "files": [
             {
-                "relativePath": "src/components/SurveyItem/SurveyItem.vue",
+                "relativePath": "src/components/Inputs/WebRadio/Radio.vue",
                 "test": false,
-                "name": "SurveyItem.vue"
+                "name": "Radio.vue"
             },
             {
-                "relativePath": "src/components/SurveyItem/index.js",
+                "relativePath": "src/components/Inputs/WebRadio/index.js",
                 "test": false,
                 "name": "index.js"
             }
         ],
-        "mainFile": "src/components/SurveyItem/index.js",
-        "trackDir": "src/components/SurveyItem",
+        "mainFile": "src/components/Inputs/WebRadio/index.js",
+        "trackDir": "src/components/Inputs/WebRadio",
+        "origin": "AUTHORED",
+        "exported": true
+    },
+    "akeshavan.mindlogger-web/select-input@0.0.1": {
+        "files": [
+            {
+                "relativePath": "src/components/Inputs/SelectInput/SelectInput.vue",
+                "test": false,
+                "name": "SelectInput.vue"
+            },
+            {
+                "relativePath": "src/components/Inputs/SelectInput/index.js",
+                "test": false,
+                "name": "index.js"
+            }
+        ],
+        "mainFile": "src/components/Inputs/SelectInput/index.js",
+        "trackDir": "src/components/Inputs/SelectInput",
         "origin": "AUTHORED",
         "exported": true
     },
