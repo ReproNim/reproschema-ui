@@ -37,16 +37,17 @@ export default {
       this.selected = this.init;
     }
     if (this.constraints['http://schema.org/itemListElement']) { // defined in schema
-      return _.map(this.constraints['http://schema.org/itemListElement'][0]['@list'], (v) => {
+      this.options = _.map(this.constraints['http://schema.org/itemListElement'][0]['@list'], (v) => {
         const activeValueChoices = _.filter(v['http://schema.org/name'], ac => ac['@language'] === this.selected_language);
-        this.options = activeValueChoices[0]['@value'];
+        // console.log(42, activeValueChoices[0]['@value']);
+        return (activeValueChoices[0]['@value']);
       });
-    }
-    if (this.inputType === 'select') {
-      axios.get('http://api.geonames.org/searchJSON?q=kochi&maxRows=10&username=sanuann')
+      // this.options = choiceList;
+    } else {
+      axios.get('http://api.geonames.org/searchJSON?q=india&maxRows=10&username=sanuann')
         .then((resp) => {
-          // console.log(28, resp.data.geonames);
-          this.options = _.map(resp.data.geonames, cities => [cities.name, cities.countryCode]);
+          console.log(28, resp.data.geonames);
+          this.options = _.map(resp.data.geonames, place => [place.name, place.countryCode]);
           console.log(30, this.options);
           // return this.options;
         });
