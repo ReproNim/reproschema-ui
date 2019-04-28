@@ -1,14 +1,15 @@
 <template>
   <div class="DateInput">
-    <datepicker placeholder="Select Date" v-model="input" lang="en"
-                :disabledDates="dateParam.disabledDates"
-                :minimumView="'day'" :maximumView="'year'" :initialView="'year'"
+    <datepicker placeholder="Select Year" v-model="input" lang="en"
+                :disabledDates="dateParam.disabledDates" :format="customFormatter"
+                :minimumView="'year'" :maximumView="'year'" :initialView="'year'"
                 @change="sendData"></datepicker>
   </div>
 </template>
 
 <script>
 import Datepicker from 'vuejs-datepicker';
+import moment from 'moment';
 
 export default {
   name: 'DateInput',
@@ -27,6 +28,9 @@ export default {
   methods: {
     sendData(val) {
       this.$emit('valueChanged', val);
+    },
+    customFormatter(date) {
+      return moment(date).format('YYYY');
     },
   },
   data() {

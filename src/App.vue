@@ -29,6 +29,9 @@
                 </a>
             </li>
         </ul>
+        <div>
+          <b-button class="align-middle" @click="downloadZipData">Export</b-button>
+        </div>
       </nav>
 
       <!-- Page Content -->
@@ -66,19 +69,20 @@
 </template>
 
 <script>
-// import jsonld from 'jsonld/dist/jsonld.min';
 import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
 import axios from 'axios';
 import _ from 'lodash';
+import JSZip from 'jszip';
+import 'jszip/dist/jszip.min';
+import { saveAs } from 'file-saver';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import circleProgress from './components/Circle/';
-// import SurveyItem from './components/SurveyItem';
 
 Vue.use(BootstrapVue);
-// Vue.component('survey-item', SurveyItem);
 Vue.filter('reverse', value => value.slice().reverse());
+
 
 function getFilename(s) {
   const folders = s.split('/');
@@ -212,6 +216,51 @@ export default {
     setVisbility() {
       const values = _.map(this.visibilityConditions, (condition, index) => ({ condition, index }));
       this.visibilityChain(values);
+    },
+    downloadZipData() {
+      const totalResponse = this.$store.state.responses;
+      this.formatData({ response: totalResponse });
+    },
+    formatData(data) {
+      const jszip = new JSZip();
+      const fileUploadData = {};
+      const JSONdata = {};
+      // sort out blobs from JSONdata
+      _.map(data.response, (val, key) => {
+        if (val instanceof Blob) {
+          fileUploadData[key] = val;
+        } else if (_.isObject(val)) {
+          // make sure there aren't any Blobs here.
+          // if there are, add them to fileUploadData
+          _.map(val, (val2, key2) => {
+            if (val2 instanceof Blob) {
+              fileUploadData[`${key2}`] = val2;
+            } else {
+              // refill the object.
+              if (!JSONdata[key]) {
+                JSONdata[key] = {};
+              }
+              JSONdata[key][key2] = val2;
+            }
+          });
+        } else {
+          JSONdata[key] = val;
+        }
+      });
+      let c = 0;
+      _.map(JSONdata, (val) => {
+        jszip.folder('data').file(`activity_${c + 1}.json`, JSON.stringify(val, null, 4));
+        c += 1;
+      });
+      let f = 0;
+      _.map(fileUploadData, (val) => {
+        jszip.folder('data').file(`voice_item_${f + 1}.wav`, val);
+        f += 1;
+      });
+      jszip.generateAsync({ type: 'blob' })
+        .then((content) => {
+          saveAs(content, 'example.zip');
+        });
     },
   },
   watch: {
