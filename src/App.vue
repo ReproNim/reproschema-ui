@@ -259,7 +259,7 @@ export default {
       });
       jszip.generateAsync({ type: 'blob' })
         .then((content) => {
-          saveAs(content, 'example.zip');
+          saveAs(content, 'study-data.zip');
         });
     },
   },
