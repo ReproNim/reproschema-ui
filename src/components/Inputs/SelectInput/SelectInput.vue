@@ -62,7 +62,7 @@ export default {
   },
   methods: {
     sendData(val) {
-      console.log(47, val, val.name);
+      // console.log(47, val, val.name);
       this.$emit('valueChanged', val.name);
     },
     limitText(count) {
@@ -110,8 +110,6 @@ export default {
       } else if (this.inputType === 'multiselect') {
         return this.asyncFindLanguage();
       } return ['not implemented yet'];
-      // const cityList = this.getCitiesFromApi();
-      // console.log(66, cityList);
     },
   },
 };
