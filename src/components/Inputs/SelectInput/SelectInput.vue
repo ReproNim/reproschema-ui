@@ -47,7 +47,7 @@ export default {
         .then((resp) => {
           // console.log(28, resp.data.geonames);
           this.options = _.map(resp.data.geonames, cities => [cities.name, cities.countryCode]);
-          console.log(30, this.options);
+          // console.log(30, this.options);
           // return this.options;
         });
       // return this.options; // temporary
@@ -69,8 +69,7 @@ export default {
       else
         return ['not implemented yet'];
        */
-      const cityList = this.getCitiesFromApi();
-      console.log(66, cityList);
+      // const cityList = this.getCitiesFromApi();
       return this.getCitiesFromApi();
     },
   },

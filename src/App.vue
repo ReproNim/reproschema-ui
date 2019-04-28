@@ -69,23 +69,20 @@
 </template>
 
 <script>
-// import jsonld from 'jsonld/dist/jsonld.min';
 import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
 import axios from 'axios';
 import _ from 'lodash';
-import fs from 'fs';
-import path from 'path';
-import jszip from 'jszip';
-// import easyzip from 'easy-zip';
+import JSZip from 'jszip';
+import 'jszip/dist/jszip.min';
+import { saveAs } from 'file-saver';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import circleProgress from './components/Circle/';
-// import SurveyItem from './components/SurveyItem';
 
 Vue.use(BootstrapVue);
-// Vue.component('survey-item', SurveyItem);
 Vue.filter('reverse', value => value.slice().reverse());
+
 
 function getFilename(s) {
   const folders = s.split('/');
@@ -222,100 +219,48 @@ export default {
     },
     downloadZipData() {
       const totalResponse = this.$store.state.responses;
-      console.log('download data file', totalResponse);
-
-      const tdata = { responses: totalResponse };
-      this.formatData(tdata);
-
-
-      // const dirPaths = config.dirPaths;
-      // const pathToJSON = totalResponse;
-      // const zip = new easyzip.EasyZip();
-      // zip.file(pathToJSON, (err) => {
-      //   if (err) {
-      //     console.log(err);
-      //     throw err;
-      //   }
-      //   console.log('success zipping');
-      //   // zip.writeToFile(res, 'myUploads');
-      //   // res.end();
-      // });
-
-      // fs.writeFile('./response.json', JSON.stringify(totalResponse, null, 4), (err) => {
-      //   if (err) {
-      //     console.error(err);
-      //     return;
-      //   }
-      //   console.log('File has been created');
-      // });
-
-      // const pathToJSON = './response.json';
-      // fs.readFile(pathToJSON, (err, data) => {
-      //   if (err) return callback(err);
-      //
-      //   const generatedZIP = jszip.file(
-      //     path.basename(pathToJSON), data).generate({
-      //     compression: 'DEFLATE',
-      //   });
-      //
-      //   return callback(null, generatedZIP);
-      // });
+      this.formatData({ response: totalResponse });
     },
     formatData(data) {
-      console.log(data);
-      const formattedData = new FormData();
+      const jszip = new JSZip();
       const fileUploadData = {};
-      const metadata = {};
-
-      // sort out blobs from metadata
-      _.map(data.responses, (val, key) => {
+      const JSONdata = {};
+      // sort out blobs from JSONdata
+      _.map(data.response, (val, key) => {
         if (val instanceof Blob) {
-          console.log(' i am a blob');
           fileUploadData[key] = val;
         } else if (_.isObject(val)) {
-          console.log(' i am a object');
           // make sure there aren't any Blobs here.
           // if there are, add them to fileUploadData
-          // and create a merged key?
           _.map(val, (val2, key2) => {
             if (val2 instanceof Blob) {
-              console.log(' i am a blob', val2);
               fileUploadData[`${key2}`] = val2;
             } else {
               // refill the object.
-              if (!metadata[key]) {
-                metadata[key] = {};
+              if (!JSONdata[key]) {
+                JSONdata[key] = {};
               }
-              metadata[key][key2] = val;
+              JSONdata[key][key2] = val2;
             }
           });
         } else {
-          metadata[key] = val;
+          JSONdata[key] = val;
         }
       });
-
-      console.log('meta: ', metadata);
-      console.log('fileup: ', fileUploadData);
-      // append the files separately on the formmatedData object.
-      _.map(fileUploadData, (val, key) => {
-        console.log(301, val, key);
-        formattedData.append(key, val);
-        console.log(formattedData);
-        metadata[key] = {
-          size: val.size,
-          type: val.type,
-        };
+      let c = 0;
+      _.map(JSONdata, (val) => {
+        jszip.folder('data').file(`activity_${c + 1}.json`, JSON.stringify(val, null, 4));
+        c += 1;
       });
-
-      console.log('format data: ', formattedData);
-      // finally, get the metadata on there.
-      formattedData.append('metadata',
-        JSON.stringify({ activity: data.activity,
-          applet: data.applet,
-          responses: metadata,
-        }));
-      console.log(307, formattedData);
-      return { formattedData };
+      let f = 0;
+      _.map(fileUploadData, (val) => {
+        jszip.folder('data').file(`voice_item_${f + 1}.wav`, val);
+        f += 1;
+      });
+      jszip.generateAsync({ type: 'blob' })
+        .then((content) => {
+          saveAs(content, 'example.zip');
+        });
     },
   },
   watch: {
