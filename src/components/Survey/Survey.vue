@@ -257,10 +257,14 @@ export default {
       let totalQ = this.context.length;
       if (!_.isEmpty(this.visibility)) {
         totalQ = _.filter(this.visibility).length;
-        // console.log(totalQ);
       }
       const progress = ((Object.keys(this.responses).length) / totalQ) * 100;
       this.$emit('updateProgress', progress);
+    },
+    order() {
+      if (this.activity['https://schema.repronim.org/shuffle'][0]['@value']) {
+        return _.shuffle(this.activity['https://schema.repronim.org/order'][0]['@list']);
+      } return this.activity['https://schema.repronim.org/order'][0]['@list'];
     },
   },
   watch: {
@@ -310,9 +314,6 @@ export default {
       }
       return [{}];
     },
-    order() {
-      return this.activity['https://schema.repronim.org/order'][0]['@list'];
-    },
     shouldShow() {
       return _.map(this.contextReverse, (o, index) => {
         const criteria1 = this.listShow.indexOf(this.contextReverse.length - index - 1) >= 0;
@@ -326,7 +327,7 @@ export default {
     context() {
       /* eslint-disable */
       if (this.activity['https://schema.repronim.org/order']) {
-        const keys = this.activity['https://schema.repronim.org/order'][0]['@list'];
+        const keys = this.order();
 
         // if (!_.isEmpty(this.visibility)) {
         //   return _.filter(keys, k => this.visibility[k['@id']]);
