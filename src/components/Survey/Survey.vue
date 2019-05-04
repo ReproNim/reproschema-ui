@@ -158,10 +158,10 @@ export default {
       if (idx === this.listShow.length - 1) {
         const nextQuestionIdx = _.max(this.listShow) + 1;
         this.listShow.push(nextQuestionIdx);
-
         // update the listShow with the next index in case this one we added isn't visible
         for (let i = nextQuestionIdx; i < this.context.length; i += 1) {
-          const id = this.order[i]['@id'];
+          const nextItem = this.order();
+          const id = nextItem[i]['@id'];
           let isVisible = this.visibility[id];
           if (isVisible === undefined) {
             isVisible = true;
@@ -263,7 +263,13 @@ export default {
     },
     order() {
       if (this.activity['https://schema.repronim.org/shuffle'][0]['@value']) {
-        return _.shuffle(this.activity['https://schema.repronim.org/order'][0]['@list']);
+        const orderList = this.activity['https://schema.repronim.org/order'][0]['@list'];
+        const listToShuffle = orderList.slice(1, orderList.length - 1);
+        const newList = _.shuffle(listToShuffle);
+        // newList.unshift(this.activity['https://schema.repronim.org/order'][0]['@list'][0]);
+        // newList.push(this.activity['https://schema.repronim.org/order'][0]['@list'][orderList.length - 1]);
+        return newList;
+        // console.log(27, newList);
       } return this.activity['https://schema.repronim.org/order'][0]['@list'];
     },
   },
