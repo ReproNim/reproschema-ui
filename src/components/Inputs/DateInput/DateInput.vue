@@ -3,7 +3,7 @@
     <datepicker placeholder="Select Year" v-model="input" lang="en"
                 :disabledDates="dateParam.disabledDates" :format="customFormatter"
                 :minimumView="'year'" :maximumView="'year'" :initialView="'year'"
-                @change="sendData"></datepicker>
+                ></datepicker>
   </div>
 </template>
 
@@ -27,7 +27,7 @@ export default {
   },
   methods: {
     sendData(val) {
-      this.$emit('valueChanged', val);
+      this.$emit('valueChanged', val.getFullYear());
     },
     customFormatter(date) {
       return moment(date).format('YYYY');
