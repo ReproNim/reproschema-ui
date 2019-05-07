@@ -30,7 +30,7 @@
             </li>
         </ul>
         <div>
-          <b-button class="align-middle" @click="downloadZipData">Export</b-button>
+          <b-button class="align-middle" @click="downloadZipData" :disabled="!isAnswered">Export</b-button>
         </div>
       </nav>
 
@@ -91,6 +91,17 @@ function getFilename(s) {
   return filename;
 }
 
+function getVariableName(s, variableMap) {
+  const vmap = variableMap[0]['@list'];
+  const mapper = {};
+  _.map(vmap, (v) => {
+    const uri = v['https://schema.repronim.org/isAbout'][0]['@id'];
+    const variable = v['https://schema.repronim.org/variableName'][0]['@value'];
+    mapper[uri] = variable;
+  });
+  return mapper[s];
+}
+
 export default {
   name: 'App',
   components: {
@@ -102,6 +113,7 @@ export default {
       selected_language: 'en',
       visibility: {},
       cache: {},
+      isAnswered: false,
       // responses: [],
     };
   },
@@ -144,6 +156,7 @@ export default {
       if (needsVizUpdate) {
         this.setVisbility();
       }
+      this.isAnswered = true;
     },
     clearResponses() {
       this.$store.dispatch('clearResponses', this.activityIndex);
@@ -325,7 +338,13 @@ export default {
       const output = {};
       if (this.schemaOrder) {
         _.map(this.schemaOrder, (s) => {
-          const fname = getFilename(s);
+          let fname = '';
+          if (this.schema['https://schema.repronim.org/variableMap']) {
+            fname = getVariableName(s, this.schema['https://schema.repronim.org/variableMap']);
+          } else {
+            // TODO: remove this backwards compatibility else
+            fname = getFilename(s);
+          }
           output[fname] = s;
         });
       }
@@ -334,8 +353,13 @@ export default {
     visibilityConditions() {
       if (this.schema['https://schema.repronim.org/visibility']) {
         return _.map(this.schemaOrder, (s) => {
-          // TODO: don't assume the key name is the same as the ending of the filename.
-          const keyName = getFilename(s);
+          let keyName = '';
+          if (this.schema['https://schema.repronim.org/variableMap']) {
+            keyName = getVariableName(s, this.schema['https://schema.repronim.org/variableMap']);
+          } else {
+            // TODO: remove this backwards compatibility else
+            keyName = getFilename(s);
+          }
 
           // look through the "https://schema.repronim.org/visibility" field
           // and reformat nicely
