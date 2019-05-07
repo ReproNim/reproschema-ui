@@ -204,14 +204,16 @@ export default {
     };
   },
   methods: {
-    skip(val) {
-      this.$emit('skip', val);
+    skip() {
+      this.$emit('skip');
     },
     dontKnow() {
       this.$emit('dontKnow');
     },
     sendData(val) {
-      this.$emit('valueChanged', val);
+      if (val instanceof Date) {
+        this.$emit('valueChanged', val.getFullYear());
+      } else this.$emit('valueChanged', val);
       this.$emit('next');
     },
   },
