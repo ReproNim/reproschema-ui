@@ -30,7 +30,7 @@
             </li>
         </ul>
         <div>
-          <b-button class="align-middle" @click="downloadZipData">Export</b-button>
+          <b-button class="align-middle" @click="downloadZipData" :disabled="!isAnswered">Export</b-button>
         </div>
       </nav>
 
@@ -113,6 +113,7 @@ export default {
       selected_language: 'en',
       visibility: {},
       cache: {},
+      isAnswered: false,
       // responses: [],
     };
   },
@@ -155,6 +156,7 @@ export default {
       if (needsVizUpdate) {
         this.setVisbility();
       }
+      this.isAnswered = true;
     },
     clearResponses() {
       this.$store.dispatch('clearResponses', this.activityIndex);
