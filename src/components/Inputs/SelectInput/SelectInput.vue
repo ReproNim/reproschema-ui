@@ -100,6 +100,12 @@ export default {
         // console.log(42, activeValueChoices[0]['@value']);
         return (activeValueChoices[0]['@value']);
       });
+    } else if (this.constraints['https://schema.org/DigitalDocument']) { // if choice list defined in external file
+      console.log(104, this.constraints['https://schema.org/DigitalDocument'][0]['@id']);
+      axios.get(this.constraints['https://schema.org/DigitalDocument'][0]['@id'])
+        .then((resp) => {
+          console.log(107, resp);
+        });
     }
   },
   computed: {
