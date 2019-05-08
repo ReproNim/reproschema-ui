@@ -283,14 +283,14 @@ export default {
       this.$emit('updateProgress', progress);
     },
     order() {
-      if (this.activity['https://schema.repronim.org/shuffle'][0]['@value']) {
+      if (this.activity['https://schema.repronim.org/shuffle'][0]['@value']) { // when shuffle is true
         const orderList = this.activity['https://schema.repronim.org/order'][0]['@list'];
-        const listToShuffle = orderList.slice(1, orderList.length - 1);
+        const listToShuffle = orderList.slice(1, orderList.length - 3);
         const newList = _.shuffle(listToShuffle);
-        // newList.unshift(this.activity['https://schema.repronim.org/order'][0]['@list'][0]);
-        // newList.push(this.activity['https://schema.repronim.org/order'][0]['@list'][orderList.length - 1]);
+        newList.unshift(orderList[0]);
+        newList.push(orderList[orderList.length - 3],
+          orderList[orderList.length - 2], orderList[orderList.length - 1]);
         return newList;
-        // console.log(27, newList);
       } return this.activity['https://schema.repronim.org/order'][0]['@list'];
     },
   },
