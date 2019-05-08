@@ -108,10 +108,12 @@
     </div>
 
     <!-- If type is select input -->
-    <div v-else-if="inputType==='select'">
+    <div v-else-if="inputType==='selectCountry' || inputType === 'selectState'
+      || inputType === 'selectLanguage' || inputType === 'select'">
       <SelectInput
         :constraints="valueConstraints"
         :selected_language="selected_language"
+        :inputType="inputType"
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
@@ -194,14 +196,16 @@ export default {
     };
   },
   methods: {
-    skip(val) {
-      this.$emit('skip', val);
+    skip() {
+      this.$emit('skip');
     },
     dontKnow() {
       this.$emit('dontKnow');
     },
     sendData(val) {
-      this.$emit('valueChanged', val);
+      if (val instanceof Date) {
+        this.$emit('valueChanged', val.getFullYear());
+      } else this.$emit('valueChanged', val);
       this.$emit('next');
     },
   },

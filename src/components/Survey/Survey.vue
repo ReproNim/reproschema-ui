@@ -152,10 +152,10 @@ export default {
       if (idx === this.listShow.length - 1) {
         const nextQuestionIdx = _.max(this.listShow) + 1;
         this.listShow.push(nextQuestionIdx);
-
         // update the listShow with the next index in case this one we added isn't visible
         for (let i = nextQuestionIdx; i < this.context.length; i += 1) {
-          const id = this.order[i]['@id'];
+          const nextItem = this.order();
+          const id = nextItem[i]['@id'];
           let isVisible = this.visibility[id];
           if (isVisible === undefined) {
             isVisible = true;
@@ -216,6 +216,25 @@ export default {
     },
     responseMapper(responses) {
       const keys = _.map(this.order, c => c['@id']); // Object.keys(this.responses);
+
+      // a variable map is defined! great
+      if (this.activity['https://schema.repronim.org/variableMap']) {
+        const vmap = this.activity['https://schema.repronim.org/variableMap'][0]['@list'];
+        const keyArr = _.map(vmap, (v) => {
+          const key = v['https://schema.repronim.org/isAbout'][0]['@id'];
+          const qId = v['https://schema.repronim.org/variableName'][0]['@value'];
+          const val = responses[key];
+          return { key, val, qId };
+        });
+        const outMapper = {};
+        _.map(keyArr, (a) => {
+          outMapper[a.qId] = { val: a.val, ref: a.key };
+        });
+        return outMapper;
+      }
+
+      // TODO: delete the code below once the schema is set!
+      // we keep this for compatibility until everything is fixed.
       const keyArr = _.map(keys, (key) => {
         const val = responses[key];
         const filenameParts = key.split('/');
@@ -223,10 +242,12 @@ export default {
         const qId = filename.split('.jsonld')[0];
         return { key, val, qId };
       });
+
       const outMapper = {};
       _.map(keyArr, (a) => {
         outMapper[a.qId] = { val: a.val, ref: a.key };
       });
+
       return outMapper;
     },
     getVisibility(responses) {
@@ -251,10 +272,20 @@ export default {
       let totalQ = this.context.length;
       if (!_.isEmpty(this.visibility)) {
         totalQ = _.filter(this.visibility).length;
-        // console.log(totalQ);
       }
       const progress = ((Object.keys(this.responses).length) / totalQ) * 100;
       this.$emit('updateProgress', progress);
+    },
+    order() {
+      if (this.activity['https://schema.repronim.org/shuffle'][0]['@value']) {
+        const orderList = this.activity['https://schema.repronim.org/order'][0]['@list'];
+        const listToShuffle = orderList.slice(1, orderList.length - 1);
+        const newList = _.shuffle(listToShuffle);
+        // newList.unshift(this.activity['https://schema.repronim.org/order'][0]['@list'][0]);
+        // newList.push(this.activity['https://schema.repronim.org/order'][0]['@list'][orderList.length - 1]);
+        return newList;
+        // console.log(27, newList);
+      } return this.activity['https://schema.repronim.org/order'][0]['@list'];
     },
   },
   watch: {
@@ -304,9 +335,6 @@ export default {
       }
       return [{}];
     },
-    order() {
-      return this.activity['https://schema.repronim.org/order'][0]['@list'];
-    },
     shouldShow() {
       return _.map(this.contextReverse, (o, index) => {
         const criteria1 = this.listShow.indexOf(this.contextReverse.length - index - 1) >= 0;
@@ -320,7 +348,7 @@ export default {
     context() {
       /* eslint-disable */
       if (this.activity['https://schema.repronim.org/order']) {
-        const keys = this.activity['https://schema.repronim.org/order'][0]['@list'];
+        const keys = this.order();
 
         // if (!_.isEmpty(this.visibility)) {
         //   return _.filter(keys, k => this.visibility[k['@id']]);

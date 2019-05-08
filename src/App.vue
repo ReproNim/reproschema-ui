@@ -28,6 +28,10 @@
                 </a>
             </li>
         </ul>
+        <div>
+          <b-button class="align-middle" @click="downloadZipData"
+                    :disabled="!isAnswered">Export</b-button>
+        </div>
       </nav>
 
       <!-- Page Content -->
@@ -65,25 +69,37 @@
 </template>
 
 <script>
-// import jsonld from 'jsonld/dist/jsonld.min';
 import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
 import axios from 'axios';
 import _ from 'lodash';
+import JSZip from 'jszip';
+import 'jszip/dist/jszip.min';
+import { saveAs } from 'file-saver';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import circleProgress from './components/Circle/';
-// import SurveyItem from './components/SurveyItem';
 
 Vue.use(BootstrapVue);
-// Vue.component('survey-item', SurveyItem);
 Vue.filter('reverse', value => value.slice().reverse());
+
 
 function getFilename(s) {
   const folders = s.split('/');
   const N = folders.length;
   const filename = folders[N - 1].split('.')[0];
   return filename;
+}
+
+function getVariableName(s, variableMap) {
+  const vmap = variableMap[0]['@list'];
+  const mapper = {};
+  _.map(vmap, (v) => {
+    const uri = v['https://schema.repronim.org/isAbout'][0]['@id'];
+    const variable = v['https://schema.repronim.org/variableName'][0]['@value'];
+    mapper[uri] = variable;
+  });
+  return mapper[s];
 }
 
 export default {
@@ -97,6 +113,7 @@ export default {
       selected_language: 'en',
       visibility: {},
       cache: {},
+      isAnswered: false,
       // responses: [],
     };
   },
@@ -139,6 +156,7 @@ export default {
       if (needsVizUpdate) {
         this.setVisbility();
       }
+      this.isAnswered = true;
     },
     clearResponses() {
       this.$store.dispatch('clearResponses', this.activityIndex);
@@ -212,6 +230,51 @@ export default {
       const values = _.map(this.visibilityConditions, (condition, index) => ({ condition, index }));
       this.visibilityChain(values);
     },
+    downloadZipData() {
+      const totalResponse = this.$store.state.responses;
+      this.formatData({ response: totalResponse });
+    },
+    formatData(data) {
+      const jszip = new JSZip();
+      const fileUploadData = {};
+      const JSONdata = {};
+      // sort out blobs from JSONdata
+      _.map(data.response, (val, key) => {
+        if (val instanceof Blob) {
+          fileUploadData[key] = val;
+        } else if (_.isObject(val)) {
+          // make sure there aren't any Blobs here.
+          // if there are, add them to fileUploadData
+          _.map(val, (val2, key2) => {
+            if (val2 instanceof Blob) {
+              fileUploadData[`${key2}`] = val2;
+            } else {
+              // refill the object.
+              if (!JSONdata[key]) {
+                JSONdata[key] = {};
+              }
+              JSONdata[key][key2] = val2;
+            }
+          });
+        } else {
+          JSONdata[key] = val;
+        }
+      });
+      let c = 0;
+      _.map(JSONdata, (val) => {
+        jszip.folder('data').file(`activity_${c + 1}.json`, JSON.stringify(val, null, 4));
+        c += 1;
+      });
+      let f = 0;
+      _.map(fileUploadData, (val) => {
+        jszip.folder('data').file(`voice_item_${f + 1}.wav`, val);
+        f += 1;
+      });
+      jszip.generateAsync({ type: 'blob' })
+        .then((content) => {
+          saveAs(content, 'study-data.zip');
+        });
+    },
   },
   watch: {
     $route() {
@@ -275,7 +338,13 @@ export default {
       const output = {};
       if (this.schemaOrder) {
         _.map(this.schemaOrder, (s) => {
-          const fname = getFilename(s);
+          let fname = '';
+          if (this.schema['https://schema.repronim.org/variableMap']) {
+            fname = getVariableName(s, this.schema['https://schema.repronim.org/variableMap']);
+          } else {
+            // TODO: remove this backwards compatibility else
+            fname = getFilename(s);
+          }
           output[fname] = s;
         });
       }
@@ -284,8 +353,13 @@ export default {
     visibilityConditions() {
       if (this.schema['https://schema.repronim.org/visibility']) {
         return _.map(this.schemaOrder, (s) => {
-          // TODO: don't assume the key name is the same as the ending of the filename.
-          const keyName = getFilename(s);
+          let keyName = '';
+          if (this.schema['https://schema.repronim.org/variableMap']) {
+            keyName = getVariableName(s, this.schema['https://schema.repronim.org/variableMap']);
+          } else {
+            // TODO: remove this backwards compatibility else
+            keyName = getFilename(s);
+          }
 
           // look through the "https://schema.repronim.org/visibility" field
           // and reformat nicely
