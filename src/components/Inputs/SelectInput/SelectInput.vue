@@ -7,7 +7,7 @@
     </multiselect>
     <multiselect v-else v-model="selected" id="ajax"
                  placeholder="Type to search"
-                 :options="this.options"
+                 :options="this.options" :multiple="multipleAllowed"
                  :searchable="true"
                  :internal-search="true" :clear-on-select="false"
                  :close-on-select="true" :options-limit="300"
@@ -87,6 +87,15 @@ export default {
           } else this.options = resp.data;
         });
     }
+  },
+  computed: {
+    multipleAllowed() {
+      // console.log(93, 'here', this.constraints);
+      if (this.constraints['http://schema.repronim.org/multipleChoice']) {
+        // console.log(94, this.constraints['http://schema.repronim.org/multipleChoice']);
+        return true;
+      } return false;
+    },
   },
 };
 </script>
