@@ -211,8 +211,11 @@ export default {
       let output = string;
       _.map(keys, (k) => {
         // grab the value of the key from responseMapper
-        const val = responseMapper[k].val;
+        let val = responseMapper[k].val;
         if (val !== 'skipped' && val !== 'dontknow') {
+          if (_.isString(val)) {
+            val = `'${val}'`; // put the string in quotes
+          }
           output = output.replace(k, val);
         } else {
           output = output.replace(k, 0);
