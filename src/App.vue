@@ -30,7 +30,8 @@
             </li>
         </ul>
         <div>
-          <b-button class="align-middle" @click="downloadZipData" :disabled="!isAnswered">Export</b-button>
+          <b-button class="align-middle" @click="downloadZipData"
+                    :disabled="!isAnswered">Export</b-button>
         </div>
       </nav>
 

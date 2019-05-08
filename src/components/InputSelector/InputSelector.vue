@@ -108,16 +108,8 @@
     </div>
 
     <!-- If type is select input -->
-    <div v-else-if="inputType==='select'">
-      <SelectInput
-        :constraints="valueConstraints"
-        :selected_language="selected_language"
-        :inputType="inputType"
-        :init="init" v-on:valueChanged="sendData"/>
-    </div>
-
-    <!-- If type is select input -->
-    <div v-else-if="inputType==='selectLanguage'">
+    <div v-else-if="inputType==='selectCountry' || inputType === 'selectState'
+      || inputType === 'selectLanguage' || inputType === 'select'">
       <SelectInput
         :constraints="valueConstraints"
         :selected_language="selected_language"
