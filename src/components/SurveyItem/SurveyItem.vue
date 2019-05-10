@@ -218,16 +218,19 @@ export default {
       this.$emit('dontKnow');
     },
     sendNext() {
+      console.log(221, 'send next in surveyitem');
       this.$emit('next');
     },
     sendData(val) {
       this.variant = null;
       /* eslint-enable */
+      console.log(227, val, this.index);
       this.$emit('setData', val, this.index);
     },
     sendDataAndGoNext(val) {
       this.variant = null;
       /* eslint-enable */
+      console.log(233, val, this.index);
       this.$emit('setData', val, this.index);
       this.sendNext();
     },
