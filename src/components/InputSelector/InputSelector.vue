@@ -28,6 +28,14 @@
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
+    <!-- If type is static -->
+    <div v-else-if="inputType==='static'">
+      <TextInput
+        :constraints="valueConstraints"
+        :selected_language="selected_language"
+        :init="init" v-on:valueChanged="sendData"/>
+    </div>
+
     <!-- If type is audioRecord -->
     <div v-else-if="inputType==='audioRecord'">
         <AudioRecord
