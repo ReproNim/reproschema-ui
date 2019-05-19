@@ -1,0 +1,303 @@
+<template>
+  <div>
+    <div v-if="!listShow.length">
+      <h1 >Loading...</h1>
+      <!-- <Loader /> -->
+    </div>
+    <div v-else>
+      <transition name="list" tag="div" mode="in-out">
+        <div v-if="progress === 100" class="mt-3 mb-3">
+          Thanks!
+        </div>
+      </transition>
+      <!-- <b-progress :value="progress" :max="100" class="mb-3"></b-progress> -->
+      <div v-if="preambleText" class="preamble-text mb-2">
+        <strong> {{ preambleText }} </strong>
+      </div>
+    </div>
+    <transition-group name="list" tag="div" mode="in-out">
+      <div v-for="(content, index) in contextReverse" :key="content['@id']+index" class="mt-3 mb-3">
+        <transition name="list" :key="'t'+content['@id']">
+          <survey-item
+            :key="'c' + content['@id']"
+            v-if="shouldShow[index]"
+            :item="content" :index="contextReverse.length - index - 1"
+            :init="responses[content['@id']]"
+            v-on:skip="nextQuestion(contextReverse.length - index - 1, 1, 0)"
+            v-on:dontKnow="nextQuestion(contextReverse.length - index - 1, 0, 1)"
+            v-on:next="nextQuestion(contextReverse.length - index - 1, 0)"
+            v-on:setData="setResponse"
+            :responses="responses"
+            :selected_language="selected_language"
+            :showPassOptions="showPassOptions"
+            :score="score"
+          />
+        </transition>
+      </div>
+    </transition-group>
+
+
+    <div class="text-right mt-3" v-if="showPassOptions !== null ">
+      <b-button variant="default"
+                @click="restart">Restart</b-button>
+      <b-button variant="default" v-if="showPassOptions['dontKnow']"
+                @click="dontKnow">Don't Know</b-button>
+      <b-button variant="default" v-if="showPassOptions['skip']"
+                @click="skip">Skip</b-button>
+    </div>
+  </div>
+</template>
+
+<script>
+import jsonld from 'jsonld/dist/jsonld.min';
+import _ from 'lodash';
+import Loader from '../Loader/';
+
+const safeEval = require('safe-eval');
+
+export default {
+  name: 'MultiPart',
+  props: {
+    srcUrl: {
+      type: String,
+    },
+    progress: {
+      type: Number,
+    },
+    responses: {
+      type: Object,
+    },
+    selected_language: {
+      type: String,
+      default: 'en',
+    },
+    showPassOptions: {
+      type: Object,
+    },
+  },
+  data() {
+    return {
+      activity: {},
+      listShow: [],
+      parsedJSONLD: {},
+      visibility: {},
+      score: 0,
+      currentIndex: 0,
+    };
+  },
+  components: {
+    Loader,
+  },
+  mounted() {
+    if (this.srcUrl) {
+      // eslint-disable-next-line
+        this.getData();
+    }
+  },
+  methods: {
+    getData() {
+      // this.$store.dispatch('getActivityData');
+      jsonld.expand(this.srcUrl).then((resp) => {
+        this.activity = resp[0];
+        this.listShow = [0];
+        this.$nextTick(() => {
+          const answered = _.filter(this.context, c =>
+            Object.keys(this.responses).indexOf(c['@id']) > -1);
+          if (!answered.length) {
+            this.listShow = [0];
+          } else {
+            this.listShow = _.map(new Array(answered.length + 1), (c, i) => i);
+          }
+          this.visibility = this.getVisibility(this.responses);
+        });
+      });
+    },
+    getVisibility(responses) {
+      const responseMapper = this.responseMapper(responses);
+      if (!_.isEmpty(this.activity['https://schema.repronim.org/visibility'])) {
+        const visibilityMapper = {};
+        _.map(this.activity['https://schema.repronim.org/visibility'], (a) => {
+          let val = a['@value'];
+          if (_.isString(a['@value'])) {
+            val = this.evaluateString(a['@value'], responseMapper);
+          }
+          if (responseMapper[a['@index']]) {
+            visibilityMapper[responseMapper[a['@index']].ref] = val;
+          }
+          // visibilityMapper[responseMapper[a['@index']].ref] = val;
+        });
+        return visibilityMapper;
+      }
+      return {};
+    },
+    restart() {
+      this.currentIndex = 0;
+      this.listShow = [0];
+      this.$emit('clearResponses');
+    },
+    evaluateString(string, responseMapper) {
+      const keys = Object.keys(responseMapper);
+      console.log(141, keys);
+      let output = string;
+      _.map(keys, (k) => {
+        // grab the value of the key from responseMapper
+        let val = responseMapper[k].val;
+        if (val !== 'skipped' && val !== 'dontknow') {
+          if (_.isString(val)) {
+            val = `'${val}'`; // put the string in quotes
+          }
+          output = output.replace(k, val);
+        } else {
+          output = output.replace(k, 0);
+        }
+      });
+      return safeEval(output);
+    },
+    responseMapper(responses) {
+      const keys = _.map(this.order, c => c['@id']); // Object.keys(this.responses);
+      const keyArr = _.map(keys, (key) => {
+        const val = responses[key];
+        const folders = key.split('/');
+        const N = folders.length - 1;
+        const qId = folders[N]; // (key.split(/\/items\//)[1]).split(/.jsonld/)[0];
+        return { key, val, qId };
+      });
+      const outMapper = {};
+      _.map(keyArr, (a) => {
+        outMapper[a.qId] = { val: a.val, ref: a.key };
+      });
+      return outMapper;
+    },
+    skip(val) {
+      this.$emit('skip', val);
+    },
+    dontKnow() {
+      this.$emit('dontKnow');
+    },
+    updateProgress() {
+      const totalQ = this.context.length;
+      // TODO: add back branching logic to this.
+      // if (!_.isEmpty(this.visibility)) {
+      //   totalQ = _.filter(this.visibility).length;
+      // }
+      const progress = ((Object.keys(this.responses).length) / totalQ) * 100;
+      this.$emit('updateProgress', progress);
+      if (progress === 100) {
+        this.$emit('valueChanged', this.responses);
+      }
+    },
+    setResponse(value, index) {
+      this.$emit('saveResponse', this.context[index]['@id'], value);
+      const currResponses = { ...this.responses };
+      currResponses[this.context[index]['@id']] = value;
+      // TODO: add back branching logic
+      // this.visibility = this.getVisibility(currResponses);
+
+      // TODO: add back scoring logic to this component.
+      // if (!_.isEmpty(this.activity['https://schema.repronim.org/scoringLogic'])) {
+      //   this.evaluateScoringLogic();
+      // }
+      this.updateProgress();
+      this.$forceUpdate();
+    },
+    nextQuestion(idx, skip, dontKnow) {
+      if (skip) {
+        this.setResponse('skipped', idx);
+      }
+      if (dontKnow) {
+        this.setResponse('dontKnow', idx);
+      }
+
+      this.$forceUpdate();
+      if (idx <= this.listShow.length - 1) {
+        const nextQuestionIdx = _.max(this.listShow) + 1;
+        this.listShow.push(nextQuestionIdx);
+        // update the listShow with the next index in case this one we added isn't visible
+        for (let i = nextQuestionIdx; i < this.context.length; i += 1) {
+          const nextItem = this.order();
+          const id = nextItem[i]['@id'];
+          let isVisible = this.visibility[id];
+          if (isVisible === undefined) {
+            isVisible = true;
+          }
+          if (!isVisible) {
+            this.listShow.push(i + 1);
+          } else {
+            break;
+          }
+        }
+
+        if (this.$store) {
+          this.$store.dispatch('updateListShow', this.listShow);
+        }
+      }
+    },
+    order() {
+      return this.activity['https://schema.repronim.org/order'][0]['@list'];
+    },
+  },
+  watch: {
+    srcUrl() {
+      if (this.srcUrl) {
+        this.getData();
+      }
+    },
+  },
+  computed: {
+    currentItem() {
+      return this.context[this.currentIndex];
+    },
+    shouldShow() {
+      return _.map(this.contextReverse, (o, index) => {
+        const criteria1 = this.listShow.indexOf(this.contextReverse.length - index - 1) >= 0;
+        let criteria2 = true;
+        if (!_.isEmpty(this.visibility)) {
+          criteria2 = this.visibility[o['@id']];
+        }
+        return criteria1 && criteria2;
+      });
+    },
+    context() {
+      if (this.activity['https://schema.repronim.org/order']) {
+        const keys = this.activity['https://schema.repronim.org/order'][0]['@list'];
+        return keys;
+      }
+      return [{}];
+    },
+    contextReverse() {
+      /* eslint-disable */
+      if(this.context.length >0) {
+        return this.context.slice().reverse();
+      }
+      return {};
+    },
+    preambleText() {
+      if (this.activity['http://schema.repronim.org/preamble']) {
+        const activePreamble = _.filter(this.activity['http://schema.repronim.org/preamble'],
+          p => p['@language'] === this.selected_language);
+        return activePreamble[0]['@value'];
+      }
+      return '';
+    },
+    findPassOptions() {
+      if (this.activity['https://schema.repronim.org/allow']) {
+        let isSkip = false;
+        let isDontKnow = false;
+        _.map(this.activity['https://schema.repronim.org/allow'][0]['@list'], s => {
+          if (s['@id'] === "https://schema.repronim.org/refused_to_answer") {
+            isSkip = true;
+          } else if (s['@id'] === "https://schema.repronim.org/dont_know_answer") {
+            isDontKnow = true;
+          }
+        });
+        return {
+          'skip': isSkip,
+          'dontKnow': isDontKnow
+        };
+      }
+      else return null;
+    }
+  },
+};
+</script>
+
