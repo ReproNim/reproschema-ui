@@ -3,8 +3,9 @@
     <!-- https://codepen.io/vikttor_/pen/jeqoPN?page=1& -->
     <div class="contextItem align-self-center center">
       <transition name="fade" mode="out-in">
-        <InputSelector v-if="(status === 'ready' && ((ui !== 'section') && (ui !== 'multipart')))"
+        <InputSelector v-if="status === 'ready' && ui !== 'multipart' && ui !== 'section'"
                        :inputType="ui"
+                       :readOnly="widgetType"
                        :title="title"
                        :preamble="itemPreamble"
                        :valueConstraints="valueConstraints"
@@ -142,6 +143,12 @@ export default {
         }
         return 'N/A';
         /* eslint-enable */
+    },
+    widgetType() {
+      if (this.data['https://schema.repronim.org/readOnly']) {
+        return this.data['https://schema.repronim.org/readOnly'][0]['@value'];
+      }
+      return false;
     },
     title() {
       if (this.data['http://schema.org/question']) {

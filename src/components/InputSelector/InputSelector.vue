@@ -28,14 +28,6 @@
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
-    <!-- If type is static -->
-    <div v-else-if="inputType==='static'">
-      <TextInput
-        :constraints="valueConstraints"
-        :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"/>
-    </div>
-
     <!-- If type is audioRecord -->
     <div v-else-if="inputType==='audioRecord'">
         <AudioRecord
@@ -133,6 +125,14 @@
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
+    <div v-else-if="inputType ==='static' && readOnly">
+      <StaticReadOnly
+        :constraints="valueConstraints"
+        :selected_language="selected_language"
+        :result="true"
+        :init="init" v-on:valueChanged="sendData"/>
+    </div>
+
     <!-- if we don't have a component built for this type, then show an error -->
     <div v-else>
       <b-alert show>
@@ -167,6 +167,7 @@ import SliderInput from '../Inputs/SliderInput';
 import TimeRange from '../Inputs/TimeRange';
 import SelectInput from '../Inputs/SelectInput';
 import AudioCheckRecord from '../Inputs/AudioCheckRecord';
+import StaticReadOnly from '../Inputs/StaticReadOnly';
 
 
 export default {
@@ -174,6 +175,9 @@ export default {
   props: {
     inputType: {
       type: String,
+    },
+    readOnly: {
+      type: Boolean,
     },
     title: {
       type: String,
@@ -207,6 +211,7 @@ export default {
     TimeRange,
     SelectInput,
     AudioCheckRecord,
+    StaticReadOnly,
   },
   data() {
     return {

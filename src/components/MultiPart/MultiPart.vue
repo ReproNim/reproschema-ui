@@ -5,11 +5,6 @@
       <!-- <Loader /> -->
     </div>
     <div v-else>
-      <transition name="list" tag="div" mode="in-out">
-        <div v-if="progress === 100" class="mt-3 mb-3">
-          Thanks!
-        </div>
-      </transition>
       <!-- <b-progress :value="progress" :max="100" class="mb-3"></b-progress> -->
       <div v-if="preambleText" class="preamble-text mb-2">
         <strong> {{ preambleText }} ({{currentIndex + 1}} / {{context.length}})</strong>
