@@ -46,6 +46,9 @@ import jsonld from 'jsonld/dist/jsonld.min';
 import _ from 'lodash';
 import Loader from '../Loader/';
 
+const safeEval = require('safe-eval');
+
+
 export default {
   name: 'MultiPart',
   props: {
@@ -99,29 +102,85 @@ export default {
           } else {
             this.listShow = _.map(new Array(answered.length + 1), (c, i) => i);
           }
-          // this.visibility = this.getVisibility(this.responses);
+          this.visibility = this.getVisibility(this.responses);
         });
       });
+    },
+    getVisibility(responses) {
+      const responseMapper = this.responseMapper(responses);
+      if (!_.isEmpty(this.activity['https://schema.repronim.org/visibility'])) {
+        const visibilityMapper = {};
+        _.map(this.activity['https://schema.repronim.org/visibility'], (a) => {
+          let val = a['@value'];
+          if (_.isString(a['@value'])) {
+            val = this.evaluateString(a['@value'], responseMapper);
+          }
+          if (responseMapper[a['@index']]) {
+            visibilityMapper[responseMapper[a['@index']].ref] = val;
+          }
+          // visibilityMapper[responseMapper[a['@index']].ref] = val;
+        });
+        return visibilityMapper;
+      }
+      return {};
+    },
+    responseMapper(responses) {
+      const keys = _.map(this.order, c => c['@id']); // Object.keys(this.responses);
+
+      // a variable map is defined! great
+      if (this.activity['https://schema.repronim.org/variableMap']) {
+        const vmap = this.activity['https://schema.repronim.org/variableMap'][0]['@list'];
+        const keyArr = _.map(vmap, (v) => {
+          const key = v['https://schema.repronim.org/isAbout'][0]['@id'];
+          const qId = v['https://schema.repronim.org/variableName'][0]['@value'];
+          const val = responses[key];
+          return { key, val, qId };
+        });
+        const outMapper = {};
+        _.map(keyArr, (a) => {
+          outMapper[a.qId] = { val: a.val, ref: a.key };
+        });
+        return outMapper;
+      }
+
+      // TODO: delete the code below once the schema is set!
+      // we keep this for compatibility until everything is fixed.
+      const keyArr = _.map(keys, (key) => {
+        const val = responses[key];
+        const filenameParts = key.split('/');
+        const filename = filenameParts[filenameParts.length - 1];
+        const qId = filename.split('.jsonld')[0];
+        return { key, val, qId };
+      });
+
+      const outMapper = {};
+      _.map(keyArr, (a) => {
+        outMapper[a.qId] = { val: a.val, ref: a.key };
+      });
+
+      return outMapper;
+    },
+    evaluateString(string, responseMapper) {
+      const keys = Object.keys(responseMapper);
+      let output = string;
+      _.map(keys, (k) => {
+        // grab the value of the key from responseMapper
+        let val = responseMapper[k].val;
+        if (val !== 'skipped' && val !== 'dontknow') {
+          if (_.isString(val)) {
+            val = `'${val}'`; // put the string in quotes
+          }
+          output = output.replace(k, val);
+        } else {
+          output = output.replace(k, 0);
+        }
+      });
+      return safeEval(output);
     },
     restart() {
       this.currentIndex = 0;
       this.listShow = [0];
       this.$emit('clearResponses');
-    },
-    responseMapper(responses) {
-      const keys = _.map(this.order, c => c['@id']); // Object.keys(this.responses);
-      const keyArr = _.map(keys, (key) => {
-        const val = responses[key];
-        const folders = key.split('/');
-        const N = folders.length - 1;
-        const qId = folders[N]; // (key.split(/\/items\//)[1]).split(/.jsonld/)[0];
-        return { key, val, qId };
-      });
-      const outMapper = {};
-      _.map(keyArr, (a) => {
-        outMapper[a.qId] = { val: a.val, ref: a.key };
-      });
-      return outMapper;
     },
     skip(val) {
       this.$emit('skip', val);

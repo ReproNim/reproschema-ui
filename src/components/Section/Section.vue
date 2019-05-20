@@ -130,14 +130,23 @@ export default {
       }
       return {};
     },
-    restart() {
-      this.currentIndex = 0;
-      this.listShow = [0];
-      this.$emit('clearResponses');
+    responseMapper(responses) {
+      // a variable map is defined! great
+      const vmap = this.activity['https://schema.repronim.org/variableMap'][0]['@list'];
+      const keyArr = _.map(vmap, (v) => {
+        const key = v['https://schema.repronim.org/isAbout'][0]['@id'];
+        const qId = v['https://schema.repronim.org/variableName'][0]['@value'];
+        const val = responses[key];
+        return { key, val, qId };
+      });
+      const outMapper = {};
+      _.map(keyArr, (a) => {
+        outMapper[a.qId] = { val: a.val, ref: a.key };
+      });
+      return outMapper;
     },
     evaluateString(string, responseMapper) {
       const keys = Object.keys(responseMapper);
-      console.log(141, keys);
       let output = string;
       _.map(keys, (k) => {
         // grab the value of the key from responseMapper
@@ -153,20 +162,10 @@ export default {
       });
       return safeEval(output);
     },
-    responseMapper(responses) {
-      const keys = _.map(this.order, c => c['@id']); // Object.keys(this.responses);
-      const keyArr = _.map(keys, (key) => {
-        const val = responses[key];
-        const folders = key.split('/');
-        const N = folders.length - 1;
-        const qId = folders[N]; // (key.split(/\/items\//)[1]).split(/.jsonld/)[0];
-        return { key, val, qId };
-      });
-      const outMapper = {};
-      _.map(keyArr, (a) => {
-        outMapper[a.qId] = { val: a.val, ref: a.key };
-      });
-      return outMapper;
+    restart() {
+      this.currentIndex = 0;
+      this.listShow = [0];
+      this.$emit('clearResponses');
     },
     skip(val) {
       this.$emit('skip', val);
@@ -175,11 +174,11 @@ export default {
       this.$emit('dontKnow');
     },
     updateProgress() {
-      const totalQ = this.context.length;
+      let totalQ = this.context.length;
       // TODO: add back branching logic to this.
-      // if (!_.isEmpty(this.visibility)) {
-      //   totalQ = _.filter(this.visibility).length;
-      // }
+      if (!_.isEmpty(this.visibility)) {
+        totalQ = _.filter(this.visibility).length;
+      }
       const progress = ((Object.keys(this.responses).length) / totalQ) * 100;
       this.$emit('updateProgress', progress);
       if (progress === 100) {
@@ -191,7 +190,7 @@ export default {
       const currResponses = { ...this.responses };
       currResponses[this.context[index]['@id']] = value;
       // TODO: add back branching logic
-      // this.visibility = this.getVisibility(currResponses);
+      this.visibility = this.getVisibility(currResponses);
 
       // TODO: add back scoring logic to this component.
       // if (!_.isEmpty(this.activity['https://schema.repronim.org/scoringLogic'])) {

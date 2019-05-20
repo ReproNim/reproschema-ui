@@ -33,7 +33,7 @@
                    v-on:skip="sendSkip"
                    v-on:dontKnow="sendDontKnow"
                    v-on:next="sendNext"
-                   v-on:valueChanged="sendData"
+                   v-on:valueChanged="sendDataAndGoNext"
                    v-on:saveResponse="setMPResponse"
                    v-on:updateProgress="setMPProgress"
                    v-on:clearResponses="clearMPResponses"
@@ -46,7 +46,7 @@
                    v-on:skip="sendSkip"
                    v-on:dontKnow="sendDontKnow"
                    v-on:next="sendNext"
-                   v-on:valueChanged="sendData"
+                   v-on:valueChanged="sendDataAndGoNext"
                    v-on:saveResponse="setMPResponse"
                    v-on:updateProgress="setMPProgress"
                    v-on:clearResponses="clearMPResponses"
@@ -91,7 +91,6 @@ import InputSelector from '../InputSelector/';
 import Loader from '../Loader/';
 import MultiPart from '../MultiPart';
 import Section from '../Section';
-
 
 export default {
   name: 'SurveyItem',
@@ -242,6 +241,7 @@ export default {
       this.$emit('setData', val, this.index);
     },
     sendDataAndGoNext(val) {
+      console.log('sending data and going next', val);
       this.variant = null;
       /* eslint-enable */
       this.$emit('setData', val, this.index);
