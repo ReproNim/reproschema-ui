@@ -154,7 +154,7 @@ export default {
         // }
       }
       this.$forceUpdate();
-      if (idx <= this.listShow.length - 1) {
+      if (idx === this.listShow.length - 1) {
         const nextQuestionIdx = _.max(this.listShow) + 1;
         this.listShow.push(nextQuestionIdx);
         // update the listShow with the next index in case this one we added isn't visible
