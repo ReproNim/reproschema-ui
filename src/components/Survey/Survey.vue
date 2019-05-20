@@ -74,7 +74,7 @@ Vue.component('survey-item', SurveyItem);
 const safeEval = require('safe-eval');
 
 export default {
-  name: 'Home',
+  name: 'Survey',
   props: ['srcUrl', 'responses', 'selected_language', 'progress'],
   data() {
     return {
@@ -193,7 +193,8 @@ export default {
       currResponses[this.context[index]['@id']] = value;
       this.visibility = this.getVisibility(currResponses);
       if (!_.isEmpty(this.activity['https://schema.repronim.org/scoringLogic'])) {
-        this.evaluateScoringLogic();
+        // TODO: if you uncomment the scoring logic evaluation, things break w/ multipart.
+        // this.evaluateScoringLogic();
       }
 
       // if (this.activity['https://schema.repronim.org/branchLogic']) {
