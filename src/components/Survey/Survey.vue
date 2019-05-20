@@ -154,13 +154,17 @@ export default {
         // }
       }
       this.$forceUpdate();
-      if (idx <= this.listShow.length - 1) {
+      if (idx === this.listShow.length - 1) {
+        console.log(158, idx, this.listShow.length, this.listShow);
         const nextQuestionIdx = _.max(this.listShow) + 1;
+        console.log(160, 'nextQ', nextQuestionIdx);
         this.listShow.push(nextQuestionIdx);
+        console.log(162, 'listshow', this.listShow);
         // update the listShow with the next index in case this one we added isn't visible
         for (let i = nextQuestionIdx; i < this.context.length; i += 1) {
           const nextItem = this.order();
           const id = nextItem[i]['@id'];
+          console.log(166, 'nextitem', id);
           let isVisible = this.visibility[id];
           if (isVisible === undefined) {
             isVisible = true;
