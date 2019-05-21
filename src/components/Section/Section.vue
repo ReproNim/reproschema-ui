@@ -5,24 +5,36 @@
       <!-- <Loader /> -->
     </div>
     <div v-else>
+      <transition name="list" tag="div" mode="in-out">
+        <div v-if="progress === 100" class="mt-3 mb-3">
+          Thanks!
+        </div>
+      </transition>
       <!-- <b-progress :value="progress" :max="100" class="mb-3"></b-progress> -->
       <div v-if="preambleText" class="preamble-text mb-2">
-        <strong> {{ preambleText }} ({{currentIndex + 1}} / {{context.length}})</strong>
+        <strong> {{ preambleText }} </strong>
       </div>
     </div>
-      <survey-item
-        :key="currentItem['@id']"
-        :item="currentItem" :index="currentIndex"
-        :init="responses[currentItem['@id']]"
-        v-on:skip="nextQuestion(currentIndex, 1, 0)"
-        v-on:dontKnow="nextQuestion(currentIndex, 0, 1)"
-        v-on:next="nextQuestion(currentIndex, 0)"
-        v-on:setData="setResponse"
-        :responses="responses"
-        :selected_language="selected_language"
-        :score="score"
-        :showPassOptions="showPassOptions"
-      />
+    <transition-group name="list" tag="div" mode="in-out">
+      <div v-for="(content, index) in contextReverse" :key="content['@id']+index" class="mt-3 mb-3">
+        <transition name="list" :key="'t'+content['@id']">
+          <survey-item
+            :key="'c' + content['@id']"
+            v-if="shouldShow[index]"
+            :item="content" :index="contextReverse.length - index - 1"
+            :init="responses[content['@id']]"
+            v-on:skip="nextQuestion(contextReverse.length - index - 1, 1, 0)"
+            v-on:dontKnow="nextQuestion(contextReverse.length - index - 1, 0, 1)"
+            v-on:next="nextQuestion(contextReverse.length - index - 1, 0)"
+            v-on:setData="setResponse"
+            :responses="responses"
+            :selected_language="selected_language"
+            :showPassOptions="showPassOptions"
+            :score="score"
+          />
+        </transition>
+      </div>
+    </transition-group>
 
 
     <div class="text-right mt-3" v-if="showPassOptions !== null ">
@@ -42,7 +54,6 @@ import _ from 'lodash';
 import Loader from '../Loader/';
 
 const safeEval = require('safe-eval');
-
 
 export default {
   name: 'MultiPart',
@@ -80,7 +91,7 @@ export default {
   mounted() {
     if (this.srcUrl) {
       // eslint-disable-next-line
-      this.getData();
+        this.getData();
     }
   },
   methods: {
@@ -120,39 +131,18 @@ export default {
       return {};
     },
     responseMapper(responses) {
-      const keys = _.map(this.order, c => c['@id']); // Object.keys(this.responses);
-
       // a variable map is defined! great
-      if (this.activity['https://schema.repronim.org/variableMap']) {
-        const vmap = this.activity['https://schema.repronim.org/variableMap'][0]['@list'];
-        const keyArr = _.map(vmap, (v) => {
-          const key = v['https://schema.repronim.org/isAbout'][0]['@id'];
-          const qId = v['https://schema.repronim.org/variableName'][0]['@value'];
-          const val = responses[key];
-          return { key, val, qId };
-        });
-        const outMapper = {};
-        _.map(keyArr, (a) => {
-          outMapper[a.qId] = { val: a.val, ref: a.key };
-        });
-        return outMapper;
-      }
-
-      // TODO: delete the code below once the schema is set!
-      // we keep this for compatibility until everything is fixed.
-      const keyArr = _.map(keys, (key) => {
+      const vmap = this.activity['https://schema.repronim.org/variableMap'][0]['@list'];
+      const keyArr = _.map(vmap, (v) => {
+        const key = v['https://schema.repronim.org/isAbout'][0]['@id'];
+        const qId = v['https://schema.repronim.org/variableName'][0]['@value'];
         const val = responses[key];
-        const filenameParts = key.split('/');
-        const filename = filenameParts[filenameParts.length - 1];
-        const qId = filename.split('.jsonld')[0];
         return { key, val, qId };
       });
-
       const outMapper = {};
       _.map(keyArr, (a) => {
         outMapper[a.qId] = { val: a.val, ref: a.key };
       });
-
       return outMapper;
     },
     evaluateString(string, responseMapper) {
@@ -184,11 +174,11 @@ export default {
       this.$emit('dontKnow');
     },
     updateProgress() {
-      const totalQ = this.context.length;
+      let totalQ = this.context.length;
       // TODO: add back branching logic to this.
-      // if (!_.isEmpty(this.visibility)) {
-      //   totalQ = _.filter(this.visibility).length;
-      // }
+      if (!_.isEmpty(this.visibility)) {
+        totalQ = _.filter(this.visibility).length;
+      }
       const progress = ((Object.keys(this.responses).length) / totalQ) * 100;
       this.$emit('updateProgress', progress);
       if (progress === 100) {
@@ -200,7 +190,7 @@ export default {
       const currResponses = { ...this.responses };
       currResponses[this.context[index]['@id']] = value;
       // TODO: add back branching logic
-      // this.visibility = this.getVisibility(currResponses);
+      this.visibility = this.getVisibility(currResponses);
 
       // TODO: add back scoring logic to this component.
       // if (!_.isEmpty(this.activity['https://schema.repronim.org/scoringLogic'])) {
@@ -217,9 +207,32 @@ export default {
         this.setResponse('dontKnow', idx);
       }
 
-      if (this.currentIndex < this.context.length - 1) {
-        this.currentIndex = Object.keys(this.responses).length;
+      this.$forceUpdate();
+      if (idx <= this.listShow.length - 1) {
+        const nextQuestionIdx = _.max(this.listShow) + 1;
+        this.listShow.push(nextQuestionIdx);
+        // update the listShow with the next index in case this one we added isn't visible
+        for (let i = nextQuestionIdx; i < this.context.length; i += 1) {
+          const nextItem = this.order();
+          const id = nextItem[i]['@id'];
+          let isVisible = this.visibility[id];
+          if (isVisible === undefined) {
+            isVisible = true;
+          }
+          if (!isVisible) {
+            this.listShow.push(i + 1);
+          } else {
+            break;
+          }
+        }
+
+        if (this.$store) {
+          this.$store.dispatch('updateListShow', this.listShow);
+        }
       }
+    },
+    order() {
+      return this.activity['https://schema.repronim.org/order'][0]['@list'];
     },
   },
   watch: {
@@ -233,8 +246,15 @@ export default {
     currentItem() {
       return this.context[this.currentIndex];
     },
-    order() {
-      return this.activity['https://schema.repronim.org/order'][0]['@list'];
+    shouldShow() {
+      return _.map(this.contextReverse, (o, index) => {
+        const criteria1 = this.listShow.indexOf(this.contextReverse.length - index - 1) >= 0;
+        let criteria2 = true;
+        if (!_.isEmpty(this.visibility)) {
+          criteria2 = this.visibility[o['@id']];
+        }
+        return criteria1 && criteria2;
+      });
     },
     context() {
       if (this.activity['https://schema.repronim.org/order']) {
@@ -242,6 +262,13 @@ export default {
         return keys;
       }
       return [{}];
+    },
+    contextReverse() {
+      /* eslint-disable */
+      if(this.context.length >0) {
+        return this.context.slice().reverse();
+      }
+      return {};
     },
     preambleText() {
       if (this.activity['http://schema.repronim.org/preamble']) {
@@ -251,6 +278,24 @@ export default {
       }
       return '';
     },
+    findPassOptions() {
+      if (this.activity['https://schema.repronim.org/allow']) {
+        let isSkip = false;
+        let isDontKnow = false;
+        _.map(this.activity['https://schema.repronim.org/allow'][0]['@list'], s => {
+          if (s['@id'] === "https://schema.repronim.org/refused_to_answer") {
+            isSkip = true;
+          } else if (s['@id'] === "https://schema.repronim.org/dont_know_answer") {
+            isDontKnow = true;
+          }
+        });
+        return {
+          'skip': isSkip,
+          'dontKnow': isDontKnow
+        };
+      }
+      else return null;
+    }
   },
 };
 </script>

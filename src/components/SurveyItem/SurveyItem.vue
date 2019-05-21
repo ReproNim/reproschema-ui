@@ -26,16 +26,30 @@
           <span class="align-middle mt-3 text-muted">loading</span> -->
           <Loader />
         </div>
-        <multipart v-else
+        <multipart v-else-if="ui === 'multipart'"
                    :progress="mp_progress"
                    :responses="mp_responses"
                    :srcUrl="item['@id']"
                    :showPassOptions="showPassOptions"
                    v-on:skip="sendSkip"
                    v-on:dontKnow="sendDontKnow"
+                   v-on:next="sendNext"
+                   v-on:valueChanged="sendDataAndGoNext"
                    v-on:saveResponse="setMPResponse"
                    v-on:updateProgress="setMPProgress"
+                   v-on:clearResponses="clearMPResponses"
+        />
+        <subactivity v-else-if="ui === 'section'"
+                   :progress="mp_progress"
+                   :responses="mp_responses"
+                   :srcUrl="item['@id']"
+                   :showPassOptions="showPassOptions"
+                   v-on:skip="sendSkip"
+                   v-on:dontKnow="sendDontKnow"
+                   v-on:next="sendNext"
                    v-on:valueChanged="sendDataAndGoNext"
+                   v-on:saveResponse="setMPResponse"
+                   v-on:updateProgress="setMPProgress"
                    v-on:clearResponses="clearMPResponses"
         />
       </transition>
@@ -77,7 +91,7 @@ import _ from 'lodash';
 import InputSelector from '../InputSelector/';
 import Loader from '../Loader/';
 import MultiPart from '../MultiPart';
-
+import Section from '../Section';
 
 export default {
   name: 'SurveyItem',
@@ -107,6 +121,7 @@ export default {
   components: {
     InputSelector,
     multipart: MultiPart,
+    subactivity: Section,
     Loader,
   },
   data() {
@@ -233,6 +248,7 @@ export default {
       this.$emit('setData', val, this.index);
     },
     sendDataAndGoNext(val) {
+      console.log('sending data and going next', val);
       this.variant = null;
       /* eslint-enable */
       this.$emit('setData', val, this.index);

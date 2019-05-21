@@ -74,7 +74,7 @@ Vue.component('survey-item', SurveyItem);
 const safeEval = require('safe-eval');
 
 export default {
-  name: 'Home',
+  name: 'Survey',
   props: ['srcUrl', 'responses', 'selected_language', 'progress'],
   data() {
     return {
@@ -154,7 +154,7 @@ export default {
         // }
       }
       this.$forceUpdate();
-      if (idx <= this.listShow.length - 1) {
+      if (idx === this.listShow.length - 1) {
         const nextQuestionIdx = _.max(this.listShow) + 1;
         this.listShow.push(nextQuestionIdx);
         // update the listShow with the next index in case this one we added isn't visible
@@ -193,7 +193,8 @@ export default {
       currResponses[this.context[index]['@id']] = value;
       this.visibility = this.getVisibility(currResponses);
       if (!_.isEmpty(this.activity['https://schema.repronim.org/scoringLogic'])) {
-        this.evaluateScoringLogic();
+        // TODO: if you uncomment the scoring logic evaluation, things break w/ multipart.
+        // this.evaluateScoringLogic();
       }
 
       // if (this.activity['https://schema.repronim.org/branchLogic']) {
@@ -369,6 +370,7 @@ export default {
     contextReverse() {
       /* eslint-disable */
       if(this.context.length >0) {
+        console.log(30, this.context.slice().reverse());
         return this.context.slice().reverse();
       }
       return {};
