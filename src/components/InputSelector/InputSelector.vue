@@ -20,6 +20,14 @@
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
+    <!-- If type is audioAutoRecord -->
+    <div v-else-if="inputType==='audioAutoRecord'">
+      <AudioCheckRecord
+        :constraints="valueConstraints"
+        :selected_language="selected_language"
+        :init="init" v-on:valueChanged="sendData"/>
+    </div>
+
     <!-- If type is audioRecord -->
     <div v-else-if="inputType==='audioRecord'">
         <AudioRecord
@@ -108,7 +116,8 @@
     </div>
 
     <!-- If type is select input -->
-    <div v-else-if="inputType==='select'">
+    <div v-else-if="inputType==='selectCountry' || inputType === 'selectState'
+      || inputType === 'selectLanguage' || inputType === 'select'">
       <SelectInput
         :constraints="valueConstraints"
         :selected_language="selected_language"
@@ -116,12 +125,11 @@
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
-    <!-- If type is select input -->
-    <div v-else-if="inputType==='selectLanguage'">
-      <SelectInput
+    <div v-else-if="inputType ==='static' && readOnly">
+      <StaticReadOnly
         :constraints="valueConstraints"
         :selected_language="selected_language"
-        :inputType="inputType"
+        :result="true"
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
@@ -158,6 +166,8 @@ import MultiTextInput from '../Inputs/MultiTextInput';
 import SliderInput from '../Inputs/SliderInput';
 import TimeRange from '../Inputs/TimeRange';
 import SelectInput from '../Inputs/SelectInput';
+import AudioCheckRecord from '../Inputs/AudioCheckRecord';
+import StaticReadOnly from '../Inputs/StaticReadOnly';
 
 
 export default {
@@ -165,6 +175,9 @@ export default {
   props: {
     inputType: {
       type: String,
+    },
+    readOnly: {
+      type: Boolean,
     },
     title: {
       type: String,
@@ -197,6 +210,8 @@ export default {
     MultiPart,
     TimeRange,
     SelectInput,
+    AudioCheckRecord,
+    StaticReadOnly,
   },
   data() {
     return {

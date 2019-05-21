@@ -5,13 +5,13 @@
                  :show-labels="false"
                  placeholder="Pick a value" @input="sendData">
     </multiselect>
-    <multiselect v-else v-model="selectedCountries" id="ajax"
+    <multiselect v-else v-model="selected" id="ajax"
                  placeholder="Type to search"
-                 :options="this.options"
+                 :options="this.options" :multiple="multipleAllowed"
                  :searchable="true"
                  :internal-search="true" :clear-on-select="false"
                  :close-on-select="true" :options-limit="300"
-                 :limit="3" :limit-text="limitText" :max-height="600"
+                 :limit="5" :limit-text="limitText" :max-height="600"
                  :show-no-results="false" :hide-selected="true"
                  @input="sendData">
       <span slot="noResult">Oops! No elements found. Consider changing the search query.</span>
@@ -62,40 +62,10 @@ export default {
   },
   methods: {
     sendData(val) {
-      // console.log(47, val, val.name);
-      this.$emit('valueChanged', val.name);
+      this.$emit('valueChanged', val);
     },
     limitText(count) {
       return `and ${count} other countries`;
-    },
-    asyncFindPlace(query) {
-      this.isLoading = true;
-      console.log(73, this.options.filter(c => c.toLowerCase().indexOf(query) > -1));
-      this.selectedCountries = this.options.filter((c) => {
-        console.log('c is', c);
-        return c.toLowerCase().indexOf(query) > -1
-      });
-      // return this.options.filter(c => c.country.toLowerCase().indexOf(query) > -1);
-      // axios.get(`http://api.geonames.org/searchJSON?q=${query}&maxRows=10&username=sanuann`)
-      //   .then((resp) => {
-      //     // this.options = _.map(resp.data.geonames, place => [place.name, place.countryCode]);
-      //     // console.log(30, this.options);
-      //     this.options = resp.data.geonames;
-      //     this.isLoading = false;
-      //   });
-    },
-    asyncFindLanguage(query) {
-      // this.isLoading = true;
-      console.log(73, this.options.filter(c => c.toLowerCase().indexOf(query) > -1));
-      return this.options.filter(c => c.toLowerCase().indexOf(query) > -1);
-      // axios.get(`http://api.geonames.org/searchJSON?q=${query}&maxRows=10&username=sanuann`) // change this
-      //   .then((resp) => {
-      //     this.options = resp.data.geonames;
-      //     this.isLoading = false;
-      //   });
-    },
-    clearAll() {
-      this.selectedCountries = [];
     },
   },
   mounted() {
@@ -110,22 +80,21 @@ export default {
     } else if (this.constraints['https://schema.org/DigitalDocument']) { // if choice list defined in external file
       axios.get(this.constraints['https://schema.org/DigitalDocument'][0]['@id'])
         .then((resp) => {
-          if (_.isObject(resp.data)) {
+          if (this.inputType === 'selectCountry') {
+            this.options = _.map(resp.data, c => c.country);
+          } else if (this.inputType === 'selectState' || this.inputType === 'selectLanguage') {
             this.options = Object.values(resp.data);
-          } else { 
-            this.options = resp.data;
-          }
+          } else this.options = resp.data;
         });
     }
   },
   computed: {
-    optionList() {
-      // TODO: else get from api
-      if (this.inputType === 'select') {
-        return this.asyncFindPlace();
-      } else if (this.inputType === 'selectLanguage') {
-        return this.asyncFindLanguage();
-      } return ['not implemented yet'];
+    multipleAllowed() {
+      // console.log(93, 'here', this.constraints);
+      if (this.constraints['http://schema.repronim.org/multipleChoice']) {
+        // console.log(94, this.constraints['http://schema.repronim.org/multipleChoice']);
+        return true;
+      } return false;
     },
   },
 };

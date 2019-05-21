@@ -74,7 +74,7 @@ Vue.component('survey-item', SurveyItem);
 const safeEval = require('safe-eval');
 
 export default {
-  name: 'Home',
+  name: 'Survey',
   props: ['srcUrl', 'responses', 'selected_language', 'progress'],
   data() {
     return {
@@ -154,7 +154,6 @@ export default {
         // }
       }
       this.$forceUpdate();
-
       if (idx === this.listShow.length - 1) {
         const nextQuestionIdx = _.max(this.listShow) + 1;
         this.listShow.push(nextQuestionIdx);
@@ -194,7 +193,8 @@ export default {
       currResponses[this.context[index]['@id']] = value;
       this.visibility = this.getVisibility(currResponses);
       if (!_.isEmpty(this.activity['https://schema.repronim.org/scoringLogic'])) {
-        this.evaluateScoringLogic();
+        // TODO: if you uncomment the scoring logic evaluation, things break w/ multipart.
+        // this.evaluateScoringLogic();
       }
 
       // if (this.activity['https://schema.repronim.org/branchLogic']) {
@@ -211,8 +211,11 @@ export default {
       let output = string;
       _.map(keys, (k) => {
         // grab the value of the key from responseMapper
-        const val = responseMapper[k].val;
+        let val = responseMapper[k].val;
         if (val !== 'skipped' && val !== 'dontknow') {
+          if (_.isString(val)) {
+            val = `'${val}'`; // put the string in quotes
+          }
           output = output.replace(k, val);
         } else {
           output = output.replace(k, 0);
@@ -283,14 +286,14 @@ export default {
       this.$emit('updateProgress', progress);
     },
     order() {
-      if (this.activity['https://schema.repronim.org/shuffle'][0]['@value']) {
+      if (this.activity['https://schema.repronim.org/shuffle'][0]['@value']) { // when shuffle is true
         const orderList = this.activity['https://schema.repronim.org/order'][0]['@list'];
-        const listToShuffle = orderList.slice(1, orderList.length - 1);
+        const listToShuffle = orderList.slice(1, orderList.length - 3);
         const newList = _.shuffle(listToShuffle);
-        // newList.unshift(this.activity['https://schema.repronim.org/order'][0]['@list'][0]);
-        // newList.push(this.activity['https://schema.repronim.org/order'][0]['@list'][orderList.length - 1]);
+        newList.unshift(orderList[0]);
+        newList.push(orderList[orderList.length - 3],
+          orderList[orderList.length - 2], orderList[orderList.length - 1]);
         return newList;
-        // console.log(27, newList);
       } return this.activity['https://schema.repronim.org/order'][0]['@list'];
     },
   },
@@ -367,6 +370,7 @@ export default {
     contextReverse() {
       /* eslint-disable */
       if(this.context.length >0) {
+        console.log(30, this.context.slice().reverse());
         return this.context.slice().reverse();
       }
       return {};

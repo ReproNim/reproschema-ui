@@ -3,8 +3,9 @@
     <!-- https://codepen.io/vikttor_/pen/jeqoPN?page=1& -->
     <div class="contextItem align-self-center center">
       <transition name="fade" mode="out-in">
-        <InputSelector v-if="status === 'ready' && ui !== 'multipart'"
+        <InputSelector v-if="status === 'ready' && ui !== 'multipart' && ui !== 'section'"
                        :inputType="ui"
+                       :readOnly="widgetType"
                        :title="title"
                        :preamble="itemPreamble"
                        :valueConstraints="valueConstraints"
@@ -25,16 +26,30 @@
           <span class="align-middle mt-3 text-muted">loading</span> -->
           <Loader />
         </div>
-        <multipart v-else
+        <multipart v-else-if="ui === 'multipart'"
                    :progress="mp_progress"
                    :responses="mp_responses"
                    :srcUrl="item['@id']"
                    :showPassOptions="showPassOptions"
                    v-on:skip="sendSkip"
                    v-on:dontKnow="sendDontKnow"
+                   v-on:next="sendNext"
+                   v-on:valueChanged="sendDataAndGoNext"
                    v-on:saveResponse="setMPResponse"
                    v-on:updateProgress="setMPProgress"
+                   v-on:clearResponses="clearMPResponses"
+        />
+        <subactivity v-else-if="ui === 'section'"
+                   :progress="mp_progress"
+                   :responses="mp_responses"
+                   :srcUrl="item['@id']"
+                   :showPassOptions="showPassOptions"
+                   v-on:skip="sendSkip"
+                   v-on:dontKnow="sendDontKnow"
+                   v-on:next="sendNext"
                    v-on:valueChanged="sendDataAndGoNext"
+                   v-on:saveResponse="setMPResponse"
+                   v-on:updateProgress="setMPProgress"
                    v-on:clearResponses="clearMPResponses"
         />
       </transition>
@@ -76,7 +91,7 @@ import _ from 'lodash';
 import InputSelector from '../InputSelector/';
 import Loader from '../Loader/';
 import MultiPart from '../MultiPart';
-
+import Section from '../Section';
 
 export default {
   name: 'SurveyItem',
@@ -106,6 +121,7 @@ export default {
   components: {
     InputSelector,
     multipart: MultiPart,
+    subactivity: Section,
     Loader,
   },
   data() {
@@ -127,6 +143,12 @@ export default {
         }
         return 'N/A';
         /* eslint-enable */
+    },
+    widgetType() {
+      if (this.data['https://schema.repronim.org/readOnly']) {
+        return this.data['https://schema.repronim.org/readOnly'][0]['@value'];
+      }
+      return false;
     },
     title() {
       if (this.data['http://schema.org/question']) {
@@ -226,6 +248,7 @@ export default {
       this.$emit('setData', val, this.index);
     },
     sendDataAndGoNext(val) {
+      console.log('sending data and going next', val);
       this.variant = null;
       /* eslint-enable */
       this.$emit('setData', val, this.index);
