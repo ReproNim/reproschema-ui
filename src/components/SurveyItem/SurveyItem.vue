@@ -1,8 +1,8 @@
 <template>
-  <b-card class="text-center question mx-auto" :border-variant="variant" :style="style"
+  <b-card class="text-center question mx-auto w-100" :border-variant="variant" :style="style"
     :no-body="ui === 'multipart' || ui === 'section'">
     <!-- https://codepen.io/vikttor_/pen/jeqoPN?page=1& -->
-    <div class="contextItem align-self-center center">
+    <div class="contextItem align-self-center center w-100">
       <transition name="fade" mode="out-in">
         <InputSelector v-if="status === 'ready' && ui !== 'multipart' && ui !== 'section'"
                        :inputType="ui"
@@ -146,6 +146,7 @@ export default {
         };
       }
       return {
+        width: '100%',
       };
     },
     bodyStyle() {
