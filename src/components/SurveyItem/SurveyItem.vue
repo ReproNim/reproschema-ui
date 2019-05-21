@@ -1,5 +1,6 @@
 <template>
-  <b-card class="text-center question mx-auto" :border-variant="variant" :style="style">
+  <b-card class="text-center question mx-auto" :border-variant="variant" :style="style"
+    :no-body="ui === 'multipart' || ui === 'section'">
     <!-- https://codepen.io/vikttor_/pen/jeqoPN?page=1& -->
     <div class="contextItem align-self-center center">
       <transition name="fade" mode="out-in">
@@ -140,6 +141,17 @@ export default {
       if (this.ui === 'section' || this.ui === 'multipart') {
         return {
           'border-color': 'white',
+          '-webkit-box-flex': 1,
+          flex: '1 1 auto',
+        };
+      }
+      return {
+      };
+    },
+    bodyStyle() {
+      if (this.ui === 'section' || this.ui === 'multipart') {
+        return {
+          padding: 0,
         };
       }
       return {};
