@@ -1,5 +1,5 @@
 <template>
-  <b-card class="text-center question mx-auto" :border-variant="variant">
+  <b-card class="text-center question mx-auto" :border-variant="variant" :style="style">
     <!-- https://codepen.io/vikttor_/pen/jeqoPN?page=1& -->
     <div class="contextItem align-self-center center">
       <transition name="fade" mode="out-in">
@@ -136,6 +136,14 @@ export default {
     };
   },
   computed: {
+    style() {
+      if (this.ui === 'section' || this.ui === 'multipart') {
+        return {
+          'border-color': 'white',
+        };
+      }
+      return {};
+    },
     ui() {
       /* eslint-disable */
         if (this.data['https://schema.repronim.org/inputType']) {
