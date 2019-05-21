@@ -1,6 +1,6 @@
 # schema-ui
 
-[![Build Status](https://travis-ci.org/akeshavan/schema-ui.svg?branch=master)](https://travis-ci.org/akeshavan/schema-ui)
+[![Build Status](https://travis-ci.org/ReproNim/schema-ui.svg?branch=master)](https://travis-ci.org/ReproNim/schema-ui)
 
 
 ## Build Setup
