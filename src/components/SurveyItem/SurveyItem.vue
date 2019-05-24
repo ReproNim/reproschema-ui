@@ -269,7 +269,7 @@ export default {
       this.$emit('setData', val, this.index);
     },
     sendDataAndGoNext(val) {
-      console.log('sending data and going next', val);
+      // console.log('sending data and going next', val);
       this.variant = null;
       /* eslint-enable */
       this.$emit('setData', val, this.index);
