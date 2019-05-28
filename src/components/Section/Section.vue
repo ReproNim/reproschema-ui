@@ -193,44 +193,11 @@ export default {
       this.visibility = this.getVisibility(currResponses);
 
       // TODO: add back scoring logic to this component.
-      if (!_.isEmpty(this.activity['https://schema.repronim.org/scoringLogic'])) {
-        this.evaluateScoringLogic();
-      }
+      // if (!_.isEmpty(this.activity['https://schema.repronim.org/scoringLogic'])) {
+      //   this.evaluateScoringLogic();
+      // }
       this.updateProgress();
       this.$forceUpdate();
-    },
-    evaluateScoringLogic() {
-      const scoringLogic = (this.activity['https://schema.repronim.org/scoringLogic'][0]['@value']);
-      if (this.responses) {
-        let str = '';
-        _.forOwn(this.responses, (val, key) => {
-          const qId = (key.split(/\/items\//)[1]).split(/.jsonld/)[0]; // split url to get the scoring key
-          if (scoringLogic) {
-            if (isNaN(val)) {
-              str += `const ${qId}=0; `;
-            } else {
-              str += `const ${qId}=${val}; `;
-            }
-          }
-        });
-        try {
-          // eslint-disable-next-line
-          this.score = eval(`${str}  ${scoringLogic}`);
-          const scoreKey = this.activity['https://schema.repronim.org/scoringLogic'][0]['@index'];
-          // a variable map is defined! great
-          const vmap = this.activity['https://schema.repronim.org/variableMap'][0]['@list'];
-          const keyArr = _.map(vmap, (v) => {
-            const key = v['https://schema.repronim.org/isAbout'][0]['@id'];
-            const qId = v['https://schema.repronim.org/variableName'][0]['@value'];
-            return { key, qId };
-          });
-          const scoreKeyMap = _.filter(keyArr, { qId: scoreKey });
-          this.$emit('saveResponse', scoreKeyMap[0].key, this.score);
-          // console.log('TOTAL SCORE::::', scoreKeyMap[0].key, this.score);
-        } catch (e) {
-          // Do nothing
-        }
-      }
     },
     nextQuestion(idx, skip, dontKnow) {
       if (skip) {
@@ -241,7 +208,7 @@ export default {
       }
 
       this.$forceUpdate();
-      if (idx === this.listShow.length - 1) {
+      if (idx <= this.listShow.length - 1) {
         const nextQuestionIdx = _.max(this.listShow) + 1;
         this.listShow.push(nextQuestionIdx);
         // update the listShow with the next index in case this one we added isn't visible

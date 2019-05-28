@@ -370,6 +370,7 @@ export default {
     contextReverse() {
       /* eslint-disable */
       if(this.context.length >0) {
+        console.log(30, this.context.slice().reverse());
         return this.context.slice().reverse();
       }
       return {};
