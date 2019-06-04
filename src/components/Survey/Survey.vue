@@ -28,6 +28,7 @@
             v-on:dontKnow="nextQuestion(contextReverse.length - index - 1, 0, 1)"
             v-on:next="nextQuestion(contextReverse.length - index - 1, 0)"
             v-on:setData="setResponse"
+            v-on:setScores="setScore"
             :responses="responses"
             :selected_language="selected_language"
             :showPassOptions="findPassOptions"
@@ -201,6 +202,9 @@ export default {
       //   this.evaluateBranchingLogic();
       // }
       this.updateProgress();
+    },
+    setScore(scoreObj, index) {
+      this.$emit('saveScores', this.context[index]['@id'], scoreObj);
     },
     restart() {
       this.$emit('clearResponses');
