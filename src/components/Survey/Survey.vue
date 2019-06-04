@@ -28,6 +28,7 @@
             v-on:dontKnow="nextQuestion(contextReverse.length - index - 1, 0, 1)"
             v-on:next="nextQuestion(contextReverse.length - index - 1, 0)"
             v-on:setData="setResponse"
+            v-on:setScores="setScore"
             :responses="responses"
             :selected_language="selected_language"
             :showPassOptions="findPassOptions"
@@ -202,6 +203,9 @@ export default {
       // }
       this.updateProgress();
     },
+    setScore(scoreObj, index) {
+      this.$emit('saveScores', this.context[index]['@id'], scoreObj);
+    },
     restart() {
       this.$emit('clearResponses');
       this.listShow = [0];
@@ -370,7 +374,6 @@ export default {
     contextReverse() {
       /* eslint-disable */
       if(this.context.length >0) {
-        console.log(30, this.context.slice().reverse());
         return this.context.slice().reverse();
       }
       return {};

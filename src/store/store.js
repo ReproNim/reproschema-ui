@@ -11,6 +11,7 @@ const state = {
   schema: {},
   progress: [],
   responses: [],
+  scores: {},
   activities: [],
   activityIndex: null,
   storeReady: false,
@@ -37,6 +38,7 @@ const mutations = {
     state.schema = data[0];
     state.progress = _.map(data[0]['https://schema.repronim.org/order'][0]['@list'], () => 0);
     state.responses = _.map(data[0]['https://schema.repronim.org/order'][0]['@list'], () => ({}));
+    state.scores = _.map(data[0]['https://schema.repronim.org/order'][0]['@list'], () => ({}));
     state.activities = _.map(data[0]['https://schema.repronim.org/order'][0]['@list'], () => ({}));
     state.storeReady = true;
   },
@@ -47,7 +49,16 @@ const mutations = {
   },
   // eslint-disable-next-line
   saveResponse(state, { key, value }) {
+    // console.log(50, state.activityIndex, key, value, state.responses);
     state.responses[state.activityIndex][key] = value;
+  },
+  // eslint-disable-next-line
+  saveScores(state, { key, scoreObj }) {
+    state.scores[state.activityIndex][key] = scoreObj;
+    // _.map(scoreObj, (val, scoreKey) => {
+    //   console.log(58, val, scoreKey, state.scores);
+    //   state.scores[key][scoreKey] = val;
+    // });
   },
   // eslint-disable-next-line
   updateProgress(state, progress) {
@@ -88,6 +99,9 @@ const actions = {
   },
   saveResponse({ commit }, { key, value }) {
     commit('saveResponse', { key, value });
+  },
+  saveScores({ commit }, { key, scoreObj }) {
+    commit('saveScores', { key, scoreObj });
   },
   updateProgress({ commit }, progress) {
     commit('updateProgress', progress);

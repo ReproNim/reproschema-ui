@@ -37,6 +37,7 @@
                    v-on:next="sendNext"
                    v-on:valueChanged="sendDataAndGoNext"
                    v-on:saveResponse="setMPResponse"
+                   v-on:saveScores="setScore"
                    v-on:updateProgress="setMPProgress"
                    v-on:clearResponses="clearMPResponses"
         />
@@ -50,6 +51,7 @@
                    v-on:next="sendNext"
                    v-on:valueChanged="sendDataAndGoNext"
                    v-on:saveResponse="setMPResponse"
+                   v-on:saveScores="setScore"
                    v-on:updateProgress="setMPProgress"
                    v-on:clearResponses="clearMPResponses"
         />
@@ -269,11 +271,14 @@ export default {
       this.$emit('setData', val, this.index);
     },
     sendDataAndGoNext(val) {
-      console.log('sending data and going next', val);
+      // console.log('sending data and going next', val);
       this.variant = null;
       /* eslint-enable */
       this.$emit('setData', val, this.index);
       this.sendNext();
+    },
+    setScore(key, scoreObj) {
+      this.$emit('setScores', scoreObj, this.index);
     },
     setMPResponse(index, value) {
       // console.log('setting response of multipart item', index, value);

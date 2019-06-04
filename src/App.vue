@@ -32,8 +32,6 @@
         <div>
           <b-button class="align-middle" @click="downloadZipData"
                     :disabled="!isAnswered">Export</b-button>
-          <b-button class="align-middle" @click="downloadZipData"
-                    :disabled="!isAnswered">Save</b-button>
         </div>
       </nav>
 
@@ -63,6 +61,7 @@
               :progress="progress[activityIndex]"
               v-on:updateProgress="updateProgress"
               v-on:saveResponse="saveResponse"
+              v-on:saveScores="saveScores"
               v-on:clearResponses="clearResponses"
             />
           </b-container>
@@ -155,11 +154,17 @@ export default {
         // there has been a change in an already completed activity
         needsVizUpdate = true;
       }
+      // const flag = 'response';
+      // console.log(150, flag, key, value);
       this.$store.dispatch('saveResponse', { key, value });
       if (needsVizUpdate) {
         this.setVisbility();
       }
       this.isAnswered = true;
+    },
+    saveScores(key, scoreObj) {
+      // console.log(168, key, scoreObj);
+      this.$store.dispatch('saveScores', { key, scoreObj });
     },
     clearResponses() {
       this.$store.dispatch('clearResponses', this.activityIndex);
@@ -203,11 +208,10 @@ export default {
         }
         // console.log('making request', request, 'cache', this.cache);
         const resp = await axios(request);
-
         // this.visibility[index] = resp.data;
-        this.cache[cacheKey] = resp.data;
+        this.cache[cacheKey] = resp.data.qualified;
 
-        return resp.data;
+        return resp.data.qualified;
       } else if (_.isString(cond)) {
         // todo: implement client-side evaluation!
         Error('Client-side branching at activity set level is not implemented yet');
@@ -234,13 +238,16 @@ export default {
       this.visibilityChain(values);
     },
     downloadZipData() {
-      const totalResponse = this.$store.state.responses;
-      this.formatData({ response: totalResponse });
+      const Response = this.$store.state.responses;
+      const totalScores = this.$store.state.scores;
+      const totalResponse = { response: Response, scores: totalScores };
+      this.formatData(totalResponse);
     },
     formatData(data) {
       const jszip = new JSZip();
       const fileUploadData = {};
       const JSONdata = {};
+      const JSONscores = {};
       // sort out blobs from JSONdata
       _.map(data.response, (val, key) => {
         if (val instanceof Blob) {
@@ -263,10 +270,16 @@ export default {
           JSONdata[key] = val;
         }
       });
-      let c = 0;
-      _.map(JSONdata, (val) => {
-        jszip.folder('data').file(`activity_${c + 1}.json`, JSON.stringify(val, null, 4));
-        c += 1;
+      _.map(data.scores, (val, key) => { // todo: check if score object not null?
+        if (!_.isEmpty(val)) {
+          JSONscores[key] = val;
+        }
+      });
+      _.map(JSONdata, (val, key) => {
+        jszip.folder('data/responses').file(`activity_${key}.json`, JSON.stringify(val, null, 4));
+      });
+      _.map(JSONscores, (val, key) => {
+        jszip.folder('data/scores').file(`activity_${key}_score.json`, JSON.stringify(val, null, 4));
       });
       let f = 0;
       _.map(fileUploadData, (val) => {

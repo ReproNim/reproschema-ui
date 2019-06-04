@@ -30,7 +30,6 @@
             :responses="responses"
             :selected_language="selected_language"
             :showPassOptions="showPassOptions"
-            :score="score"
           />
         </transition>
       </div>
@@ -81,7 +80,7 @@ export default {
       listShow: [],
       parsedJSONLD: {},
       visibility: {},
-      score: 0,
+      scores: {},
       currentIndex: 0,
     };
   },
@@ -124,7 +123,6 @@ export default {
           if (responseMapper[a['@index']]) {
             visibilityMapper[responseMapper[a['@index']].ref] = val;
           }
-          // visibilityMapper[responseMapper[a['@index']].ref] = val;
         });
         return visibilityMapper;
       }
@@ -193,11 +191,35 @@ export default {
       this.visibility = this.getVisibility(currResponses);
 
       // TODO: add back scoring logic to this component.
-      // if (!_.isEmpty(this.activity['https://schema.repronim.org/scoringLogic'])) {
-      //   this.evaluateScoringLogic();
-      // }
+      if (!_.isEmpty(this.activity['https://schema.repronim.org/scoringLogic'])) {
+        _.map(this.getScoring(this.responses), (score, key) => {
+          if (!_.isNaN(score)) {
+            this.scores[key] = score;
+          }
+        });
+        if (!_.isEmpty(this.scores)) {
+          this.$emit('saveScores', this.srcUrl, this.scores);
+        }
+      }
       this.updateProgress();
       this.$forceUpdate();
+    },
+    getScoring(responses) {
+      const responseMapper = this.responseMapper(responses);
+      if (!_.isEmpty(this.activity['https://schema.repronim.org/scoringLogic'])) {
+        const scoreMapper = {};
+        _.map(this.activity['https://schema.repronim.org/scoringLogic'], (a) => {
+          let val = a['@value'];
+          if (_.isString(a['@value'])) {
+            val = this.evaluateString(a['@value'], responseMapper);
+          }
+          if (responseMapper[a['@index']]) {
+            scoreMapper[responseMapper[a['@index']].ref] = val;
+          }
+        });
+        return scoreMapper;
+      }
+      return {};
     },
     nextQuestion(idx, skip, dontKnow) {
       if (skip) {
