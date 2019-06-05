@@ -330,6 +330,9 @@ export default {
     responses() {
       return this.$store.state.responses;
     },
+    scores() {
+      return this.$store.state.scores;
+    },
     activityIndex() {
       return this.$store.state.activityIndex;
     },
@@ -401,7 +404,7 @@ export default {
               _.map(payloadList, (p) => {
                 const item = p['@value'];
                 const index = this.schemaOrder.indexOf(this.schemaNameMapper[item]);
-                payload[this.schemaNameMapper[item]] = this.responses[index];
+                payload[this.schemaNameMapper[item]] = this.scores[index];
               });
               return {
                 url: condition['http://schema.org/url'][0]['@value'],
