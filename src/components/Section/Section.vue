@@ -48,9 +48,14 @@
 </template>
 
 <script>
+import Vue from 'vue';
 import jsonld from 'jsonld/dist/jsonld.min';
+import VuejsDialog from 'vuejs-dialog';
+import 'vuejs-dialog/dist/vuejs-dialog.min.css';
 import _ from 'lodash';
 import Loader from '../Loader/';
+
+Vue.use(VuejsDialog);
 
 const safeEval = require('safe-eval');
 
@@ -222,6 +227,18 @@ export default {
       return {};
     },
     nextQuestion(idx, skip, dontKnow) {
+      if (idx === 8 && this.responses[this.context[idx]['@id']] > 0) {
+        // Trigger notification for non-zero suicidal ideation
+        const notification = ' <i> If this is how you feel, think about getting help. </i><br> ' +
+          'There are people who can help 24/7 <br>' +
+          'Text the Crisis Text Line at 741741 <br>' +
+          'Or<br>' +
+          'Call the National Suicide Prevention Lifeline at 1-800-273-8255';
+        const options = {
+          html: true,
+        };
+        this.$dialog.alert(notification, options);
+      }
       if (skip) {
         this.setResponse('skipped', idx);
       }
