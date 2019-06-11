@@ -63,6 +63,7 @@
               v-on:saveResponse="saveResponse"
               v-on:saveScores="saveScores"
               v-on:clearResponses="clearResponses"
+              v-on:surveyStartTime="totalSurveyTime"
             />
           </b-container>
       </div>
@@ -103,6 +104,8 @@ function getVariableName(s, variableMap) {
   });
   return mapper[s];
 }
+
+const safeEval = require('safe-eval');
 
 export default {
   name: 'App',
@@ -146,6 +149,11 @@ export default {
       if ((oldP !== newP) && newP === 100) {
         // console.log('time to check for branching activities!');
         this.setVisbility();
+      }
+    },
+    totalSurveyTime(val) {
+      if (this.progress[this.activityIndex] === 100) {
+        console.log('survey completed', val);
       }
     },
     saveResponse(key, value) {
@@ -213,11 +221,65 @@ export default {
 
         return resp.data.qualified;
       } else if (_.isString(cond)) {
+        console.log(222, 'hi', cond);
         // todo: implement client-side evaluation!
         Error('Client-side branching at activity set level is not implemented yet');
+        const vis = this.getVisibility(this.responses);
+        console.log(26, vis);
       }
       // this.visibility[index] = cond;
       return cond;
+    },
+    getVisibility(responses) {
+      const responseMapper = this.responseMapper(responses);
+      if (!_.isEmpty(this.$store.state.schema['https://schema.repronim.org/visibility'])) {
+        const visibilityMapper = {};
+        _.map(this.activity['https://schema.repronim.org/visibility'], (a) => {
+          let val = a['@value'];
+          if (_.isString(a['@value'])) {
+            val = this.evaluateString(a['@value'], responseMapper);
+          }
+          if (responseMapper[a['@index']]) {
+            visibilityMapper[responseMapper[a['@index']].ref] = val;
+          }
+        });
+        return visibilityMapper;
+      }
+      return {};
+    },
+    responseMapper(responses) {
+      console.log(25, responses);
+      // a variable map is defined! great
+      const vmap = this.$store.state.schema['https://schema.repronim.org/variableMap'][0]['@list'];
+      const keyArr = _.map(vmap, (v) => {
+        const key = v['https://schema.repronim.org/isAbout'][0]['@id'];
+        const qId = v['https://schema.repronim.org/variableName'][0]['@value'];
+        const val = responses[key];
+        return { key, val, qId };
+      });
+      console.log(25, keyArr);
+      const outMapper = {};
+      _.map(keyArr, (a) => {
+        outMapper[a.qId] = { val: a.val, ref: a.key };
+      });
+      return outMapper;
+    },
+    evaluateString(string, responseMapper) {
+      const keys = Object.keys(responseMapper);
+      let output = string;
+      _.map(keys, (k) => {
+        // grab the value of the key from responseMapper
+        let val = responseMapper[k].val;
+        if (val !== 'skipped' && val !== 'dontknow') {
+          if (_.isString(val)) {
+            val = `'${val}'`; // put the string in quotes
+          }
+          output = output.replace(k, val);
+        } else {
+          output = output.replace(k, 0);
+        }
+      });
+      return safeEval(output);
     },
     visibilityChain(conditionList) {
       if (!conditionList[0]) {

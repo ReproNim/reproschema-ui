@@ -86,6 +86,7 @@ export default {
       score: 0,
       isSkip: false,
       isDontKnow: false,
+      t0: 0,
     };
   },
   components: {
@@ -190,6 +191,15 @@ export default {
     },
     setResponse(value, index) {
       this.$emit('saveResponse', this.context[index]['@id'], value);
+      const t1 = performance.now();
+      console.log(194, 'end of a question', index, 'is', t1);
+      if (index === 0) {
+        console.log(197, 'time taken for question', index, 'is', (t1 - this.t0) / 1000);
+        this.t0 = t1;
+      } else {
+        console.log(200, 'time taken for question', index, 'is', (t1 - this.t0) / 1000);
+        this.t0 = t1;
+      }
       const currResponses = { ...this.responses };
       currResponses[this.context[index]['@id']] = value;
       this.visibility = this.getVisibility(currResponses);
@@ -417,6 +427,9 @@ export default {
       // eslint-disable-next-line
       this.getData();
     }
+    this.t0 = performance.now();
+    console.log(424, 'start of survey', this.t0);
+    this.$emit('surveyStartTime', this.t0);
   },
 };
 </script>

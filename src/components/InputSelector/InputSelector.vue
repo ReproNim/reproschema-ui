@@ -17,7 +17,7 @@
         <Radio
           :constraints="valueConstraints"
           :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"/>
+        :init="init" v-on:valueChanged="sendData" v-on:sendStartTime="sendTime"/>
     </div>
 
     <!-- If type is audioAutoRecord -->
@@ -230,6 +230,9 @@ export default {
         this.$emit('valueChanged', val.getFullYear());
       } else this.$emit('valueChanged', val);
       this.$emit('next');
+    },
+    sendTime(val) {
+      this.$emit('startTime', val);
     },
   },
 };

@@ -190,6 +190,10 @@ export default {
     },
     setResponse(value, index) {
       this.$emit('saveResponse', this.context[index]['@id'], value);
+      const t1 = performance.now();
+      console.log(194, 'end of a section question', index, 'is', t1);
+      console.log(200, 'time for section question', index, 'is', (t1 - this.t0) / 1000);
+      this.t0 = t1;
       const currResponses = { ...this.responses };
       currResponses[this.context[index]['@id']] = value;
       // TODO: add back branching logic
