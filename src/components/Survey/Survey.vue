@@ -425,6 +425,7 @@ export default {
   mounted() {
     if (this.srcUrl) {
       // eslint-disable-next-line
+      console.log(428, this.srcUrl);
       this.getData();
     }
     this.t0 = performance.now();

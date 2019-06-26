@@ -1,40 +1,27 @@
 <template>
-  <div class="landingPage mt-3 pt-3 text-left">
-    <vue-markdown v-if="content"> {{content}} </vue-markdown>
-    <Loader v-else/>
+  <div class="mt-3 mb-3 h-100">
+    <div class="mb-3 pt-3">
+      <h1>Welcome to Voice Study</h1>
+      <p class="lead">
+        <!-- Mindlogger is an online data collection platform for scientific research. -->
+        Participate in scientific research studies online!
+      </p>
+      <div>
+        <p class="mt-3">
+          To get started click Join
+        </p>
+        <p style="margin-top: 2rem">
+          <router-link class="join-button" to="/study/intro">Join</router-link>
+        </p>
+      </div>
+    </div>
   </div>
 </template>
 
-<style>
-  .landingPage img {
-    max-width: 250px;
-  }
-</style>
+<style></style>
 
 <script>
-import axios from 'axios';
-import VueMarkdown from 'vue-markdown';
-import Loader from '../Loader';
-
 export default {
-  props: {
-    contentSrc: {
-      type: String,
-    },
-  },
-  components: {
-    VueMarkdown,
-    Loader,
-  },
-  data() {
-    return {
-      content: null,
-    };
-  },
-  mounted() {
-    axios.get(this.contentSrc).then((resp) => {
-      this.content = resp.data;
-    });
-  },
+  name: 'Landing',
 };
 </script>

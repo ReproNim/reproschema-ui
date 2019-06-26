@@ -1,84 +1,74 @@
-<!--<template>-->
-  <!--<div id="app" class="">-->
-    <!--<div class="wrapper">-->
-      <!--&lt;!&ndash; Sidebar &ndash;&gt;-->
-      <!--<nav id="sidebar" ref="sidebar">-->
-        <!--<div class="sidebar-header">-->
-          <!--<h3>Activities</h3>-->
-        <!--</div>-->
-        <!--<div>-->
-          <!--<select v-model="selected_language">-->
-            <!--<option disabled value="">Select Language</option>-->
-            <!--<option value="en">English</option>-->
-          <!--</select>-->
-        <!--</div>-->
-        <!--<ul class="list-unstyled components">-->
-            <!--&lt;!&ndash; <p>Dummy Heading</p> &ndash;&gt;-->
-            <!--<li v-for="(ui, index) in schemaOrder" :key="index">-->
-                <!--<a @click="setActivity(index)"-->
-                <!--v-if="visibility[index]"-->
-                <!--:class="{'current': index==activityIndex}">-->
-                  <!--<circleProgress-->
-                   <!--:radius="20"-->
-                   <!--:progress="progress[index]"-->
-                   <!--:stroke="4"-->
-                   <!--strokeColor="#007bff" />-->
-                   <!--<span class="align-middle activityItem">-->
-                     <!--{{getName(ui)}}-->
-                   <!--</span>-->
-                <!--</a>-->
-            <!--</li>-->
-        <!--</ul>-->
-        <!--<div>-->
-          <!--<b-button class="align-middle" @click="downloadZipData"-->
-                    <!--:disabled="!isAnswered">Export</b-button>-->
-        <!--</div>-->
-      <!--</nav>-->
-
-      <!--&lt;!&ndash; Page Content &ndash;&gt;-->
-      <!--<div id="content">-->
-          <!--&lt;!&ndash; We'll fill this with dummy content &ndash;&gt;-->
-          <!--<nav class="navbar navbar-expand-lg navbar-light bg-light">-->
-              <!--<div class="container-fluid">-->
-                <!--<b-navbar-nav>-->
-                  <!--<button @click="toggleSidebar"-->
-                          <!--type="button"-->
-                          <!--id="sidebarCollapse"-->
-                          <!--class="btn">-->
-                      <!--<span class="navbar-toggler-icon"></span>-->
-                  <!--</button>-->
-                  <!--</b-navbar-nav>-->
-
-                  <!--<b-navbar-nav class="float-right">-->
-                    <!--<b-nav-item :to="{name: 'Landing', query: $route.query}" exact>Home</b-nav-item>-->
-                  <!--</b-navbar-nav>-->
-              <!--</div>-->
-          <!--</nav>-->
-          <!--<b-container>-->
-            <!--<router-view-->
-              <!--:srcUrl="srcUrl" :responses="responses[activityIndex]"-->
-              <!--:selected_language="selected_language"-->
-              <!--:progress="progress[activityIndex]"-->
-              <!--v-on:updateProgress="updateProgress"-->
-              <!--v-on:saveResponse="saveResponse"-->
-              <!--v-on:saveScores="saveScores"-->
-              <!--v-on:clearResponses="clearResponses"-->
-              <!--v-on:surveyStartTime="totalSurveyTime"-->
-            <!--/>-->
-          <!--</b-container>-->
-      <!--</div>-->
-    <!--</div>-->
-  <!--</div>-->
-<!--</template>-->
-
 <template>
-  <div id="app">
-    <div class="demo mb-3">
-      <router-view
-      />
+  <div id="app" class="">
+    <div class="wrapper">
+    <!-- Sidebar -->
+      <nav id="sidebar" ref="sidebar">
+      <div class="sidebar-header">
+      <h3>Activities</h3>
+      </div>
+      <div>
+      <select v-model="selected_language">
+      <option disabled value="">Select Language</option>
+      <option value="en">English</option>
+      </select>
+      </div>
+      <ul class="list-unstyled components">
+      <!-- <p>Dummy Heading</p> -->
+      <li v-for="(ui, index) in schemaOrder" :key="index">
+      <a @click="setActivity(index)"
+      v-if="visibility[index]"
+      :class="{'current': index==activityIndex}">
+      <circleProgress
+      :radius="20"
+      :progress="progress[index]"
+      :stroke="4"
+      strokeColor="#007bff" />
+      <span class="align-middle activityItem">
+      {{getName(ui)}}
+      </span>
+      </a>
+      </li>
+      </ul>
+      <div>
+      <b-button class="align-middle" @click="downloadZipData"
+      :disabled="!isAnswered">Export</b-button>
+      </div>
+      </nav>
+    <!-- Page Content -->
+      <div id="content">
+      <!-- We'll fill this with dummy content -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <div class="container-fluid">
+            <b-navbar-nav>
+              <button @click="toggleSidebar"
+                type="button"
+                id="sidebarCollapse"
+                class="btn">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+            </b-navbar-nav>
+            <b-navbar-nav class="float-right">
+              <b-nav-item :to="{name: 'Landing', query: $route.query}" exact>Home</b-nav-item>
+            </b-navbar-nav>
+          </div>
+        </nav>
+        <b-container>
+          <router-view
+          :srcUrl="srcUrl" :responses="responses[activityIndex]"
+          :selected_language="selected_language"
+          :progress="progress[activityIndex]"
+          v-on:updateProgress="updateProgress"
+          v-on:saveResponse="saveResponse"
+          v-on:saveScores="saveScores"
+          v-on:clearResponses="clearResponses"
+          v-on:surveyStartTime="totalSurveyTime"
+          />
+        </b-container>
+      </div>
     </div>
   </div>
 </template>
+
 
 <script>
 import Vue from 'vue';
@@ -90,7 +80,7 @@ import 'jszip/dist/jszip.min';
 import { saveAs } from 'file-saver';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
-import circleProgress from './components/Circle/';
+import circleProgress from './Circle/';
 
 Vue.use(BootstrapVue);
 Vue.filter('reverse', value => value.slice().reverse());
@@ -393,6 +383,7 @@ export default {
   },
   computed: {
     srcUrl() {
+      console.log(38, this.$store.getters.srcUrl);
       return this.$store.getters.srcUrl;
     },
     schema() {
@@ -466,8 +457,8 @@ export default {
             }
 
             if (conditionKeys.indexOf('http://schema.org/httpMethod') > -1 &&
-              conditionKeys.indexOf('http://schema.org/url') > -1 &&
-              conditionKeys.indexOf('https://schema.repronim.org/payload') > -1
+                conditionKeys.indexOf('http://schema.org/url') > -1 &&
+                conditionKeys.indexOf('https://schema.repronim.org/payload') > -1
             ) {
               // lets fill the payload here.
               const payload = {};
@@ -496,87 +487,87 @@ export default {
 </script>
 
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-   -webkit-font-smoothing: antialiased;
-   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+  #app {
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #2c3e50;
+  }
 
-#content {
-  width: 100%;
-}
+  #content {
+    width: 100%;
+  }
 
-.wrapper {
+  .wrapper {
     display: flex;
     width: 100%;
     align-items: stretch;
-}
+  }
 
-#sidebar {
+  #sidebar {
     min-width: 250px;
     max-width: 250px;
-}
+  }
 
-#sidebar.active {
+  #sidebar.active {
     margin-left: -250px;
-}
+  }
 
-@media (max-width: 768px) {
+  @media (max-width: 768px) {
     #sidebar {
-        margin-left: -250px;
+      margin-left: -250px;
     }
     #sidebar.active {
-        margin-left: 0;
+      margin-left: 0;
     }
-}
+  }
 
-#sidebar {
+  #sidebar {
     /* don't forget to add all the previously mentioned styles here too */
     transition: all 0.3s;
-}
+  }
 
-#sidebar .sidebar-header {
+  #sidebar .sidebar-header {
     padding: 20px;
-}
+  }
 
-#sidebar ul.components {
+  #sidebar ul.components {
     padding: 20px 0;
-}
+  }
 
-#sidebar ul p {
+  #sidebar ul p {
     padding: 10px;
-}
+  }
 
-#sidebar ul li a {
+  #sidebar ul li a {
     padding: 10px;
     font-size: 1.1em;
     display: block;
     cursor: pointer;
     text-align: left;
 
-}
-#sidebar ul li a:hover {
-  background-color: #17a2b8;
-  color: white;
-}
+  }
+  #sidebar ul li a:hover {
+    background-color: #17a2b8;
+    color: white;
+  }
 
-.current {
-  background-color: #17a2b8;
-  color: white !important;
-}
+  .current {
+    background-color: #17a2b8;
+    color: white !important;
+  }
 
-#sidebar ul li.active > a, a[aria-expanded="true"] {
+  #sidebar ul li.active > a, a[aria-expanded="true"] {
 
-}
-ul ul a {
+  }
+  ul ul a {
     font-size: 1.5em !important;
     padding-left: 30px !important;
 
-}
+  }
 
-select > .placeholder {
-  display: none;
-}
+  select > .placeholder {
+    display: none;
+  }
 </style>
