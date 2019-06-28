@@ -7,9 +7,10 @@
             <BridgeImage src="/static/images/about%20the%20study.svg"/>
 
             <h3>About the study</h3>
-            <p>mPower research study was developed by Sage Bionetworks (non-profit) to
-              measure the symptoms, day to day changes, and
-              long-term changes in people with Parkinson’s Disease (PD).
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eu sagittis leo,
+              sit amet consectetur mi. Donec volutpat rutrum massa et luctus.
+              Fusce ac dui quam. Nam a nibh porttitor, tincidunt libero id, condimentum velit.
+              Praesent ultricies consectetur nulla vel pharetra.
             </p>
             <p><a href="" @click.prevent="learnMore">Learn more</a></p>
 
@@ -79,6 +80,13 @@ export default {
     nextName() {
       return (this.step === this.totalSteps) ? 'Submit' : 'Next';
     },
+    appletURL() {
+      console.log(167, this.$route.params.inviteURL);
+      return 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/activity-sets/voice-pilot/voice_pilot_schema.jsonld';
+    },
+    redirect() {
+      return { name: 'Applet', params: { appletId: this.appletURL }, query: { ...this.query, consent: true } };
+    },
   },
   methods: {
     doBack() {
@@ -90,11 +98,9 @@ export default {
       if (this.step < this.totalSteps) {
         this.step += 1;
       } else if (this.step === this.totalSteps) {
-        this.$router.push('/study/overview?start=true');
+        // this.$router.push('/study/overview?start=true');
+        this.$router.push({ path: '/activities/0', query: { url: 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/activity-sets/voice-pilot/voice_pilot_schema.jsonld' } });
       }
-    },
-    doSubmit() {
-      this.$router.push('/study/overview?start=true');
     },
     learnMore() {
       this.$refs.consentViewer.toggleMax();
