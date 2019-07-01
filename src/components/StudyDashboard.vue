@@ -1,67 +1,70 @@
 <template>
-  <div id="app" class="">
+  <div class="">
     <div class="wrapper">
-    <!-- Sidebar -->
+      <!-- Sidebar -->
       <nav id="sidebar" ref="sidebar">
-      <div class="sidebar-header">
-      <h3>Activities</h3>
-      </div>
-      <div>
-      <select v-model="selected_language">
-      <option disabled value="">Select Language</option>
-      <option value="en">English</option>
-      </select>
-      </div>
-      <ul class="list-unstyled components">
-      <!-- <p>Dummy Heading</p> -->
-      <li v-for="(ui, index) in schemaOrder" :key="index">
-      <a @click="setActivity(index)"
-      v-if="visibility[index]"
-      :class="{'current': index==activityIndex}">
-      <circleProgress
-      :radius="20"
-      :progress="progress[index]"
-      :stroke="4"
-      strokeColor="#007bff" />
-      <span class="align-middle activityItem">
-      {{getName(ui)}}
-      </span>
-      </a>
-      </li>
-      </ul>
-      <div>
-      <b-button class="align-middle" @click="downloadZipData"
-      :disabled="!isAnswered">Export</b-button>
-      </div>
+        <div class="sidebar-header">
+          <h3>Activities</h3>
+        </div>
+        <div>
+          <select v-model="selected_language">
+            <option disabled value="">Select Language</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+        <ul class="list-unstyled components">
+          <!-- <p>Dummy Heading</p> -->
+          <li v-for="(ui, index) in schemaOrder" :key="index">
+            <a @click="setActivity(index)"
+               v-if="visibility[index]"
+               :class="{'current': index==activityIndex}">
+              <circleProgress
+                :radius="20"
+                :progress="progress[index]"
+                :stroke="4"
+                strokeColor="#007bff" />
+              <span class="align-middle activityItem">
+                     {{getName(ui)}}
+                   </span>
+            </a>
+          </li>
+        </ul>
+        <div>
+          <b-button class="align-middle" @click="downloadZipData"
+                    :disabled="!isAnswered">Export</b-button>
+        </div>
       </nav>
-    <!-- Page Content -->
+
+      <!-- Page Content -->
       <div id="content">
-      <!-- We'll fill this with dummy content -->
+        <!-- We'll fill this with dummy content -->
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
           <div class="container-fluid">
             <b-navbar-nav>
               <button @click="toggleSidebar"
-                type="button"
-                id="sidebarCollapse"
-                class="btn">
+                      type="button"
+                      id="sidebarCollapse"
+                      class="btn">
                 <span class="navbar-toggler-icon"></span>
               </button>
             </b-navbar-nav>
+
             <b-navbar-nav class="float-right">
-              <b-nav-item :to="{name: 'Landing', query: $route.query}" exact>Home</b-nav-item>
+              <b-nav-item :to="{name: 'Landing', query: $route.query}"
+                          exact>Home</b-nav-item>
             </b-navbar-nav>
           </div>
         </nav>
         <b-container>
           <router-view
-          :srcUrl="srcUrl" :responses="responses[activityIndex]"
-          :selected_language="selected_language"
-          :progress="progress[activityIndex]"
-          v-on:updateProgress="updateProgress"
-          v-on:saveResponse="saveResponse"
-          v-on:saveScores="saveScores"
-          v-on:clearResponses="clearResponses"
-          v-on:surveyStartTime="totalSurveyTime"
+            :srcUrl="srcUrl" :responses="responses[activityIndex]"
+            :selected_language="selected_language"
+            :progress="progress[activityIndex]"
+            v-on:updateProgress="updateProgress"
+            v-on:saveResponse="saveResponse"
+            v-on:saveScores="saveScores"
+            v-on:clearResponses="clearResponses"
+            v-on:surveyStartTime="totalSurveyTime"
           />
         </b-container>
       </div>

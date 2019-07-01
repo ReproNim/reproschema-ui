@@ -50,7 +50,8 @@
                   <!--</b-navbar-nav>-->
 
                   <!--<b-navbar-nav class="float-right">-->
-                    <!--<b-nav-item :to="{name: 'Landing', query: $route.query}" exact>Home</b-nav-item>-->
+                    <!--<b-nav-item :to="{name: 'Landing', query: $route.query}"
+                    exact>Home</b-nav-item>-->
                   <!--</b-navbar-nav>-->
               <!--</div>-->
           <!--</nav>-->

@@ -98,8 +98,9 @@ export default {
       if (this.step < this.totalSteps) {
         this.step += 1;
       } else if (this.step === this.totalSteps) {
-        // this.$router.push('/study/overview?start=true');
-        this.$router.push({ path: '/activities/0', query: { url: 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/activity-sets/voice-pilot/voice_pilot_schema.jsonld' } });
+        this.$router.push('/study/overview?start=true');
+        // this.$router.push('/activities/0');
+        // this.$router.push({ path: '/activities/0', query: { url: 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/activity-sets/voice-pilot/voice_pilot_schema.jsonld' } });
       }
     },
     learnMore() {

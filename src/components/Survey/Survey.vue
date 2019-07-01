@@ -326,11 +326,11 @@ export default {
     listShow() {
       this.updateProgress();
     },
-    srcUrl() {
-      if (this.srcUrl) {
-        this.getData();
-      }
-    },
+    // srcUrl() {
+    //   if (this.srcUrl) {
+    //     this.getData();
+    //   }
+    // },
     readyForActivity() {
       if (this.readyForActivity) {
         if (this.$store) {
@@ -429,7 +429,7 @@ export default {
       this.getData();
     }
     this.t0 = performance.now();
-    console.log(424, 'start of survey', this.t0);
+    console.log(424, 'start of survey', this.t0, this.srcUrl, this.selected_language);
     this.$emit('surveyStartTime', this.t0);
   },
 };

@@ -21,7 +21,9 @@ const state = {
 const getters = {
   // eslint-disable-next-line
   srcUrl(state) {
+    console.log(24, state.schema, state.activityIndex);
     if (!_.isEmpty(state.schema) && state.activityIndex) {
+      console.log(26, state.schema['https://schema.repronim.org/order'][0]['@list'][state.activityIndex]['@id']);
       return state.schema['https://schema.repronim.org/order'][0]['@list'][state.activityIndex]['@id'];
     }
     return null;
@@ -124,13 +126,6 @@ const actions = {
   },
 };
 
-export default new Vuex.Store({
-  state,
-  getters,
-  mutations,
-  actions,
-});
-
 const ANSWERS = 'answers';
 const CURRENT_STEP = 'currentStep';
 const NAME = 'name';
@@ -156,54 +151,105 @@ function loadInt(key) {
   return DATA[key];
 }
 
-class Store {
-  static UNSTARTED = 0
-  static ELIGIBILITY_DONE = 1
-  static CONSENT_DONE = 2
-  static QUIZ_DONE = 3
-  static SIGN_DONE = 4
-  static REGISTER_DONE = 5
-
+export default new Vuex.Store({
+  state,
+  getters,
+  mutations,
+  actions,
   clearAll() {
     DATA = {};
-  }
+  },
   getSharingScope() {
     return loadString(SCOPE) || '';
-  }
+  },
   setSharingScope(scope) {
     saveString(SCOPE, scope);
-  }
+  },
   getPhone() {
     return loadString(PHONE) || '';
-  }
+  },
   setPhone(phone) {
     saveString(PHONE, phone);
-  }
+  },
   getSystem() {
     return loadString(OS) || '';
-  }
+  },
   setSystem(os) {
     saveString(OS, os);
-  }
+  },
   getName() {
     return loadString(NAME) || '';
-  }
+  },
   setName(name) {
     saveString(NAME, name);
-  }
+  },
   getAnswers() {
     return loadObj(ANSWERS) || {};
-  }
+  },
   setAnswers(answers) {
     saveObj(ANSWERS, answers);
-  }
+  },
   getCurrentStep() {
     return loadInt(CURRENT_STEP) || 0;
-  }
+  },
   setCurrentStep(step) {
     saveObj(CURRENT_STEP, step);
-  }
+  },
   advanceCurrentStep() {
     this.setCurrentStep(this.getCurrentStep() + 1);
-  }
-}
+  },
+
+});
+
+
+// class Store {
+//   static UNSTARTED = 0
+//   static ELIGIBILITY_DONE = 1
+//   static CONSENT_DONE = 2
+//   static QUIZ_DONE = 3
+//   static SIGN_DONE = 4
+//   static REGISTER_DONE = 5
+//
+//   clearAll() {
+//     DATA = {};
+//   }
+//   getSharingScope() {
+//     return loadString(SCOPE) || '';
+//   }
+//   setSharingScope(scope) {
+//     saveString(SCOPE, scope);
+//   }
+//   getPhone() {
+//     return loadString(PHONE) || '';
+//   }
+//   setPhone(phone) {
+//     saveString(PHONE, phone);
+//   }
+//   getSystem() {
+//     return loadString(OS) || '';
+//   }
+//   setSystem(os) {
+//     saveString(OS, os);
+//   }
+//   getName() {
+//     return loadString(NAME) || '';
+//   }
+//   setName(name) {
+//     saveString(NAME, name);
+//   }
+//   getAnswers() {
+//     return loadObj(ANSWERS) || {};
+//   }
+//   setAnswers(answers) {
+//     saveObj(ANSWERS, answers);
+//   }
+//   getCurrentStep() {
+//     return loadInt(CURRENT_STEP) || 0;
+//   }
+//   setCurrentStep(step) {
+//     saveObj(CURRENT_STEP, step);
+//   }
+//   advanceCurrentStep() {
+//     this.setCurrentStep(this.getCurrentStep() + 1);
+//   }
+// }
