@@ -134,9 +134,9 @@ export default {
     },
     setActivity(index) {
       if (this.$route.query.url) {
-        this.$router.push(`/activities/${index}?url=${this.$route.query.url}`);
+        this.$router.push(`/study/overview/activities/${index}?url=${this.$route.query.url}`);
       } else {
-        this.$router.push(`/activities/${index}`);
+        this.$router.push(`/study/overview/activities/${index}`);
       }
     },
     updateProgress(progress) {

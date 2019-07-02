@@ -3,7 +3,9 @@ import Router from 'vue-router';
 import Home from '@/components/Survey/';
 import Landing from '@/components/Landing/';
 import BridgeImage from '@/components/study/BridgeImage';
-import StudyDashboard from '@/components/StudyDashboard';
+import StudyParentRoute from '@/components/StudyParentRoute';
+import StudyLanding from '@/components/StudyLanding';
+
 
 /* I love Vue router. Lazy loading the onboarding screens is this simple. */
 const StudyIntroduction = () => import(/* webpackChunkName: "study" */ '@/components/study/Introduction');
@@ -27,18 +29,31 @@ export default new Router({
       name: 'Landing',
       component: Landing,
     },
-    {
-      path: '/activities/:id',
-      name: 'Home',
-      component: Home,
-    },
+    // {
+    //   path: '/activities/:id',
+    //   name: 'Home',
+    //   component: Home,
+    // },
     {
       path: '/study/intro',
       component: StudyIntroduction,
     },
     {
-      path: '/study/overview',
-      component: StudyDashboard,
+      path: '/study',
+      name: 'StudyParentRoute',
+      component: StudyParentRoute,
+      children: [
+        {
+          name: 'Applet',
+          path: '/study/overview',
+          component: StudyLanding,
+        },
+        {
+          path: '/study/overview/activities/:id',
+          name: 'Home',
+          component: Home,
+        },
+      ],
     },
     {
       path: '/study/consent',
