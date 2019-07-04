@@ -4,7 +4,7 @@
       <p :class="{'text-justify': inputType==='audioPassageRecord'}">{{ preamble }}</p>
     </div>
     <div class="lead scroll mb-3 pr-3 pl-3" v-if="title">
-      <p :class="{'text-justify': inputType==='audioPassageRecord'}">{{ title }}</p>
+      <p :class="{'text-justify': inputType==='audioPassageRecord'}" v-html="title">{{ title }}</p>
       <span v-if="valueConstraints.requiredValue" class="text-danger">*</span>
     </div>
 
@@ -17,6 +17,14 @@
         <Radio
           :constraints="valueConstraints"
           :selected_language="selected_language"
+        :init="init" v-on:valueChanged="sendData" v-on:sendStartTime="sendTime"/>
+    </div>
+
+    <!-- If type is sign -->
+    <div v-else-if="inputType==='sign'">
+      <StudySign
+        :constraints="valueConstraints"
+        :selected_language="selected_language"
         :init="init" v-on:valueChanged="sendData" v-on:sendStartTime="sendTime"/>
     </div>
 
@@ -168,6 +176,7 @@ import TimeRange from '../Inputs/TimeRange';
 import SelectInput from '../Inputs/SelectInput';
 import AudioCheckRecord from '../Inputs/AudioCheckRecord';
 import StaticReadOnly from '../Inputs/StaticReadOnly';
+import StudySign from "../study/Sign";
 
 
 export default {
@@ -199,6 +208,7 @@ export default {
     },
   },
   components: {
+    StudySign,
     Radio,
     AudioRecord,
     TextInput,

@@ -20,50 +20,58 @@
         <section>
           <div class="will-use container">
             <object data="/static/images/Step1.svg" type="image/svg+xml"></object>
-            <div>I will use the mPower app to answer questions and do short physical and cognitive activities. The app will help me track my symptoms, triggers, and medications.</div> 
+            <div>I will use the mPower app to answer questions and do short physical and cognitive
+              activities. The app will help me track my symptoms, triggers, and medications.</div>
           </div>
         </section>
         <section>
           <div class="privacy container">
             <object data="/static/images/Step2.svg" type="image/svg+xml"></object>
-            <div>My study data will be encrypted and transferred from my phone. It will be stored on Sage Bionetworks’ secure cloud-based database.</div>
+            <div>My study data will be encrypted and transferred from my phone. It will be stored
+              on Sage Bionetworks’ secure cloud-based database.</div>
           </div>
         </section>
         <section>
           <div class="research container">
             <object data="/static/images/Step3.svg" type="image/svg+xml"></object>
-            <div>My data will be used for research as described in the study information 
+            <div>My data will be used for research as described in the study information
               (<router-link to="/study/consent-review">https://<wbr>parkinsonmpower.<wbr>org/<wbr>consent</router-link>).</div>
           </div>
         </section>
         <section>
           <div class="sharing-scope container">
             <object data="/static/images/Step4.svg" type="image/svg+xml"></object>
-            <div>I have the option to share my coded study data for future research. It is up to me. I can say yes or no.</div>
+            <div>I have the option to share my coded study data for future research. It is up to me.
+              I can say yes or no.</div>
           </div>
         </section>
         <section>
           <div class="risks-benefits container">
             <object data="/static/images/Step5.svg" type="image/svg+xml"></object>
-            <div>The main risk of participating in the mPower Progression Study is to my privacy and confidentiality. This risk is low but not zero. The main benefit is seeing the trends in my data over time.</div>
+            <div>The main risk of participating in the mPower Progression Study is to my privacy and
+              confidentiality. This risk is low but not zero. The main benefit is seeing the trends
+              in my data over time.</div>
           </div>
         </section>
         <section>
           <div class="unpaid container">
             <object data="/static/images/Step6.svg" type="image/svg+xml"></object>
-            <div>mPower Progression Study is a research study. The mPower app shouldn’t be used for diagnosis or treatment decision.</div>
+            <div>mPower Progression Study is a research study. The mPower app shouldn’t be used for
+              diagnosis or treatment decision.</div>
           </div>
         </section>
         <section>
           <div class="not-medical container">
             <object data="/static/images/Step7.svg" type="image/svg+xml"></object>
-            <div>I will not get paid for participating in this study. I will not receive any profit from the use of my data in this or future research.</div>
+            <div>I will not get paid for participating in this study. I will not receive any profit
+              from the use of my data in this or future research.</div>
           </div>
         </section>
         <section>
           <div class="voluntary container">
             <object data="/static/images/Step8.svg" type="image/svg+xml"></object>
-            <div>I can withdraw (quit) at any time for any reason. There is no penalty if I withdraw.</div>
+            <div>I can withdraw (quit) at any time for any reason. There is no penalty if I withdraw
+              .</div>
           </div>
         </section>
         <section>
@@ -78,7 +86,9 @@
           <div class="slider-element animated" :class="{'slideOutLeft': showSharing}">
             <div class="inner">
               <h1>Please review and sign below if you want to join.</h1>
-              <p>I have read and understand the above information. All of my questions have been answered. I freely and willingly choose to take part in the mPower Progression Study. By signing this consent I have not given up any of my legal rights.</p> 
+              <p>I have read and understand the above information. All of my questions have been
+                answered. I freely and willingly choose to take part in the mPower Progression
+                Study. By signing this consent I have not given up any of my legal rights.</p>
               <input v-model="name" placeholder="Please type your full name here">
               <div class="buttons">
                 <router-link to="/">Disagree</router-link>
@@ -86,11 +96,14 @@
               </div>
             </div>
           </div>
-          <div class="slider-element slider-offscreen animated" :class="{'slideInRight': showSharing}">
+          <div class="slider-element slider-offscreen animated"
+               :class="{'slideInRight': showSharing}">
             <div class="inner" style="padding-bottom:0">
               <h1>Data sharing option (you can change this at any time in the app setting)</h1>
-              <RadioButton @change="updateSharing"  name="sharing" value="all_qualified_researchers">
-                <span style="font-size:.8rem">I want to share my data with other researchers for future research.</span>
+              <RadioButton @change="updateSharing"  name="sharing"
+                           value="all_qualified_researchers">
+                <span style="font-size:.8rem">I want to share my data with other researchers for
+                  future research.</span>
               </RadioButton>
               <RadioButton @change="updateSharing"  name="sharing" value="sponsors_and_partners">
                 <span style="font-size:.8rem">I want to share my data for this study only.</span>
@@ -107,68 +120,61 @@
 </template>
 
 <script>
-import ConsentSummaryViewer from './ConsentSummaryViewer.vue'
-import MainNav from './MainNav.vue'
-import Store from '../store'
-import RadioButton from './RadioButton'
+// import ConsentSummaryViewer from './ConsentSummaryViewer.vue'
+// import MainNav from './MainNav.vue'
+// import Store from '../store'
+// import RadioButton from './RadioButton'
 
 export default {
   name: 'StudySign',
-  components: { ConsentSummaryViewer, MainNav, RadioButton },
+  // components: { ConsentSummaryViewer, MainNav, RadioButton },
   data() {
     return {
       name: '',
       showSharing: false,
-      scope: ''
-    }
+      scope: '',
+    };
   },
   computed: {
-    canSubmit: function() {
-      if (!this.showSharing) {
-        return this.name.length === 0
-      } else {
-        return this.scope === ''
-      }
-    },
-    isEmbedded: function() {
-      return !!(window.consentsToResearch || window.document.consentsToResearch || 
+    isEmbedded() {
+      return !!(window.consentsToResearch || window.document.consentsToResearch ||
         (window.AndroidJsBridge && window.AndroidJsBridge.consentsToResearch));
-    }
+    },
   },
   methods: {
-    cancel: function() {
-      this.$store.setCurrentStep(Store.UNSTARTED)
-      this.$router.push('/study/overview')
+    // cancel() {
+    //   this.$store.setCurrentStep(Store.UNSTARTED);
+    //   this.$router.push('/study/overview');
+    // },
+    // advance() {
+    //   if (!this.showSharing) {
+    //     this.showSharing = true;
+    //     return;
+    //   }
+    //   this.accept();
+    // },
+    // accept() {
+    //   if (this.isEmbedded) {
+    //     const obj = { name: this.name, scope: this.scope };
+    //     if (window.consentsToResearch) {
+    //       window.consentsToResearch(obj);
+    //     } else if (window.document.consentsToResearch) {
+    //       window.document.consentsToResearch(obj);
+    //     } else if (window.AndroidJsBridge.consentsToResearch) {
+    //       window.AndroidJsBridge.consentsToResearch(JSON.stringify(obj));
+    //     }
+    //   } else {
+    //     this.$store.setName(this.name);
+    //     this.$store.setSharingScope(this.scope);
+    //     this.$store.setCurrentStep(Store.SIGN_DONE);
+    //     this.$router.push('/study/overview');
+    //   }
+    // },
+    updateSharing(name, value) {
+      this.scope = value;
     },
-    advance: function() {
-      if (!this.showSharing) {
-        this.showSharing = true
-        return
-      }
-      this.accept()
-    },
-    accept: function() {
-      if (this.isEmbedded) {
-        var obj = {'name': this.name, 'scope': this.scope}
-        if (window.consentsToResearch) {
-          window.consentsToResearch(obj)
-        } else if (window.document.consentsToResearch) {
-          window.document.consentsToResearch(obj)
-        } else if (window.AndroidJsBridge.consentsToResearch) {
-          window.AndroidJsBridge.consentsToResearch(JSON.stringify(obj))
-        }
-      } else {
-        this.$store.setName(this.name)
-        this.$store.setSharingScope(this.scope)
-        this.$store.setCurrentStep(Store.SIGN_DONE)
-        this.$router.push('/study/overview')
-      }
-    },
-    updateSharing: function(name, value) {
-      this.scope = value
-    }
-  }
-}
+  },
+};
 </script>
 
 <style>
@@ -232,23 +238,23 @@ footer {
     height: 15rem;
   }
   .slider-element {
-    position: absolute; 
-    top: 0; 
-    left: 0; 
-    right: 0; 
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
     bottom: 0;
   }
     .inner {
-      padding: 1rem; 
-      max-width: 30rem; 
+      padding: 1rem;
+      max-width: 30rem;
       margin: 0 auto;
     }
   .slider-offscreen {
     transform: translate(100%,0);
     -webkit-transform: translate(100%,0);
 
-    display:flex; 
-    flex-direction: column; 
+    display:flex;
+    flex-direction: column;
     align-items: center;
   }
   .slider-element .radio-holder {
