@@ -18,6 +18,31 @@ const state = {
   activityReady: false,
 };
 
+const ANSWERS = 'answers';
+const CURRENT_STEP = 'currentStep';
+const NAME = 'name';
+const PHONE = 'phone';
+const OS = 'os';
+const SCOPE = 'scope';
+
+let DATA = {};
+
+function loadString(key) {
+  return DATA[key];
+}
+function saveString(key, string) {
+  DATA[key] = string;
+}
+function loadObj(key) {
+  return DATA[key];
+}
+function saveObj(key, object) {
+  DATA[key] = object;
+}
+function loadInt(key) {
+  return DATA[key];
+}
+
 const getters = {
   // eslint-disable-next-line
   srcUrl(state) {
@@ -48,6 +73,10 @@ const mutations = {
   setActivityIndex(state, idx) {
     state.activityIndex = idx;
     state.activityReady = true;
+  },
+  // eslint-disable-next-line
+  setName(name) {
+    saveString(NAME, name);
   },
   // eslint-disable-next-line
   saveResponse(state, { key, value }) {
@@ -125,31 +154,6 @@ const actions = {
     commit('clearResponses', actIndex);
   },
 };
-
-const ANSWERS = 'answers';
-const CURRENT_STEP = 'currentStep';
-const NAME = 'name';
-const PHONE = 'phone';
-const OS = 'os';
-const SCOPE = 'scope';
-
-let DATA = {};
-
-function loadString(key) {
-  return DATA[key];
-}
-function saveString(key, string) {
-  DATA[key] = string;
-}
-function loadObj(key) {
-  return DATA[key];
-}
-function saveObj(key, object) {
-  DATA[key] = object;
-}
-function loadInt(key) {
-  return DATA[key];
-}
 
 export default new Vuex.Store({
   state,

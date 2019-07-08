@@ -92,7 +92,7 @@
               <input v-model="name" placeholder="Please type your full name here">
               <div class="buttons">
                 <router-link to="/">Disagree</router-link>
-                <button class="join-button" :disabled="canSubmit" @click="advance">Accept</button>
+                <button class="join-button" :disabled="canSubmit" @click="accept">Accept</button>
               </div>
             </div>
           </div>
@@ -136,40 +136,46 @@ export default {
     };
   },
   computed: {
+    canSubmit() {
+      if (!this.showSharing) {
+        return this.name.length === 0;
+      }
+      return this.scope === '';
+    },
     isEmbedded() {
       return !!(window.consentsToResearch || window.document.consentsToResearch ||
         (window.AndroidJsBridge && window.AndroidJsBridge.consentsToResearch));
     },
   },
   methods: {
-    // cancel() {
-    //   this.$store.setCurrentStep(Store.UNSTARTED);
-    //   this.$router.push('/study/overview');
-    // },
-    // advance() {
-    //   if (!this.showSharing) {
-    //     this.showSharing = true;
-    //     return;
-    //   }
-    //   this.accept();
-    // },
-    // accept() {
-    //   if (this.isEmbedded) {
-    //     const obj = { name: this.name, scope: this.scope };
-    //     if (window.consentsToResearch) {
-    //       window.consentsToResearch(obj);
-    //     } else if (window.document.consentsToResearch) {
-    //       window.document.consentsToResearch(obj);
-    //     } else if (window.AndroidJsBridge.consentsToResearch) {
-    //       window.AndroidJsBridge.consentsToResearch(JSON.stringify(obj));
-    //     }
-    //   } else {
-    //     this.$store.setName(this.name);
-    //     this.$store.setSharingScope(this.scope);
-    //     this.$store.setCurrentStep(Store.SIGN_DONE);
-    //     this.$router.push('/study/overview');
-    //   }
-    // },
+    cancel() {
+      this.$store.setCurrentStep(Store.UNSTARTED);
+      this.$router.push('/study/overview');
+    },
+    advance() {
+      if (!this.showSharing) {
+        this.showSharing = true;
+        return;
+      }
+      this.accept();
+    },
+    accept() {
+      if (this.isEmbedded) {
+        const obj = { name: this.name, scope: this.scope };
+        if (window.consentsToResearch) {
+          window.consentsToResearch(obj);
+        } else if (window.document.consentsToResearch) {
+          window.document.consentsToResearch(obj);
+        } else if (window.AndroidJsBridge.consentsToResearch) {
+          window.AndroidJsBridge.consentsToResearch(JSON.stringify(obj));
+        }
+      } else {
+        this.$store.setName(this.name);
+        this.$store.setSharingScope(this.scope);
+        this.$store.setCurrentStep(Store.SIGN_DONE);
+        this.$router.push('/study/overview');
+      }
+    },
     updateSharing(name, value) {
       this.scope = value;
     },
