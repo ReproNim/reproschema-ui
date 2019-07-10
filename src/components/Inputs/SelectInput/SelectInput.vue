@@ -3,7 +3,7 @@
     <multiselect v-if=" inputType=== 'select' && this.constraints['http://schema.org/itemListElement']"
                  v-model="selected" :options="this.options" :searchable="false"
                  :show-labels="false"
-                 placeholder="Pick a value" @input="sendData">
+                 placeholder="Pick a value" @input="checkNotOtherAndSendData">
     </multiselect>
     <multiselect v-else v-model="selected" id="ajax"
                  placeholder="Type to search"
@@ -13,20 +13,12 @@
                  :close-on-select="true" :options-limit="300"
                  :limit="5" :limit-text="limitText" :max-height="600"
                  :show-no-results="false" :hide-selected="true"
-                 @input="sendData">
+                 @input="checkNotOtherAndSendData">
       <span slot="noResult">Oops! No elements found. Consider changing the search query.</span>
     </multiselect>
-    <!-- <multiselect v-else-if="inputType==='selectLanguage'" v-model="selected" label="name"
-                 track-by="code" placeholder="Type to search"
-                 :options="this.options" :multiple="true"
-                 :searchable="true" :loading="isLoading"
-                 :internal-search="true" :clear-on-select="false"
-                 :close-on-select="false" :options-limit="300"
-                 :limit="3" :limit-text="limitText" :max-height="600"
-                 :show-no-results="false" :hide-selected="true"
-                 @search-change="asyncFindLanguage" @input="sendData">
-      <span slot="noResult">Oops! No elements found. Consider changing the search query.</span>
-    </multiselect> -->
+    <div v-if="checkOther" id="ifOther" style="display: block;">
+      <br><input type="text" placeholder="Please describe" @change="sendData"/><br />
+    </div>
   </div>
 
 </template>
@@ -61,6 +53,11 @@ export default {
 
   },
   methods: {
+    checkNotOtherAndSendData(val) {
+      if (val !== 'Other') {
+        this.$emit('valueChanged', val);
+      }
+    },
     sendData(val) {
       this.$emit('valueChanged', val);
     },
@@ -95,6 +92,12 @@ export default {
         // console.log(94, this.constraints['http://schema.repronim.org/multipleChoice']);
         return true;
       } return false;
+    },
+    checkOther() {
+      if (this.selected === 'Other') {
+        return true;
+      }
+      return false;
     },
   },
 };
