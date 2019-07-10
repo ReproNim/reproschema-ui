@@ -16,7 +16,7 @@
                  @input="checkNotOtherAndSendData">
       <span slot="noResult">Oops! No elements found. Consider changing the search query.</span>
     </multiselect>
-    <div id="ifOther" style="display: none;">
+    <div v-if="checkOther" id="ifOther" style="display: block;">
       <br><input type="text" placeholder="Please describe" @change="sendData"/><br />
     </div>
   </div>
@@ -54,10 +54,7 @@ export default {
   },
   methods: {
     checkNotOtherAndSendData(val) {
-      if (val === 'Other') {
-        document.getElementById('ifOther').style.display = 'block';
-      } else {
-        document.getElementById('ifOther').style.display = 'none';
+      if (val !== 'Other') {
         this.$emit('valueChanged', val);
       }
     },
@@ -95,6 +92,12 @@ export default {
         // console.log(94, this.constraints['http://schema.repronim.org/multipleChoice']);
         return true;
       } return false;
+    },
+    checkOther() {
+      if (this.selected === 'Other') {
+        return true;
+      }
+      return false;
     },
   },
 };
