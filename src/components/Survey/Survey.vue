@@ -99,7 +99,7 @@ export default {
         this.listShow = [0];
         this.$nextTick(() => {
           // eslint-disable-next-line
-          // console.log(86, this.context);
+          console.log(86, this.responses);
           // set listShow if there are responses for items in the context
           const answered = _.filter(this.context, c =>
             Object.keys(this.responses).indexOf(c['@id']) > -1);
@@ -287,6 +287,7 @@ export default {
         totalQ = _.filter(this.visibility).length;
       }
       const progress = ((Object.keys(this.responses).length) / totalQ) * 100;
+      console.log(290, Object.keys(this.responses), Object.keys(this.responses).length, totalQ, progress);
       this.$emit('updateProgress', progress);
     },
     order() {
@@ -415,6 +416,7 @@ export default {
   mounted() {
     if (this.srcUrl) {
       // eslint-disable-next-line
+      console.log(419, this.srcUrl);
       this.getData();
     }
   },

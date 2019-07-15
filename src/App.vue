@@ -328,6 +328,7 @@ export default {
       return this.$store.state.schema;
     },
     responses() {
+      console.log(340, this.$store.state.responses);
       return this.$store.state.responses;
     },
     scores() {
@@ -337,6 +338,7 @@ export default {
       return this.$store.state.activityIndex;
     },
     progress() {
+      console.log(340, this.$store.state.progress);
       return this.$store.state.progress;
     },
     currentActivityProgress() {
