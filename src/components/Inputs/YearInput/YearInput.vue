@@ -12,7 +12,7 @@ import Datepicker from 'vuejs-datepicker';
 import moment from 'moment';
 
 export default {
-  name: 'DateInput',
+  name: 'YearInput',
   props: ['constraints', 'init'],
   components: {
     Datepicker,
@@ -47,7 +47,11 @@ export default {
   },
   mounted() {
     if (this.init) {
-      this.input = this.init;
+      if (!(this.init instanceof Date)) {
+        const d = new Date();
+        d.setFullYear(this.init);
+        this.input = d;
+      } else this.input = this.init;
     }
   },
 };

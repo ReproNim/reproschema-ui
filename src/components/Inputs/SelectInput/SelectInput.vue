@@ -17,7 +17,8 @@
       <span slot="noResult">Oops! No elements found. Consider changing the search query.</span>
     </multiselect>
     <div v-if="checkOther" id="ifOther" style="display: block;">
-      <br><input type="text" placeholder="Please describe" @change="sendData"/><br />
+      <br><b-form-input v-model="otherInput" placeholder="Please describe" @change="sendData">
+    </b-form-input>
     </div>
   </div>
 
@@ -39,6 +40,7 @@ export default {
     return {
       // The selected value.
       selected: null,
+      otherInput: '',
       // Options.
       options: [],
       selectedCountries: [],
@@ -59,7 +61,7 @@ export default {
       }
     },
     sendData(val) {
-      this.$emit('valueChanged', val);
+      this.$emit('valueChanged', [this.selected, val]);
     },
     limitText(count) {
       return `and ${count} other countries`;
@@ -67,7 +69,11 @@ export default {
   },
   mounted() {
     if (this.init) {
-      this.selected = this.init;
+      // console.log(74, this.init);
+      if (Array.isArray(this.init)) {
+        this.selected = this.init[0];
+        this.otherInput = this.init[1];
+      } else this.selected = this.init;
     }
     if (this.constraints['http://schema.org/itemListElement']) { // if choices defined in schema
       this.options = _.map(this.constraints['http://schema.org/itemListElement'][0]['@list'], (v) => {
