@@ -159,7 +159,7 @@ import Radio from '../Inputs/WebRadio/';
 import AudioRecord from '../Inputs/WebAudioRecord/';
 import TextInput from '../Inputs/WebTextInput/';
 import IntegerInput from '../Inputs/WebIntegerInput/';
-import DateInput from '../Inputs/DateInput/';
+import DateInput from '../Inputs/YearInput/';
 import MultiPart from '../MultiPart/';
 import DocumentUpload from '../Inputs/DocumentUpload';
 import MultiTextInput from '../Inputs/MultiTextInput';
