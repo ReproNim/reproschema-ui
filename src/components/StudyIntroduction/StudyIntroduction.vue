@@ -68,7 +68,7 @@ export default {
   },
   computed: {
     nextName() {
-      return (this.step === this.totalSteps) ? 'Submit' : 'Next';
+      return (this.step === this.totalSteps) ? 'Start' : 'Next';
     },
     appletURL() {
       return 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/activity-sets/voice-pilot/voice_pilot_schema.jsonld';

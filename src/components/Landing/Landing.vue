@@ -63,7 +63,7 @@
 <template>
   <div class="docked-layout">
     <section class="smooth-scroller" style="padding-top: 0">
-      <section style="height: 30vw; min-height: 15rem; background: linear-gradient(#5A478F, #47337D)">
+      <section style="height: 30vw; min-height: 15rem; background: linear-gradient(#268762, #15ac7f)">
         <div style="
           height: 30vw;
           min-height: 15rem;
@@ -75,7 +75,7 @@
       </section>
       <br>
       <section>
-        <div class="container">
+        <div class="container-fluid">
           <h2>Welcome to Voice Study</h2>
           <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eu sagittis leo, sit
             amet consectetur mi. Donec volutpat rutrum massa et luctus. Fusce ac dui quam. Nam a
@@ -180,12 +180,12 @@ export default {
     color: #5A478F;
   }
   h2 {
-    color: #5A478F;
+    color: #268762;
     text-align: center;
     margin: 1rem 0 .5rem 0;
   }
   h3 {
-    color: #5A478F;
+    color: #268762;
     margin: 0;
     margin-bottom: .25rem;
   }
@@ -214,7 +214,7 @@ export default {
     padding: 1.5rem;
   }
   .image.container {
-    max-width: 40rem;
+    max-width: 60rem;
     padding: 1rem 1rem 0 1rem;
     display: flex;
     align-items: center;
@@ -229,10 +229,10 @@ export default {
     margin-left: 2rem;
   }
   .image.container .text h2 {
-    color: #31117d;
+    color: #219c6d;
   }
   .image.container .text h3 {
-    color: #31117d;
+    color: #219c6d;
   }
   .image.container .text p {
     font-size: .9rem;
