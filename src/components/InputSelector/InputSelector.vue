@@ -1,7 +1,11 @@
 <template>
   <div class="inputContent">
-    <div class="lead scroll mb-3 pr-3 pl-3" v-if="preamble">
-      <p :class="{'text-justify': inputType==='audioPassageRecord'}">{{ preamble }}</p>
+    <div class="scroll mb-3 pr-3 pl-3" v-if="preamble">
+      <p :class="{'text-justify': inputType==='audioPassageRecord'}">
+          <small>
+            <b>{{ preamble }}</b>
+          </small>
+      </p>
     </div>
     <div class="lead scroll mb-3 pr-3 pl-3" v-if="title">
       <p :class="{'text-justify': inputType==='audioPassageRecord'}">{{ title }}</p>
