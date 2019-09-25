@@ -69,7 +69,7 @@
           :init="init" v-on:valueChanged="sendData"/>
     </div>
 
-    <!-- If type is time rnage -->
+    <!-- If type is time range -->
     <div v-else-if="inputType==='timeRange'">
         <TimeRange
           :constraints="valueConstraints"
@@ -86,6 +86,14 @@
     <!-- If type is number -->
     <div v-else-if="inputType==='number'">
         <IntegerInput
+          :constraints="valueConstraints"
+          :selected_language="selected_language"
+          :init="init" v-on:valueChanged="sendData"/>
+    </div>
+
+    <!-- If type is float -->
+    <div v-else-if="inputType==='float'">
+        <FloatInput
           :constraints="valueConstraints"
           :selected_language="selected_language"
           :init="init" v-on:valueChanged="sendData"/>
@@ -159,6 +167,7 @@ import Radio from '../Inputs/WebRadio/';
 import AudioRecord from '../Inputs/WebAudioRecord/';
 import TextInput from '../Inputs/WebTextInput/';
 import IntegerInput from '../Inputs/WebIntegerInput/';
+import FloatInput from '../Inputs/WebFloatInput/';
 import DateInput from '../Inputs/YearInput/';
 import MultiPart from '../MultiPart/';
 import DocumentUpload from '../Inputs/DocumentUpload';
@@ -203,6 +212,7 @@ export default {
     AudioRecord,
     TextInput,
     IntegerInput,
+    FloatInput,
     DateInput,
     DocumentUpload,
     MultiTextInput,
