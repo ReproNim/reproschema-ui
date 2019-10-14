@@ -96,6 +96,8 @@ import Loader from '../Loader/';
 import MultiPart from '../MultiPart';
 import Section from '../Section';
 
+const reproterms = 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/terms/'
+
 export default {
   name: 'SurveyItem',
   props: {
@@ -161,15 +163,15 @@ export default {
     },
     ui() {
       /* eslint-disable */
-        if (this.data['https://schema.repronim.org/inputType']) {
-          return this.data['https://schema.repronim.org/inputType'][0]['@value'];
+        if (this.data[reproterms+'inputType']) {
+          return this.data[reproterms+'inputType'][0]['@value'];
         }
         return 'N/A';
         /* eslint-enable */
     },
     widgetType() {
-      if (this.data['https://schema.repronim.org/readOnly']) {
-        return this.data['https://schema.repronim.org/readOnly'][0]['@value'];
+      if (this.data[reproterms+'readOnly']) {
+        return this.data[reproterms+'readOnly'][0]['@value'];
       }
       return false;
     },
@@ -181,14 +183,14 @@ export default {
       return null;
     },
     itemPreamble() {
-      if (this.data['http://schema.repronim.org/preamble']) {
-        const activePreamble = _.filter(this.data['http://schema.repronim.org/preamble'], q => q['@language'] === this.selected_language);
+      if (this.data[reproterms+'preamble']) {
+        const activePreamble = _.filter(this.data[reproterms+'preamble'], q => q['@language'] === this.selected_language);
         return activePreamble[0]['@value'];
       }
       return null;
     },
     valueConstraints() {
-      if (this.data['https://schema.repronim.org/valueconstraints']) {
+      if (this.data[reproterms+'valueconstraints']) {
         // eslint-disable-next-line
           return this.valueC;
       }
@@ -196,17 +198,17 @@ export default {
       return { requiredValue: false };
     },
     findPassOptions() {
-      if (this.data['https://schema.repronim.org/valueconstraints']) {
+      if (this.data[reproterms+'valueconstraints']) {
         // when valueConstraints is a remote object
-        if (Object.keys(this.data['https://schema.repronim.org/valueconstraints'][0]).indexOf('@id') > -1) {
+        if (Object.keys(this.data[reproterms+'valueconstraints'][0]).indexOf('@id') > -1) {
           this.getRequiredVal();
           return this.requireVal;
         }
         // when valueConstraints in embedded in item object itself
-        if (this.data['https://schema.repronim.org/valueconstraints'][0]) {
+        if (this.data[reproterms+'valueconstraints'][0]) {
           // make sure the requiredValue key is defined
-          if (this.data['https://schema.repronim.org/valueconstraints'][0]['http://schema.repronim.org/requiredValue']) {
-            return this.data['https://schema.repronim.org/valueconstraints'][0]['http://schema.repronim.org/requiredValue'][0]['@value'];
+          if (this.data[reproterms+'valueconstraints'][0][reproterms+'requiredValue']) {
+            return this.data[reproterms+'valueconstraints'][0][reproterms+'requiredValue'][0]['@value'];
           }
         }
       }
@@ -215,9 +217,9 @@ export default {
   },
   methods: {
     getRequiredVal() {
-      jsonld.expand(this.data['https://schema.repronim.org/valueconstraints'][0]['@id'])
+      jsonld.expand(this.data[reproterms+'valueconstraints'][0]['@id'])
         .then((rsp) => {
-          this.requireVal = rsp[0]['http://schema.repronim.org/requiredValue'][0]['@value'];
+          this.requireVal = rsp[0][reproterms+'requiredValue'][0]['@value'];
           // console.log(143, this.requireVal);
         });
     },
@@ -230,13 +232,13 @@ export default {
       }).then((resp) => {
         if (resp.length) {
           this.data = resp[0];
-          if (this.data['https://schema.repronim.org/valueconstraints']) {
-            if (Object.keys(this.data['https://schema.repronim.org/valueconstraints'][0]).indexOf('@id') > -1) {
-              jsonld.expand(this.data['https://schema.repronim.org/valueconstraints'][0]['@id']).then((rsp) => {
+          if (this.data[reproterms+'valueconstraints']) {
+            if (Object.keys(this.data[reproterms+'valueconstraints'][0]).indexOf('@id') > -1) {
+              jsonld.expand(this.data[reproterms+'valueconstraints'][0]['@id']).then((rsp) => {
                 this.valueC = rsp[0];
               });
             } else {
-              this.valueC = this.data['https://schema.repronim.org/valueconstraints'][0];
+              this.valueC = this.data[reproterms+'valueconstraints'][0];
             }
           } else {
             // console.log(this.data);
