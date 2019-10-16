@@ -71,7 +71,7 @@ export default {
       return (this.step === this.totalSteps) ? 'Start' : 'Next';
     },
     appletURL() {
-      return 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/activity-sets/voice-pilot/voice_pilot_schema.jsonld';
+      return 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/activity-sets/VoicePilot/VoicePilot_schema';
     },
     redirect() {
       return { name: 'Applet', params: { appletId: this.appletURL }, query: { ...this.query, consent: true } };
@@ -88,8 +88,6 @@ export default {
         this.step += 1;
       } else if (this.step === this.totalSteps) {
         this.$router.push('/activities/0');
-        // this.$router.push('/activities/0');
-        // this.$router.push({ path: '/activities/0', query: { url: 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/activity-sets/voice-pilot/voice_pilot_schema.jsonld' } });
       }
     },
     learnMore() {
