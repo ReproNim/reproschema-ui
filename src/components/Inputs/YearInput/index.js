@@ -1,2 +1,2 @@
 // eslint-disable-next-line
-export { default } from './DateInput.vue';
+export { default } from './YearInput.vue';
