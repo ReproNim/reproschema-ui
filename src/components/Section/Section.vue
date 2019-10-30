@@ -62,7 +62,7 @@ const safeEval = require('safe-eval');
 const reproterms = 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/terms/';
 
 export default {
-  name: 'MultiPart',
+  name: 'Section',
   props: {
     srcUrl: {
       type: String,
@@ -191,7 +191,8 @@ export default {
       }
     },
     setResponse(value, index) {
-      this.$emit('saveResponse', this.context[index]['@id'], value);
+      console.log(192, 'save sec resp', this.context, this.context[index]['@id'], index, value);
+      this.$emit('saveSectionResponse', this.context[index]['@id'], value);
       const currResponses = { ...this.responses };
       currResponses[this.context[index]['@id']] = value;
       // TODO: add back branching logic

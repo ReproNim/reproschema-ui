@@ -16,6 +16,10 @@
                             ref="radiobutton"
         >
         </b-form-radio-group>
+        <!--<div v-if="checkOther" id="ifOther" style="display: block;">-->
+          <!--<br><b-form-input v-model="otherInput" placeholder="Please describe" @change="sendData">-->
+        <!--</b-form-input>-->
+        <!--</div>-->
       </b-form-group>
       <div class="text-center" v-else>
         <vue-select-image :dataImages="dataImages"
