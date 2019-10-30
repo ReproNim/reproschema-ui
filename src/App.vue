@@ -85,6 +85,7 @@ import circleProgress from './components/Circle/';
 Vue.use(BootstrapVue);
 Vue.filter('reverse', value => value.slice().reverse());
 
+const reproterms = 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/terms/';
 
 function getFilename(s) {
   const folders = s.split('/');
@@ -97,8 +98,8 @@ function getVariableName(s, variableMap) {
   const vmap = variableMap[0]['@list'];
   const mapper = {};
   _.map(vmap, (v) => {
-    const uri = v['https://schema.repronim.org/isAbout'][0]['@id'];
-    const variable = v['https://schema.repronim.org/variableName'][0]['@value'];
+    const uri = v[`${reproterms}isAbout`][0]['@id'];
+    const variable = v[`${reproterms}variableName`][0]['@value'];
     mapper[uri] = variable;
   });
   return mapper[s];
@@ -174,7 +175,7 @@ export default {
       // TODO: this is a hack. the jsonld expander should give us this info.
       if (url) {
         if (!_.isEmpty(this.$store.state.schema)) {
-          const nameMap = this.$store.state.schema['https://schema.repronim.org/activity_display_name'][0];
+          const nameMap = this.$store.state.schema[`${reproterms}activity_display_name`][0];
           if (url in nameMap) {
             // console.log(123, nameMap[url][0]['@id']);
             const mappedUrl = nameMap[url][0]['@id'];
@@ -347,7 +348,7 @@ export default {
     },
     schemaOrder() {
       if (!_.isEmpty(this.$store.state.schema)) {
-        const order = _.map(this.$store.state.schema['https://schema.repronim.org/order'][0]['@list'],
+        const order = _.map(this.$store.state.schema[`${reproterms}order`][0]['@list'],
           u => u['@id']);
         return order;
       }
@@ -358,8 +359,8 @@ export default {
       if (this.schemaOrder) {
         _.map(this.schemaOrder, (s) => {
           let fname = '';
-          if (this.schema['https://schema.repronim.org/variableMap']) {
-            fname = getVariableName(s, this.schema['https://schema.repronim.org/variableMap']);
+          if (this.schema[`${reproterms}variableMap`]) {
+            fname = getVariableName(s, this.schema[`${reproterms}variableMap`]);
           } else {
             // TODO: remove this backwards compatibility else
             fname = getFilename(s);
@@ -370,11 +371,11 @@ export default {
       return output;
     },
     visibilityConditions() {
-      if (this.schema['https://schema.repronim.org/visibility']) {
+      if (this.schema[`${reproterms}visibility`]) {
         return _.map(this.schemaOrder, (s) => {
           let keyName = '';
-          if (this.schema['https://schema.repronim.org/variableMap']) {
-            keyName = getVariableName(s, this.schema['https://schema.repronim.org/variableMap']);
+          if (this.schema[`${reproterms}variableMap`]) {
+            keyName = getVariableName(s, this.schema[`${reproterms}variableMap`]);
           } else {
             // TODO: remove this backwards compatibility else
             keyName = getFilename(s);
@@ -383,7 +384,7 @@ export default {
           // look through the "https://schema.repronim.org/visibility" field
           // and reformat nicely
 
-          let condition = _.filter(this.schema['https://schema.repronim.org/visibility'], c => c['@index'] === keyName);
+          let condition = _.filter(this.schema[`${reproterms}visibility`], c => c['@index'] === keyName);
           if (condition.length === 1) {
             condition = condition[0];
 
@@ -396,11 +397,11 @@ export default {
 
             if (conditionKeys.indexOf('http://schema.org/httpMethod') > -1 &&
               conditionKeys.indexOf('http://schema.org/url') > -1 &&
-              conditionKeys.indexOf('https://schema.repronim.org/payload') > -1
+              conditionKeys.indexOf(`${reproterms}payload`) > -1
             ) {
               // lets fill the payload here.
               const payload = {};
-              const payloadList = condition['https://schema.repronim.org/payload'];
+              const payloadList = condition[`${reproterms}payload`];
               _.map(payloadList, (p) => {
                 const item = p['@value'];
                 const index = this.schemaOrder.indexOf(this.schemaNameMapper[item]);

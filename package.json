@@ -9,7 +9,7 @@
   "private": true,
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
-    "start": "npm run dev",
+    "start": "node server.js",
     "unit": "jest --config test/unit/jest.conf.js --coverage",
     "e2e": "node test/e2e/runner.js",
     "test": "npm run unit && npm run e2e",
@@ -25,6 +25,7 @@
     "d3-scale": "^3.0.0",
     "d3-selection": "^1.4.0",
     "d3-time": "^1.0.11",
+    "express": "^4.17.1",
     "file-saver": "^2.0.1",
     "jsonld": "^1.2.1",
     "jszip": "^3.2.1",

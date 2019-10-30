@@ -30,6 +30,8 @@ import axios from 'axios';
 import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
 
+const reproterms = 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/terms/';
+
 export default {
   name: 'SelectInput',
   props: ['constraints', 'init', 'selected_language', 'inputType'],
@@ -94,8 +96,8 @@ export default {
   computed: {
     multipleAllowed() {
       // console.log(93, 'here', this.constraints);
-      if (this.constraints['http://schema.repronim.org/multipleChoice']) {
-        // console.log(94, this.constraints['http://schema.repronim.org/multipleChoice']);
+      if (this.constraints[`${reproterms}multipleChoice`]) {
+        // console.log(94, this.constraints[reproterms+'multipleChoice']);
         return true;
       } return false;
     },

@@ -59,6 +59,8 @@ Vue.use(VuejsDialog);
 
 const safeEval = require('safe-eval');
 
+const reproterms = 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/terms/';
+
 export default {
   name: 'Section',
   props: {
@@ -118,9 +120,9 @@ export default {
     },
     getVisibility(responses) {
       const responseMapper = this.responseMapper(responses);
-      if (!_.isEmpty(this.activity['https://schema.repronim.org/visibility'])) {
+      if (!_.isEmpty(this.activity[`${reproterms}visibility`])) {
         const visibilityMapper = {};
-        _.map(this.activity['https://schema.repronim.org/visibility'], (a) => {
+        _.map(this.activity[`${reproterms}visibility`], (a) => {
           let val = a['@value'];
           if (_.isString(a['@value'])) {
             val = this.evaluateString(a['@value'], responseMapper);
@@ -135,10 +137,10 @@ export default {
     },
     responseMapper(responses) {
       // a variable map is defined! great
-      const vmap = this.activity['https://schema.repronim.org/variableMap'][0]['@list'];
+      const vmap = this.activity[`${reproterms}variableMap`][0]['@list'];
       const keyArr = _.map(vmap, (v) => {
-        const key = v['https://schema.repronim.org/isAbout'][0]['@id'];
-        const qId = v['https://schema.repronim.org/variableName'][0]['@value'];
+        const key = v[`${reproterms}isAbout`][0]['@id'];
+        const qId = v[`${reproterms}variableName`][0]['@value'];
         const val = responses[key];
         return { key, val, qId };
       });
@@ -197,7 +199,7 @@ export default {
       this.visibility = this.getVisibility(currResponses);
 
       // TODO: add back scoring logic to this component.
-      if (!_.isEmpty(this.activity['https://schema.repronim.org/scoringLogic'])) {
+      if (!_.isEmpty(this.activity[`${reproterms}scoringLogic`])) {
         _.map(this.getScoring(this.responses), (score, key) => {
           if (!_.isNaN(score)) {
             this.scores[key] = score;
@@ -212,9 +214,9 @@ export default {
     },
     getScoring(responses) {
       const responseMapper = this.responseMapper(responses);
-      if (!_.isEmpty(this.activity['https://schema.repronim.org/scoringLogic'])) {
+      if (!_.isEmpty(this.activity[`${reproterms}scoringLogic`])) {
         const scoreMapper = {};
-        _.map(this.activity['https://schema.repronim.org/scoringLogic'], (a) => {
+        _.map(this.activity[`${reproterms}scoringLogic`], (a) => {
           let val = a['@value'];
           if (_.isString(a['@value'])) {
             val = this.evaluateString(a['@value'], responseMapper);
@@ -272,7 +274,7 @@ export default {
       }
     },
     order() {
-      return this.activity['https://schema.repronim.org/order'][0]['@list'];
+      return this.activity[`${reproterms}order`][0]['@list'];
     },
   },
   watch: {
@@ -297,8 +299,8 @@ export default {
       });
     },
     context() {
-      if (this.activity['https://schema.repronim.org/order']) {
-        const keys = this.activity['https://schema.repronim.org/order'][0]['@list'];
+      if (this.activity[`${reproterms}order`]) {
+        const keys = this.activity[`${reproterms}order`][0]['@list'];
         return keys;
       }
       return [{}];
@@ -311,18 +313,18 @@ export default {
       return {};
     },
     preambleText() {
-      if (this.activity['http://schema.repronim.org/preamble']) {
-        const activePreamble = _.filter(this.activity['http://schema.repronim.org/preamble'],
+      if (this.activity[reproterms+'preamble']) {
+        const activePreamble = _.filter(this.activity[reproterms+'preamble'],
           p => p['@language'] === this.selected_language);
         return activePreamble[0]['@value'];
       }
       return '';
     },
     findPassOptions() {
-      if (this.activity['https://schema.repronim.org/allow']) {
+      if (this.activity[reproterms+'allow']) {
         let isSkip = false;
         let isDontKnow = false;
-        _.map(this.activity['https://schema.repronim.org/allow'][0]['@list'], s => {
+        _.map(this.activity[reproterms+'allow'][0]['@list'], s => {
           if (s['@id'] === "https://schema.repronim.org/refused_to_answer") {
             isSkip = true;
           } else if (s['@id'] === "https://schema.repronim.org/dont_know_answer") {
