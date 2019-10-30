@@ -17,12 +17,13 @@ const state = {
   storeReady: false,
   activityReady: false,
 };
+const reproterms = 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/terms/';
 
 const getters = {
   // eslint-disable-next-line
   srcUrl(state) {
     if (!_.isEmpty(state.schema) && state.activityIndex) {
-      return state.schema['https://schema.repronim.org/order'][0]['@list'][state.activityIndex]['@id'];
+      return state.schema[`${reproterms}order`][0]['@list'][state.activityIndex]['@id'];
     }
     return null;
   },
@@ -36,10 +37,10 @@ const mutations = {
   // eslint-disable-next-line
   setBaseSchema(state, data) {
     state.schema = data[0];
-    state.progress = _.map(data[0]['https://schema.repronim.org/order'][0]['@list'], () => 0);
-    state.responses = _.map(data[0]['https://schema.repronim.org/order'][0]['@list'], () => ({}));
-    state.scores = _.map(data[0]['https://schema.repronim.org/order'][0]['@list'], () => ({}));
-    state.activities = _.map(data[0]['https://schema.repronim.org/order'][0]['@list'], () => ({}));
+    state.progress = _.map(data[0][`${reproterms}order`][0]['@list'], () => 0);
+    state.responses = _.map(data[0][`${reproterms}order`][0]['@list'], () => ({}));
+    state.scores = _.map(data[0][`${reproterms}order`][0]['@list'], () => ({}));
+    state.activities = _.map(data[0][`${reproterms}order`][0]['@list'], () => ({}));
     state.storeReady = true;
   },
   // eslint-disable-next-line
