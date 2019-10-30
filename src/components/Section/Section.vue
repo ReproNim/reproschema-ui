@@ -58,7 +58,8 @@ import Loader from '../Loader/';
 Vue.use(VuejsDialog);
 
 const safeEval = require('safe-eval');
-const reproterms = 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/terms/'
+
+const reproterms = 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/terms/';
 
 export default {
   name: 'MultiPart',
@@ -119,9 +120,9 @@ export default {
     },
     getVisibility(responses) {
       const responseMapper = this.responseMapper(responses);
-      if (!_.isEmpty(this.activity[reproterms+'visibility'])) {
+      if (!_.isEmpty(this.activity[`${reproterms}visibility`])) {
         const visibilityMapper = {};
-        _.map(this.activity[reproterms+'visibility'], (a) => {
+        _.map(this.activity[`${reproterms}visibility`], (a) => {
           let val = a['@value'];
           if (_.isString(a['@value'])) {
             val = this.evaluateString(a['@value'], responseMapper);
@@ -136,10 +137,10 @@ export default {
     },
     responseMapper(responses) {
       // a variable map is defined! great
-      const vmap = this.activity[reproterms+'variableMap'][0]['@list'];
+      const vmap = this.activity[`${reproterms}variableMap`][0]['@list'];
       const keyArr = _.map(vmap, (v) => {
-        const key = v[reproterms+'isAbout'][0]['@id'];
-        const qId = v[reproterms+'variableName'][0]['@value'];
+        const key = v[`${reproterms}isAbout`][0]['@id'];
+        const qId = v[`${reproterms}variableName`][0]['@value'];
         const val = responses[key];
         return { key, val, qId };
       });
@@ -197,7 +198,7 @@ export default {
       this.visibility = this.getVisibility(currResponses);
 
       // TODO: add back scoring logic to this component.
-      if (!_.isEmpty(this.activity[reproterms+'scoringLogic'])) {
+      if (!_.isEmpty(this.activity[`${reproterms}scoringLogic`])) {
         _.map(this.getScoring(this.responses), (score, key) => {
           if (!_.isNaN(score)) {
             this.scores[key] = score;
@@ -212,9 +213,9 @@ export default {
     },
     getScoring(responses) {
       const responseMapper = this.responseMapper(responses);
-      if (!_.isEmpty(this.activity[reproterms+'scoringLogic'])) {
+      if (!_.isEmpty(this.activity[`${reproterms}scoringLogic`])) {
         const scoreMapper = {};
-        _.map(this.activity[reproterms+'scoringLogic'], (a) => {
+        _.map(this.activity[`${reproterms}scoringLogic`], (a) => {
           let val = a['@value'];
           if (_.isString(a['@value'])) {
             val = this.evaluateString(a['@value'], responseMapper);
@@ -272,7 +273,7 @@ export default {
       }
     },
     order() {
-      return this.activity[reproterms+'order'][0]['@list'];
+      return this.activity[`${reproterms}order`][0]['@list'];
     },
   },
   watch: {
@@ -297,8 +298,8 @@ export default {
       });
     },
     context() {
-      if (this.activity[reproterms+'order']) {
-        const keys = this.activity[reproterms+'order'][0]['@list'];
+      if (this.activity[`${reproterms}order`]) {
+        const keys = this.activity[`${reproterms}order`][0]['@list'];
         return keys;
       }
       return [{}];

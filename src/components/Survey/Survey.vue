@@ -73,7 +73,8 @@ import Loader from '../Loader/';
 
 Vue.component('survey-item', SurveyItem);
 const safeEval = require('safe-eval');
-const reproterms = 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/terms/'
+
+const reproterms = 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/terms/';
 
 export default {
   name: 'Survey',
@@ -118,7 +119,7 @@ export default {
       });
     },
     evaluateScoringLogic() {
-      const scoringLogic = (this.activity[reproterms+'scoringLogic'][0]['@value']).split('= ')[1];
+      const scoringLogic = (this.activity[`${reproterms}scoringLogic`][0]['@value']).split('= ')[1];
       if (this.responses) {
         let str = '';
         _.forOwn(this.responses, (val, key) => {
@@ -194,7 +195,7 @@ export default {
       const currResponses = { ...this.responses };
       currResponses[this.context[index]['@id']] = value;
       this.visibility = this.getVisibility(currResponses);
-      if (!_.isEmpty(this.activity[reproterms+'scoringLogic'])) {
+      if (!_.isEmpty(this.activity[`${reproterms}scoringLogic`])) {
         // TODO: if you uncomment the scoring logic evaluation, things break w/ multipart.
         // this.evaluateScoringLogic();
       }
@@ -232,11 +233,11 @@ export default {
       const keys = _.map(this.order, c => c['@id']); // Object.keys(this.responses);
 
       // a variable map is defined! great
-      if (this.activity[reproterms+'variableMap']) {
-        const vmap = this.activity[reproterms+'variableMap'][0]['@list'];
+      if (this.activity[`${reproterms}variableMap`]) {
+        const vmap = this.activity[`${reproterms}variableMap`][0]['@list'];
         const keyArr = _.map(vmap, (v) => {
-          const key = v[reproterms+'isAbout'][0]['@id'];
-          const qId = v[reproterms+'variableName'][0]['@value'];
+          const key = v[`${reproterms}isAbout`][0]['@id'];
+          const qId = v[`${reproterms}variableName`][0]['@value'];
           const val = responses[key];
           return { key, val, qId };
         });
@@ -266,9 +267,9 @@ export default {
     },
     getVisibility(responses) {
       const responseMapper = this.responseMapper(responses);
-      if (!_.isEmpty(this.activity[reproterms+'visibility'])) {
+      if (!_.isEmpty(this.activity[`${reproterms}visibility`])) {
         const visibilityMapper = {};
-        _.map(this.activity[reproterms+'visibility'], (a) => {
+        _.map(this.activity[`${reproterms}visibility`], (a) => {
           let val = a['@value'];
           if (_.isString(a['@value'])) {
             val = this.evaluateString(a['@value'], responseMapper);
@@ -291,15 +292,15 @@ export default {
       this.$emit('updateProgress', progress);
     },
     order() {
-      if (this.activity[reproterms+'shuffle'][0]['@value']) { // when shuffle is true
-        const orderList = this.activity[reproterms+'order'][0]['@list'];
+      if (this.activity[`${reproterms}shuffle`][0]['@value']) { // when shuffle is true
+        const orderList = this.activity[`${reproterms}order`][0]['@list'];
         const listToShuffle = orderList.slice(1, orderList.length - 3);
         const newList = _.shuffle(listToShuffle);
         newList.unshift(orderList[0]);
         newList.push(orderList[orderList.length - 3],
           orderList[orderList.length - 2], orderList[orderList.length - 1]);
         return newList;
-      } return this.activity[reproterms+'order'][0]['@list'];
+      } return this.activity[`${reproterms}order`][0]['@list'];
     },
   },
   watch: {
@@ -342,7 +343,7 @@ export default {
         if (state.activities.length && state.activityIndex != null) {
           if (state.activities[state.activityIndex].activity) {
             const currentActivity = state.activities[state.activityIndex].activity;
-            const actList = currentActivity[reproterms+'order'][0]['@list'];
+            const actList = currentActivity[`${reproterms}order`][0]['@list'];
             return actList;
           }
         }
