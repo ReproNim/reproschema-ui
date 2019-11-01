@@ -74,7 +74,7 @@ import Loader from '../Loader/';
 Vue.component('survey-item', SurveyItem);
 const safeEval = require('safe-eval');
 
-const reproterms = 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/terms/';
+const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
 
 export default {
   name: 'Survey',

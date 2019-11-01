@@ -71,7 +71,7 @@ export default {
       return (this.step === this.totalSteps) ? 'Start' : 'Next';
     },
     appletURL() {
-      return 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/activity-sets/VoicePilot/VoicePilot_schema';
+      return 'https://raw.githubusercontent.com/ReproNim/reproschema/master/activity-sets/VoicePilot/VoicePilot_schema';
     },
     redirect() {
       return { name: 'Applet', params: { appletId: this.appletURL }, query: { ...this.query, consent: true } };
