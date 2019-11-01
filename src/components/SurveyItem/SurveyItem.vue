@@ -96,7 +96,7 @@ import Loader from '../Loader/';
 import MultiPart from '../MultiPart';
 import Section from '../Section';
 
-const reproterms = 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/terms/';
+const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
 
 export default {
   name: 'SurveyItem',

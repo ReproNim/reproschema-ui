@@ -85,7 +85,7 @@ import circleProgress from './components/Circle/';
 Vue.use(BootstrapVue);
 Vue.filter('reverse', value => value.slice().reverse());
 
-const reproterms = 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/terms/';
+const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
 
 function getFilename(s) {
   const folders = s.split('/');
