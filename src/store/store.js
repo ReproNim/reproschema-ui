@@ -17,7 +17,7 @@ const state = {
   storeReady: false,
   activityReady: false,
 };
-const reproterms = 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/terms/';
+const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
 
 const getters = {
   // eslint-disable-next-line
