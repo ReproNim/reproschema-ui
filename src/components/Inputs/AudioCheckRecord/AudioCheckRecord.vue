@@ -139,7 +139,7 @@ export default {
           })
           .catch((err) => {
             /* handle the error */
-            console.log(err);
+            // console.log(err);
             this.supported = false;
           });
       }

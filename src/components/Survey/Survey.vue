@@ -101,7 +101,6 @@ export default {
         this.listShow = [0];
         this.$nextTick(() => {
           // eslint-disable-next-line
-          console.log(86, this.responses);
           // set listShow if there are responses for items in the context
           const answered = _.filter(this.context, c =>
             Object.keys(this.responses).indexOf(c['@id']) > -1);
@@ -417,7 +416,6 @@ export default {
   mounted() {
     if (this.srcUrl) {
       // eslint-disable-next-line
-      console.log(419, this.srcUrl);
       this.getData();
     }
   },
