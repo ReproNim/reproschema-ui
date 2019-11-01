@@ -59,7 +59,7 @@ Vue.use(VuejsDialog);
 
 const safeEval = require('safe-eval');
 
-const reproterms = 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/terms/';
+const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
 
 export default {
   name: 'Section',

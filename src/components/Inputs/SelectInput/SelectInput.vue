@@ -30,7 +30,7 @@ import axios from 'axios';
 import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
 
-const reproterms = 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/terms/';
+const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
 
 export default {
   name: 'SelectInput',
