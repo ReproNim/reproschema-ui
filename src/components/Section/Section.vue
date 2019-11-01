@@ -59,7 +59,7 @@ Vue.use(VuejsDialog);
 
 const safeEval = require('safe-eval');
 
-const reproterms = 'https://raw.githubusercontent.com/ReproNim/schema-standardization/master/terms/';
+const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
 
 export default {
   name: 'Section',
@@ -98,6 +98,7 @@ export default {
     if (this.srcUrl) {
       // eslint-disable-next-line
         this.getData();
+      this.t0 = performance.now();
     }
   },
   methods: {
@@ -190,11 +191,16 @@ export default {
         this.$emit('valueChanged', this.responses);
       }
     },
-    setResponse(value, index) {
-      console.log(192, 'save sec resp', this.context, this.context[index]['@id'], index, value);
-      this.$emit('saveSectionResponse', this.context[index]['@id'], value);
+    setResponse(val, index) {
+      const t1 = performance.now();
+      // console.log(202, 'end of a section-question', index, 'is', t1);
+      const respData = { startedAt: this.t0 / 1000,
+        recordedAt: t1 / 1000,
+        value: val };
+        // console.log(207, 'section resp obj', respData);
+      this.$emit('saveResponse', this.context[index]['@id'], val);
       const currResponses = { ...this.responses };
-      currResponses[this.context[index]['@id']] = value;
+      currResponses[this.context[index]['@id']] = val;
       // TODO: add back branching logic
       this.visibility = this.getVisibility(currResponses);
 
@@ -233,10 +239,10 @@ export default {
       if (idx === 8 && this.responses[this.context[idx]['@id']] > 0) {
         // Trigger notification for non-zero suicidal ideation
         const notification = ' <i> If this is how you feel, think about getting help. </i><br> ' +
-          'There are people who can help 24/7 <br>' +
-          'Text the Crisis Text Line at 741741 <br>' +
-          'Or<br>' +
-          'Call the National Suicide Prevention Lifeline at 1-800-273-8255';
+            'There are people who can help 24/7 <br>' +
+            'Text the Crisis Text Line at 741741 <br>' +
+            'Or<br>' +
+            'Call the National Suicide Prevention Lifeline at 1-800-273-8255';
         const options = {
           html: true,
         };
@@ -307,38 +313,38 @@ export default {
     },
     contextReverse() {
       /* eslint-disable */
-      if(this.context.length >0) {
-        return this.context.slice().reverse();
+        if(this.context.length >0) {
+          return this.context.slice().reverse();
+        }
+        return {};
+      },
+      preambleText() {
+        if (this.activity[`${reproterms}preamble`]) {
+          const activePreamble = _.filter(this.activity[`${reproterms}preamble`],
+            p => p['@language'] === this.selected_language);
+          return activePreamble[0]['@value'];
+        }
+        return '';
+      },
+      findPassOptions() {
+        if (this.activity[reproterms+'allow']) {
+          let isSkip = false;
+          let isDontKnow = false;
+          _.map(this.activity[`${reproterms}allow`][0]['@list'], s => {
+            if (s['@id'] === `${reproterms}refused_to_answer`) {
+              isSkip = true;
+            } else if (s['@id'] === `${reproterms}dont_know_answer`) {
+              isDontKnow = true;
+            }
+          });
+          return {
+            'skip': isSkip,
+            'dontKnow': isDontKnow
+          };
+        }
+        else return null;
       }
-      return {};
     },
-    preambleText() {
-      if (this.activity[reproterms+'preamble']) {
-        const activePreamble = _.filter(this.activity[reproterms+'preamble'],
-          p => p['@language'] === this.selected_language);
-        return activePreamble[0]['@value'];
-      }
-      return '';
-    },
-    findPassOptions() {
-      if (this.activity[reproterms+'allow']) {
-        let isSkip = false;
-        let isDontKnow = false;
-        _.map(this.activity[reproterms+'allow'][0]['@list'], s => {
-          if (s['@id'] === "https://schema.repronim.org/refused_to_answer") {
-            isSkip = true;
-          } else if (s['@id'] === "https://schema.repronim.org/dont_know_answer") {
-            isDontKnow = true;
-          }
-        });
-        return {
-          'skip': isSkip,
-          'dontKnow': isDontKnow
-        };
-      }
-      else return null;
-    }
-  },
-};
+  };
 </script>
 
