@@ -164,7 +164,6 @@ export default {
       this.isAnswered = true;
     },
     saveScores(key, scoreObj) {
-      // console.log(168, key, scoreObj);
       this.$store.dispatch('saveScores', { key, scoreObj });
     },
     clearResponses() {
@@ -177,7 +176,6 @@ export default {
         if (!_.isEmpty(this.$store.state.schema)) {
           const nameMap = this.$store.state.schema[`${reproterms}activity_display_name`][0];
           if (url in nameMap) {
-            // console.log(123, nameMap[url][0]['@id']);
             const mappedUrl = nameMap[url][0]['@id'];
             const folders = mappedUrl.split('/');
             const N = folders.length;
@@ -211,7 +209,6 @@ export default {
         const resp = await axios(request);
         // this.visibility[index] = resp.data;
         this.cache[cacheKey] = resp.data.qualified;
-
         return resp.data.qualified;
       } else if (_.isString(cond)) {
         // todo: implement client-side evaluation!

@@ -197,7 +197,7 @@ export default {
       }
     },
     setResponse(value, index) {
-      console.log(199, 'save mult resp', this.context, this.context[index]['@id'], index, value);
+      // console.log(199, 'save mult resp', this.context, this.context[index]['@id'], index, value);
       this.$emit('saveResponse', this.context[index]['@id'], value);
       const currResponses = { ...this.responses };
       currResponses[this.context[index]['@id']] = value;
