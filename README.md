@@ -1,1 +1,1 @@
-[View live](https://ReproNim.github.io/schema-ui/)
+[View live](https://ReproNim.github.io/reproschema-ui/)
