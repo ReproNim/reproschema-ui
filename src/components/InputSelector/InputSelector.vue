@@ -1,10 +1,10 @@
 <template>
   <div class="inputContent">
     <div class="lead scroll mb-3 pr-3 pl-3" v-if="preamble">
-      <p :class="{'text-justify': inputType==='audioPassageRecord'}">{{ preamble }}</p>
+      <p :class="{'text-justify': inputType==='audioPassageRecord'}" v-html="preamble">{{ preamble }}</p>
     </div>
     <div class="lead scroll mb-3 pr-3 pl-3" v-if="title">
-      <p :class="{'text-justify': inputType==='audioPassageRecord'}">{{ title }}</p>
+      <p :class="{'text-justify': inputType==='audioPassageRecord'}" v-html="title">{{ title }}</p>
       <span v-if="valueConstraints.requiredValue" class="text-danger">*</span>
     </div>
 
@@ -14,9 +14,9 @@
 
     <!-- If type is radio -->
     <div v-if="inputType==='radio'">
-        <Radio
-          :constraints="valueConstraints"
-          :selected_language="selected_language"
+      <Radio
+        :constraints="valueConstraints"
+        :selected_language="selected_language"
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
@@ -30,10 +30,10 @@
 
     <!-- If type is audioRecord -->
     <div v-else-if="inputType==='audioRecord'">
-        <AudioRecord
-          :constraints="valueConstraints"
-          :selected_language="selected_language"
-          :init="init" v-on:valueChanged="sendData"/>
+      <AudioRecord
+        :constraints="valueConstraints"
+        :selected_language="selected_language"
+        :init="init" v-on:valueChanged="sendData"/>
     </div>
 
     <div v-else-if="inputType==='audioPassageRecord'">
@@ -45,7 +45,7 @@
 
     <!-- If type is audioImageRecord -->
     <div v-else-if="inputType==='audioImageRecord'">
-        <AudioRecord
+      <AudioRecord
         :constraints="valueConstraints"
         :selected_language="selected_language"
         :init="init" v-on:valueChanged="sendData"
@@ -63,19 +63,19 @@
 
     <!-- If type is text -->
     <div v-else-if="inputType==='text'">
-        <TextInput
-          :constraints="valueConstraints"
-          :selected_language="selected_language"
-          :init="init" v-on:valueChanged="sendData"/>
+      <TextInput
+        :constraints="valueConstraints"
+        :selected_language="selected_language"
+        :init="init" v-on:valueChanged="sendData"/>
     </div>
 
-    <!-- If type is time range -->
+    <!-- If type is time rnage -->
     <div v-else-if="inputType==='timeRange'">
-        <TimeRange
-          :constraints="valueConstraints"
-          :selected_language="selected_language"
-          :id="'timeRange' + Math.floor(Math.random()*1000)"
-          :init="init" v-on:valueChanged="sendData"/>
+      <TimeRange
+        :constraints="valueConstraints"
+        :selected_language="selected_language"
+        :id="'timeRange' + Math.floor(Math.random()*1000)"
+        :init="init" v-on:valueChanged="sendData"/>
     </div>
 
     <!-- If type is text -->
@@ -85,10 +85,10 @@
 
     <!-- If type is number -->
     <div v-else-if="inputType==='number'">
-        <IntegerInput
-          :constraints="valueConstraints"
-          :selected_language="selected_language"
-          :init="init" v-on:valueChanged="sendData"/>
+      <IntegerInput
+        :constraints="valueConstraints"
+        :selected_language="selected_language"
+        :init="init" v-on:valueChanged="sendData"/>
     </div>
 
     <!-- If type is float -->
@@ -101,10 +101,10 @@
 
     <!-- If type is date -->
     <div v-else-if="inputType==='date'">
-        <DateInput
-          :constraints="valueConstraints"
-          :selected_language="selected_language"
-          :init="init" v-on:valueChanged="sendData"/>
+      <DateInput
+        :constraints="valueConstraints"
+        :selected_language="selected_language"
+        :init="init" v-on:valueChanged="sendData"/>
     </div>
 
     <!-- If type is document upload -->
@@ -138,6 +138,29 @@
         :constraints="valueConstraints"
         :selected_language="selected_language"
         :result="true"
+        :init="init" v-on:valueChanged="sendData"/>
+    </div>
+
+    <div v-else-if="inputType ==='save'">
+      <SaveData
+        :constraints="valueConstraints"
+        :selected_language="selected_language"
+        :ipAddress="ipAddress"
+        :init="init" v-on:valueChanged="sendData"/>
+    </div>
+
+    <div v-else-if="inputType ==='sign'">
+      <StudySign
+        :constraints="valueConstraints"
+        :selected_language="selected_language"
+        :result="true"
+        :init="init" v-on:valueChanged="sendData"/>
+    </div>
+
+    <div v-else-if="inputType ==='static'">
+      <Static
+        :constraints="valueConstraints"
+        :selected_language="selected_language"
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
@@ -177,6 +200,9 @@ import TimeRange from '../Inputs/TimeRange';
 import SelectInput from '../Inputs/SelectInput';
 import AudioCheckRecord from '../Inputs/AudioCheckRecord';
 import StaticReadOnly from '../Inputs/StaticReadOnly';
+import SaveData from '../Inputs/SaveData/SaveData';
+import StudySign from '../StudySign/StudySign';
+import Static from '../Inputs/Static';
 
 
 export default {
@@ -206,8 +232,13 @@ export default {
     preamble: {
       type: String,
     },
+    ipAddress: {
+      type: String,
+    },
   },
   components: {
+    StudySign,
+    SaveData,
     Radio,
     AudioRecord,
     TextInput,
@@ -222,6 +253,7 @@ export default {
     SelectInput,
     AudioCheckRecord,
     StaticReadOnly,
+    Static,
   },
   data() {
     return {
@@ -257,7 +289,7 @@ export default {
   }
 
   .scroll::-webkit-scrollbar-track {
-      -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
   }
 
   .scroll::-webkit-scrollbar-thumb {
