@@ -77,12 +77,10 @@
       <section>
         <div class="container-fluid">
           <h2>Welcome to Voice Study</h2>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eu sagittis leo, sit
-            amet consectetur mi. Donec volutpat rutrum massa et luctus. Fusce ac dui quam. Nam a
-            nibh porttitor, tincidunt libero id, condimentum velit. Praesent ultricies consectetur
-            nulla vel pharetra. Fusce auctor viverra fringilla. Duis euismod enim eu quam tincidunt,
-            sed faucibus leo placerat. Pellentesque et justo a orci dictum pulvinar eleifend at
-            nisl. Integer eu purus sapien.</p>
+          <p>We are trying to understand how your voice and language provides a window into your 
+          mental health. By collecting this data, we are hoping to move away from having to answer 
+          100s of questions about your symptoms to a more objective marker that can be readily 
+          and privately collected.</p>
         </div>
       </section>
 
@@ -93,11 +91,11 @@
           </div>
           <div class="text" style="padding-top: 1rem">
             <h3>Understand your PD</h3>
-            <p>Although your path is uncertain, seeing patterns over time may lead to a better
-              understanding of your PD. Tracking your medication and other factors
-              (e.g. stress, exercise) may provide insight into your symptoms and your ability to
-              complete activities.  Understanding this may provide insights into your day to day
-              health and lifestyle.</p>
+            <p>Although your individual path is uncertain, seeing patterns over time may lead to a 
+            better  understanding of your mental well being. Tracking your medication and other 
+            factors (e.g. stress, exercise, noise) may provide additional insight into your symptoms 
+            and your ability to  complete activities.  Understanding this may provide insights into 
+            your day to day health and lifestyle.</p>
           </div>
         </div>
       </section>
@@ -109,11 +107,11 @@
           </div>
           <div class="text">
             <h3>Telling your story</h3>
-            <p>Through the mPower app, you can tell your story of living with PD. It’s a tool to
-              understand your symptoms, factors, and how these relate to your medication. You also
-              can see your changes over time on physical and cognitive activities. This can help
-              you talk about your story with doctors and caregivers. It is about you and how you
-              live with PD.</p>
+            <p>Through Voice Up, you can tell your story of living with mental illness. It’s a tool 
+            to understand your symptoms, factors, and how these relate to your medication, your 
+            interactions, and your environment. If you do this every week, you will be able to see 
+            your changes over time. This can help you talk about your story with doctors and 
+            caregivers. It is about you and how you live with mental illness.</p>
           </div>
         </div>
       </section>
