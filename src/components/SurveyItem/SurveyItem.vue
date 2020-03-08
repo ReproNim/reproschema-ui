@@ -1,6 +1,6 @@
 <template>
   <b-card class="text-center question mx-auto w-100" :border-variant="variant" :style="style"
-    :no-body="ui === 'multipart' || ui === 'section'">
+          :no-body="ui === 'multipart' || ui === 'section'">
     <!-- https://codepen.io/vikttor_/pen/jeqoPN?page=1& -->
     <div class="contextItem align-self-center center w-100">
       <transition name="fade" mode="out-in">
@@ -13,6 +13,7 @@
                        :init="init"
                        :responses="responses"
                        :selected_language="selected_language"
+                       :ipAddress="clientIp"
                        :showPassOptions="showPassOptions"
                        v-on:skip="sendSkip"
                        v-on:dontKnow="sendDontKnow"
@@ -21,10 +22,6 @@
         />
 
         <div class="loader" v-else-if="status !== 'ready'">
-          <!-- <b-progress :value="50"
-          :max="100" animated variant="secondary" class="mb-3 align-middle">
-          </b-progress>
-          <span class="align-middle mt-3 text-muted">loading</span> -->
           <Loader />
         </div>
         <multipart v-else-if="ui === 'multipart'"
@@ -32,6 +29,7 @@
                    :responses="mp_responses"
                    :srcUrl="item['@id']"
                    :showPassOptions="showPassOptions"
+                   :ipAddress="clientIp"
                    v-on:skip="sendSkip"
                    v-on:dontKnow="sendDontKnow"
                    v-on:next="sendNext"
@@ -42,18 +40,19 @@
                    v-on:clearResponses="clearMPResponses"
         />
         <subactivity v-else-if="ui === 'section'"
-                   :progress="mp_progress"
-                   :responses="mp_responses"
-                   :srcUrl="item['@id']"
-                   :showPassOptions="showPassOptions"
-                   v-on:skip="sendSkip"
-                   v-on:dontKnow="sendDontKnow"
-                   v-on:next="sendNext"
-                   v-on:valueChanged="sendDataAndGoNext"
-                   v-on:saveResponse="setMPResponse"
-                   v-on:saveScores="setScore"
-                   v-on:updateProgress="setMPProgress"
-                   v-on:clearResponses="clearMPResponses"
+                     :progress="mp_progress"
+                     :responses="mp_responses"
+                     :srcUrl="item['@id']"
+                     :showPassOptions="showPassOptions"
+                     :ipAddress="clientIp"
+                     v-on:skip="sendSkip"
+                     v-on:dontKnow="sendDontKnow"
+                     v-on:next="sendNext"
+                     v-on:valueChanged="sendDataAndGoNext"
+                     v-on:saveResponse="setMPResponse"
+                     v-on:saveScores="setScore"
+                     v-on:updateProgress="setMPProgress"
+                     v-on:clearResponses="clearMPResponses"
         />
       </transition>
     </div>
@@ -98,6 +97,7 @@ import Section from '../Section';
 
 const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
 
+
 export default {
   name: 'SurveyItem',
   props: {
@@ -119,8 +119,14 @@ export default {
     selected_language: {
       type: String,
     },
+    clientIp: {
+      type: String,
+    },
     showPassOptions: {
       type: Object,
+    },
+    surveyStart: {
+      type: Number,
     },
   },
   components: {
@@ -163,8 +169,8 @@ export default {
     },
     ui() {
       /* eslint-disable */
-        if (this.data[reproterms+'inputType']) {
-          return this.data[reproterms+'inputType'][0]['@value'];
+        if (this.data[`${reproterms}inputType`]) {
+          return this.data[`${reproterms}inputType`][0]['@value'];
         }
         return 'N/A';
         /* eslint-enable */
@@ -177,7 +183,13 @@ export default {
     },
     title() {
       if (this.data['http://schema.org/question']) {
+        // console.log(186, this.selected_language, this.data['http://schema.org/question']);
         const activeQuestion = _.filter(this.data['http://schema.org/question'], q => q['@language'] === this.selected_language);
+        if (!Array.isArray(activeQuestion) || !activeQuestion.length) {
+          // array does not exist, is not an array, or is empty
+          // ⇒ return value in default language
+          return this.data['http://schema.org/question'][0]['@value'];
+        }
         return activeQuestion[0]['@value'];
       }
       return null;
@@ -280,6 +292,7 @@ export default {
       this.sendNext();
     },
     setScore(key, scoreObj) {
+      // console.log(291, 'score obj', scoreObj, this.index);
       this.$emit('setScores', scoreObj, this.index);
     },
     setMPResponse(index, value) {

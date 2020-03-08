@@ -5,11 +5,24 @@
       <Loader />
     </div>
     <div v-else>
-      <transition name="list" tag="div" mode="in-out">
-        <div v-if="progress === 100" class="mt-3 mb-3">
-          <slot></slot>
+      <div v-if="complete && autoAdvance">
+        <div v-if="isVis">
+          <p v-if="currentActivityIndex === 0">
+            Great, you are eligible for the voice study! Hit "Next" to learn about the study, risks,
+            and benefits of joining.</p>
+          <p v-else-if="currentActivityIndex === 1">
+            Thanks for walking through the consent. You have agreed to the study, let’s get started.
+          </p>
+          <p v-else-if="currentActivityIndex !== 9">
+            Please review your responses, then click "Next" below:</p>
+          <!--<div class="mt-3 mb-3">Please review your responses, then click "Next" below:</div>-->
+          <b-button v-if="nextActivity[activityUrl]" @click="nextActivity1">Next</b-button>
         </div>
-      </transition>
+        <div v-else>
+          <p>Thank you for participating. Not eligible at this time!</p>
+        </div>
+      </div>
+      <br>
       <b-progress :value="progress" :max="100" class="mb-3"></b-progress>
       <div v-if="preambleText" class="preamble-text">
         <strong> {{ preambleText }} </strong>
@@ -31,6 +44,7 @@
             v-on:setScores="setScore"
             :responses="responses"
             :selected_language="selected_language"
+            :clientIp="ipAddress"
             :showPassOptions="findPassOptions"
             :score="score"
           />
@@ -64,360 +78,401 @@
 </style>
 
 <script>
-import Vue from 'vue';
-import jsonld from 'jsonld/dist/jsonld.min';
-import _ from 'lodash';
-import SurveyItem from '../SurveyItem/';
-import Loader from '../Loader/';
+  import Vue from 'vue';
+  import jsonld from 'jsonld/dist/jsonld.min';
+  import _ from 'lodash';
+  import SurveyItem from '../SurveyItem/';
+  import Loader from '../Loader/';
 
 
-Vue.component('survey-item', SurveyItem);
-const safeEval = require('safe-eval');
+  Vue.component('survey-item', SurveyItem);
+  const safeEval = require('safe-eval');
 
-const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
+  const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
 
-export default {
-  name: 'Survey',
-  props: ['srcUrl', 'responses', 'selected_language', 'progress'],
-  data() {
-    return {
-      activity: {},
-      listShow: [],
-      parsedJSONLD: {},
-      visibility: {},
-      score: 0,
-      isSkip: false,
-      isDontKnow: false,
-    };
-  },
-  components: {
-    Loader,
-  },
-  methods: {
-    getData() {
-      // this.$store.dispatch('getActivityData');
-      jsonld.expand(this.srcUrl).then((resp) => {
-        this.activity = resp[0];
-        this.listShow = [0];
-        this.$nextTick(() => {
-          // eslint-disable-next-line
-          // set listShow if there are responses for items in the context
-          const answered = _.filter(this.context, c =>
-            Object.keys(this.responses).indexOf(c['@id']) > -1);
-          if (!answered.length) {
-            this.listShow = [0];
-            // eslint-disable-next-line
-            // console.log(92, this.listShow);
-          } else {
-            this.listShow = _.map(new Array(answered.length + 1), (c, i) => i);
-            // eslint-disable-next-line
-            // console.log(95, this.listShow);
-          }
-          this.visibility = this.getVisibility(this.responses);
-        });
-      });
+  export default {
+    name: 'Survey',
+    props: ['srcUrl', 'responses', 'selected_language', 'progress', 'autoAdvance', 'actVisibility', 'nextActivity', 'ipAddress'],
+    data() {
+      return {
+        activity: {},
+        listShow: [],
+        parsedJSONLD: {},
+        visibility: {},
+        score: 0,
+        isSkip: false,
+        isDontKnow: false,
+        isVis: false,
+      };
     },
-    evaluateScoringLogic() {
-      const scoringLogic = (this.activity[`${reproterms}scoringLogic`][0]['@value']).split('= ')[1];
-      if (this.responses) {
-        let str = '';
-        _.forOwn(this.responses, (val, key) => {
-          const qId = (key.split(/\/items\//)[1]).split(/.jsonld/)[0]; // split url to get the scoring key
-          if (scoringLogic) {
-            if (isNaN(val)) {
-              str += `const ${qId}=0; `;
+    components: {
+      Loader,
+    },
+    methods: {
+      getData() {
+        // this.$store.dispatch('getActivityData');
+        jsonld.expand(this.srcUrl).then((resp) => {
+          this.activity = resp[0];
+          this.listShow = [0];
+          this.$nextTick(() => {
+            // set listShow if there are responses for items in the context
+            const answered = _.filter(this.context, c =>
+              Object.keys(this.responses).indexOf(c['@id']) > -1);
+            if (!answered.length) {
+              this.listShow = [0];
+              // eslint-disable-next-line
+              // console.log(92, this.listShow);
             } else {
-              str += `const ${qId}=${val}; `;
+              this.listShow = _.map(new Array(answered.length + 1), (c, i) => i);
+              // eslint-disable-next-line
+              // console.log(95, this.listShow);
+            }
+            this.visibility = this.getVisibility(this.responses);
+          });
+        });
+      },
+      evaluateScoringLogic() {
+        const scoringLogic = (this.activity[`${reproterms}scoring_logic`][0][`${reproterms}jsExpression`][0]['@value']);
+        // console.log(138, this.activity[`${reproterms}scoring_logic`]);
+        if (this.responses) {
+          let str = '';
+          _.forOwn(this.responses, (val, key) => {
+            const qId = (key.split(/\/items\//))[1]; // split url to get the scoring key
+            if (scoringLogic) {
+              if (isNaN(val)) {
+                str += `const ${qId}=0; `;
+              } else {
+                str += `const ${qId}=${val}; `;
+              }
+            }
+          });
+          try {
+            // eslint-disable-next-line
+            this.score = eval(`${str}  ${scoringLogic}`);
+            // console.log('TOTAL SCORING LOGIC::::', this.score);
+          } catch (e) {
+            // Do nothing
+          }
+        }
+      },
+      nextQuestion(idx, skip, dontKnow) {
+        if (skip) {
+          this.$emit('saveResponse', this.context[idx]['@id'], 'skipped');
+          this.setResponse('skipped', idx);
+          // if (!_.isEmpty(this.activity[reproterms+'scoringLogic'])) {
+          //   this.evaluateScoringLogic();
+          // }
+        }
+        if (dontKnow) {
+          this.$emit('saveResponse', this.context[idx]['@id'], 'dontKnow');
+          this.setResponse('dontknow', idx);
+          // if (!_.isEmpty(this.activity[reproterms+'scoringLogic'])) {
+          //   this.evaluateScoringLogic();
+          // }
+        }
+        this.$forceUpdate();
+        if (idx === this.listShow.length - 1) {
+          const nextQuestionIdx = _.max(this.listShow) + 1;
+          this.listShow.push(nextQuestionIdx);
+          // update the listShow with the next index in case this one we added isn't visible
+          for (let i = nextQuestionIdx; i < this.context.length; i += 1) {
+            const nextItem = this.order();
+            const id = nextItem[i]['@id'];
+            let isVisible = this.visibility[id];
+            if (isVisible === undefined) {
+              isVisible = true;
+            }
+            if (!isVisible) {
+              this.listShow.push(i + 1);
+            } else {
+              break;
             }
           }
+
+          if (this.$store) {
+            this.$store.dispatch('updateListShow', this.listShow);
+          }
+        }
+      },
+      computeNewShow(listShow) {
+        return _.map(this.contextReverse, (o, index) => {
+          const criteria1 = listShow.indexOf(this.contextReverse.length - index - 1) >= 0;
+          let criteria2 = true;
+          if (!_.isEmpty(this.visibility)) {
+            criteria2 = this.visibility[o['@id']];
+          }
+          return criteria1 && criteria2;
         });
-        try {
-          // eslint-disable-next-line
-          this.score = eval(`${str}  ${scoringLogic}`);
-          // console.log('TOTAL SCORING LOGIC::::', this.score);
-        } catch (e) {
-          // Do nothing
-        }
-      }
-    },
-    nextQuestion(idx, skip, dontKnow) {
-      if (skip) {
-        this.$emit('saveResponse', this.context[idx]['@id'], 'skipped');
-        this.setResponse('skipped', idx);
-        // if (!_.isEmpty(this.activity[reproterms+'scoringLogic'])) {
-        //   this.evaluateScoringLogic();
-        // }
-      }
-      if (dontKnow) {
-        this.$emit('saveResponse', this.context[idx]['@id'], 'dontKnow');
-        this.setResponse('dontknow', idx);
-        // if (!_.isEmpty(this.activity[reproterms+'scoringLogic'])) {
-        //   this.evaluateScoringLogic();
-        // }
-      }
-      this.$forceUpdate();
-      if (idx === this.listShow.length - 1) {
-        const nextQuestionIdx = _.max(this.listShow) + 1;
-        this.listShow.push(nextQuestionIdx);
-        // update the listShow with the next index in case this one we added isn't visible
-        for (let i = nextQuestionIdx; i < this.context.length; i += 1) {
-          const nextItem = this.order();
-          const id = nextItem[i]['@id'];
-          let isVisible = this.visibility[id];
-          if (isVisible === undefined) {
-            isVisible = true;
-          }
-          if (!isVisible) {
-            this.listShow.push(i + 1);
-          } else {
-            break;
-          }
-        }
-
-        if (this.$store) {
-          this.$store.dispatch('updateListShow', this.listShow);
-        }
-      }
-    },
-    computeNewShow(listShow) {
-      return _.map(this.contextReverse, (o, index) => {
-        const criteria1 = listShow.indexOf(this.contextReverse.length - index - 1) >= 0;
-        let criteria2 = true;
-        if (!_.isEmpty(this.visibility)) {
-          criteria2 = this.visibility[o['@id']];
-        }
-        return criteria1 && criteria2;
-      });
-    },
-    setResponse(value, index) {
-      this.$emit('saveResponse', this.context[index]['@id'], value);
-      const currResponses = { ...this.responses };
-      currResponses[this.context[index]['@id']] = value;
-      this.visibility = this.getVisibility(currResponses);
-      if (!_.isEmpty(this.activity[`${reproterms}scoringLogic`])) {
-        // TODO: if you uncomment the scoring logic evaluation, things break w/ multipart.
-        // this.evaluateScoringLogic();
-      }
-
-      // if (this.activity[reproterms+'branchLogic']) {
-      //   this.evaluateBranchingLogic();
-      // }
-      this.updateProgress();
-    },
-    setScore(scoreObj, index) {
-      this.$emit('saveScores', this.context[index]['@id'], scoreObj);
-    },
-    restart() {
-      this.$emit('clearResponses');
-      this.listShow = [0];
-    },
-    evaluateString(string, responseMapper) {
-      const keys = Object.keys(responseMapper);
-      let output = string;
-      _.map(keys, (k) => {
-        // grab the value of the key from responseMapper
-        let val = responseMapper[k].val;
-        if (val !== 'skipped' && val !== 'dontknow') {
-          if (_.isString(val)) {
-            val = `'${val}'`; // put the string in quotes
-          }
-          output = output.replace(k, val);
+      },
+      setResponse(val, index) {
+        const t1 = performance.now();
+        const respData = { startedAt: this.t0 / 1000,
+          recordedAt: t1 / 1000,
+          value: val };
+        this.$emit('saveResponse', this.context[index]['@id'], val);
+        this.t0 = t1;
+        const currResponses = { ...this.responses };
+        if (val instanceof Object) {
+          currResponses[this.context[index]['@id']] = respData.value;
         } else {
-          output = output.replace(k, 0);
+          currResponses[this.context[index]['@id']] = val;
         }
-      });
-      return safeEval(output);
-    },
-    responseMapper(responses) {
-      const keys = _.map(this.order, c => c['@id']); // Object.keys(this.responses);
+        this.visibility = this.getVisibility(currResponses);
+        if (!_.isEmpty(this.activity[`${reproterms}scoring_logic`])) {
+          // TODO: if you uncomment the scoring logic evaluation, things break w/ multipart.
+          this.evaluateScoringLogic();
+        }
+        this.updateProgress();
+      },
+      setScore(scoreObj, index) {
+        // console.log(236, 'set score in survey', this.context[index]['@id'], scoreObj);
+        this.$emit('saveScores', this.context[index]['@id'], scoreObj);
+      },
+      restart() {
+        this.$emit('clearResponses');
+        this.listShow = [0];
+      },
+      evaluateString(string, responseMapper) {
+        const keys = Object.keys(responseMapper);
+        let output = string;
+        _.map(keys, (k) => {
+          // grab the value of the key from responseMapper
+          let val = responseMapper[k].val;
+          if (val !== 'skipped' && val !== 'dontknow') {
+            if (_.isString(val)) {
+              val = `'${val}'`; // put the string in quotes
+            }
+            output = output.replace(k, val);
+          } else {
+            output = output.replace(k, 0);
+          }
+        });
+        return safeEval(output);
+      },
+      responseMapper(responses) {
+        const keys = _.map(this.order(), c => c['@id']); // Object.keys(this.responses);
+        // a variable map is defined! great
+        if (this.activity[`${reproterms}variableMap`]) {
+          const vmap = this.activity[`${reproterms}variableMap`];
+          const keyArr = _.map(vmap, (v) => {
+            const key = v[`${reproterms}isAbout`][0]['@id'];
+            const qId = v[`${reproterms}variableName`][0]['@value'];
+            const val = responses[key];
+            return { key, val, qId };
+          });
+          const outMapper = {};
+          _.map(keyArr, (a) => {
+            outMapper[a.qId] = { val: a.val, ref: a.key };
+          });
+          return outMapper;
+        }
 
-      // a variable map is defined! great
-      if (this.activity[`${reproterms}variableMap`]) {
-        const vmap = this.activity[`${reproterms}variableMap`][0]['@list'];
-        const keyArr = _.map(vmap, (v) => {
-          const key = v[`${reproterms}isAbout`][0]['@id'];
-          const qId = v[`${reproterms}variableName`][0]['@value'];
+        // TODO: delete the code below once the schema is set!
+        // we keep this for compatibility until everything is fixed.
+        const keyArr = _.map(keys, (key) => {
           const val = responses[key];
+          const filenameParts = key.split('/');
+          const filename = filenameParts[filenameParts.length - 1];
+          const qId = filename.split('.jsonld')[0];
           return { key, val, qId };
         });
+
         const outMapper = {};
         _.map(keyArr, (a) => {
           outMapper[a.qId] = { val: a.val, ref: a.key };
         });
+
         return outMapper;
-      }
-
-      // TODO: delete the code below once the schema is set!
-      // we keep this for compatibility until everything is fixed.
-      const keyArr = _.map(keys, (key) => {
-        const val = responses[key];
-        const filenameParts = key.split('/');
-        const filename = filenameParts[filenameParts.length - 1];
-        const qId = filename.split('.jsonld')[0];
-        return { key, val, qId };
-      });
-
-      const outMapper = {};
-      _.map(keyArr, (a) => {
-        outMapper[a.qId] = { val: a.val, ref: a.key };
-      });
-
-      return outMapper;
-    },
-    getVisibility(responses) {
-      const responseMapper = this.responseMapper(responses);
-      if (!_.isEmpty(this.activity[`${reproterms}visibility`])) {
-        const visibilityMapper = {};
-        _.map(this.activity[`${reproterms}visibility`], (a) => {
-          let val = a['@value'];
-          if (_.isString(a['@value'])) {
-            val = this.evaluateString(a['@value'], responseMapper);
-          }
-          if (responseMapper[a['@index']]) {
-            visibilityMapper[responseMapper[a['@index']].ref] = val;
-          }
-          // visibilityMapper[responseMapper[a['@index']].ref] = val;
-        });
-        return visibilityMapper;
-      }
-      return {};
-    },
-    updateProgress() {
-      let totalQ = this.context.length;
-      if (!_.isEmpty(this.visibility)) {
-        totalQ = _.filter(this.visibility).length;
-      }
-      const progress = ((Object.keys(this.responses).length) / totalQ) * 100;
-      this.$emit('updateProgress', progress);
-    },
-    order() {
-      if (this.activity[`${reproterms}shuffle`][0]['@value']) { // when shuffle is true
-        const orderList = this.activity[`${reproterms}order`][0]['@list'];
-        const listToShuffle = orderList.slice(1, orderList.length - 3);
-        const newList = _.shuffle(listToShuffle);
-        newList.unshift(orderList[0]);
-        newList.push(orderList[orderList.length - 3],
-          orderList[orderList.length - 2], orderList[orderList.length - 1]);
-        return newList;
-      } return this.activity[`${reproterms}order`][0]['@list'];
-    },
-  },
-  watch: {
-    $route() {
-      this.getData();
-      if (this.readyForActivity) {
-        if (this.$store) {
-          this.$store.dispatch('getActivityData');
+      },
+      getVisibility(responses) {
+        const responseMapper = this.responseMapper(responses);
+        if (!_.isEmpty(this.activity[`${reproterms}vis`])) {
+          console.log(295, 'visi', this.activity[`${reproterms}vis`]);
+          const visibilityMapper = {};
+          _.map(this.activity[`${reproterms}vis`], (a) => {
+            let val = a[`${reproterms}isVis`][0]['@value'];
+            if (_.isString(val)) {
+              val = this.evaluateString(val, responseMapper);
+            }
+            if (responseMapper[a[`${reproterms}variableName`][0]['@value']]) {
+              visibilityMapper[responseMapper[a[`${reproterms}variableName`][0]['@value']].ref] = val;
+            }
+            // visibilityMapper[responseMapper[a['@index']].ref] = val;
+          });
+          return visibilityMapper;
         }
-      }
+        return {};
+      },
+      updateProgress() {
+        let totalQ = this.context.length;
+        if (!_.isEmpty(this.visibility)) {
+          totalQ = _.filter(this.visibility).length;
+        }
+        const progress = ((Object.keys(this.responses).length) / totalQ) * 100;
+        this.$emit('updateProgress', progress);
+      },
+      order() {
+        if (this.activity[`${reproterms}shuffle`][0]['@value']) { // when shuffle is true
+          const orderList = this.activity[`${reproterms}order`][0]['@list'];
+          const listToShuffle = orderList.slice(1, orderList.length - 3);
+          const newList = _.shuffle(listToShuffle);
+          newList.unshift(orderList[0]);
+          newList.push(orderList[orderList.length - 3],
+            orderList[orderList.length - 2], orderList[orderList.length - 1]);
+          return newList;
+        } return this.activity[`${reproterms}order`][0]['@list'];
+      },
+      nextActivity1() {
+        const currentIndex = parseInt(this.$store.state.activityIndex);
+        const nextIndex = currentIndex + 1;
+        if (this.actVisibility[nextIndex]) {
+          this.$router.push(`/activities/${nextIndex}`);
+        }
+      },
     },
-    listContentRev() {
-      this.$forceUpdate();
+    watch: {
+      $route() {
+        this.getData();
+        if (this.readyForActivity) {
+          if (this.$store) {
+            this.$store.dispatch('getActivityData');
+          }
+        }
+      },
+      actVisibility: {
+        deep: true,
+        handler(newVal) {
+          newVal.shift();
+          this.isVis = _.some(newVal);
+        },
+      },
+      listContentRev() {
+        this.$forceUpdate();
+      },
+      listShow() {
+        this.updateProgress();
+      },
+      srcUrl() {
+        if (this.srcUrl) {
+          this.getData();
+        }
+      },
+      readyForActivity() {
+        if (this.readyForActivity) {
+          if (this.$store) {
+            this.$store.dispatch('getActivityData');
+          }
+        }
+      },
+      storeContext() {
+        if (this.$store) {
+          this.$store.dispatch('setActivityList', this.storeContext);
+        }
+      },
     },
-    listShow() {
-      this.updateProgress();
+    computed: {
+      complete() {
+        return this.progress === 100;
+      },
+      storeContext() {
+        if (this.$store) {
+          const state = this.$store.state;
+          if (state.activities.length && state.activityIndex != null) {
+            if (state.activities[state.activityIndex].activity) {
+              const currentActivity = state.activities[state.activityIndex].activity;
+              const actList = currentActivity[`${reproterms}order`][0]['@list'];
+              return actList;
+            }
+          }
+        }
+        return [{}];
+      },
+      shouldShow() {
+        return _.map(this.contextReverse, (o, index) => {
+          const criteria1 = this.listShow.indexOf(this.contextReverse.length - index - 1) >= 0;
+          let criteria2 = true;
+          if (!_.isEmpty(this.visibility)) {
+            criteria2 = this.visibility[o['@id']];
+          }
+          return criteria1 && criteria2;
+        });
+      },
+      context() {
+        /* eslint-disable */
+        if (this.activity[reproterms+'order']) {
+          const keys = this.order();
+
+          // if (!_.isEmpty(this.visibility)) {
+          //   return _.filter(keys, k => this.visibility[k['@id']]);
+          // }
+          return keys;
+        }
+        /* eslint-enable */
+        return [{}];
+      },
+      contextReverse() {
+        /* eslint-disable */
+        if(this.context.length >0) {
+          return this.context.slice().reverse();
+        }
+        return {};
+      },
+      preambleText() {
+        if (this.activity[`${reproterms}preamble`]) {
+          console.log(422, this.selected_language, this.activity[`${reproterms}preamble`]);
+          const activePreamble = _.filter(this.activity[`${reproterms}preamble`], p => p['@language'] === this.selected_language);
+          if (!Array.isArray(activePreamble) || !activePreamble.length) {
+            // array does not exist, is not an array, or is empty
+            // ⇒ do not attempt to process array
+            return this.activity[`${reproterms}preamble`][0]['@value'];
+          }
+          else {
+            console.log(430, activePreamble);
+            return activePreamble[0]['@value'];
+          }
+        }
+        return '';
+      },
+      /**
+       * we need to keep an eye on the store.
+       */
+      readyForActivity() {
+        if (this.$store) {
+          return this.$store.getters.readyForActivity;
+        }
+      },
+      findPassOptions() {
+        if (this.activity[reproterms+'allow']) {
+          let isSkip = false;
+          let isDontKnow = false;
+          _.map(this.activity[reproterms+'allow'][0]['@list'], s => {
+            if (s['@id'] === `${reproterms}refused_to_answer`) {
+              isSkip = true;
+            } else if (s['@id'] === `${reproterms}dont_know_answer`) {
+              isDontKnow = true;
+            }
+          });
+          return {
+            'skip': isSkip,
+            'dontKnow': isDontKnow
+          };
+        }
+        else return null;
+      },
+      activityUrl() {
+        return this.srcUrl;
+      },
+      currentActivityIndex() {
+        return parseInt(this.$store.state.activityIndex);
+      },
     },
-    srcUrl() {
+    mounted() {
       if (this.srcUrl) {
+        // eslint-disable-next-line
+        // console.log(46, this.srcUrl);
         this.getData();
       }
+      this.t0 = performance.now();
     },
-    readyForActivity() {
-      if (this.readyForActivity) {
-        if (this.$store) {
-          this.$store.dispatch('getActivityData');
-        }
-      }
-    },
-    storeContext() {
-      if (this.$store) {
-        this.$store.dispatch('setActivityList', this.storeContext);
-      }
-    },
-  },
-  computed: {
-    storeContext() {
-      if (this.$store) {
-        const state = this.$store.state;
-        if (state.activities.length && state.activityIndex != null) {
-          if (state.activities[state.activityIndex].activity) {
-            const currentActivity = state.activities[state.activityIndex].activity;
-            const actList = currentActivity[`${reproterms}order`][0]['@list'];
-            return actList;
-          }
-        }
-      }
-      return [{}];
-    },
-    shouldShow() {
-      return _.map(this.contextReverse, (o, index) => {
-        const criteria1 = this.listShow.indexOf(this.contextReverse.length - index - 1) >= 0;
-        let criteria2 = true;
-        if (!_.isEmpty(this.visibility)) {
-          criteria2 = this.visibility[o['@id']];
-        }
-        return criteria1 && criteria2;
-      });
-    },
-    context() {
-      /* eslint-disable */
-      if (this.activity[reproterms+'order']) {
-        const keys = this.order();
-
-        // if (!_.isEmpty(this.visibility)) {
-        //   return _.filter(keys, k => this.visibility[k['@id']]);
-        // }
-        return keys;
-      }
-      /* eslint-enable */
-      return [{}];
-    },
-    contextReverse() {
-      /* eslint-disable */
-      if(this.context.length >0) {
-        return this.context.slice().reverse();
-      }
-      return {};
-    },
-    preambleText() {
-      if (this.activity[reproterms+'preamble']) {
-        const activePreamble = _.filter(this.activity[reproterms+'preamble'], p => p['@language'] === this.selected_language);
-        return activePreamble[0]['@value'];
-      }
-      return '';
-    },
-    /**
-     * we need to keep an eye on the store.
-     */
-    readyForActivity() {
-      if (this.$store) {
-        return this.$store.getters.readyForActivity;
-      }
-    },
-    findPassOptions() {
-      if (this.activity[reproterms+'allow']) {
-        let isSkip = false;
-        let isDontKnow = false;
-        _.map(this.activity[reproterms+'allow'][0]['@list'], s => {
-          if (s['@id'] === "https://schema.repronim.org/refused_to_answer") {
-            isSkip = true;
-          } else if (s['@id'] === "https://schema.repronim.org/dont_know_answer") {
-            isDontKnow = true;
-          }
-        });
-        return {
-          'skip': isSkip,
-          'dontKnow': isDontKnow
-        };
-      }
-      else return null;
-    }
-  },
-  mounted() {
-    if (this.srcUrl) {
-      // eslint-disable-next-line
-      this.getData();
-    }
-  },
-};
+  };
 </script>
