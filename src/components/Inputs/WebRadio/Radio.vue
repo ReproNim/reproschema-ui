@@ -8,25 +8,21 @@
     <div v-else>
       <b-form-group label="" v-if="!isImageSelect">
         <b-form-radio-group
-                            v-model="selected"
-                            :options="options"
-                            stacked
-                            class="text-left"
-                            @change="sendData"
-                            ref="radiobutton"
+          v-model="selected"
+          :options="options"
+          stacked
+          class="text-left"
+          @change="sendData"
+          ref="radiobutton"
         >
         </b-form-radio-group>
-        <!--<div v-if="checkOther" id="ifOther" style="display: block;">-->
-          <!--<br><b-form-input v-model="otherInput" placeholder="Please describe" @change="sendData">-->
-        <!--</b-form-input>-->
-        <!--</div>-->
       </b-form-group>
       <div class="text-center" v-else>
         <vue-select-image :dataImages="dataImages"
-              ref="imageSelect"
-              :selectedImages="selectedImages"
-              @onselectimage="onSelectImage"
-              useLabel>
+                          ref="imageSelect"
+                          :selectedImages="selectedImages"
+                          @onselectimage="onSelectImage"
+                          useLabel>
         </vue-select-image>
       </div>
     </div>
@@ -34,15 +30,15 @@
 </template>
 
 <style>
-.vue-select-image__img {
-  height: 100px !important;
-  width: 100px !important;
-}
-.vue-select-image__wrapper {
-  width: fit-content !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-}
+  .vue-select-image__img {
+    height: 100px !important;
+    width: 100px !important;
+  }
+  .vue-select-image__wrapper {
+    width: fit-content !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
 </style>
 
 <script>
@@ -65,10 +61,17 @@ export default {
   },
   computed: {
     options() {
+      let text = '';
+      // console.log(64, this.constraints['http://schema.org/itemListElement'][0]['@list']);
       return _.map(this.constraints['http://schema.org/itemListElement'][0]['@list'], (v) => {
         const activeValueChoices = _.filter(v['http://schema.org/name'], ac => ac['@language'] === this.selected_language);
+        if (!Array.isArray(activeValueChoices) || !activeValueChoices.length) {
+          // array does not exist, is not an array, or is empty
+          // ⇒ select value in default language
+          text = v['http://schema.org/name'][0]['@value'];
+        } else text = activeValueChoices[0]['@value'];
         return {
-          text: activeValueChoices[0]['@value'],
+          text, // ESLint object-shorthand
           value: v['http://schema.org/value'][0]['@value'],
           image: v['http://schema.org/image'] ? v['http://schema.org/image'][0]['@value'] : null,
         };

@@ -121,15 +121,15 @@ export default {
     },
     getVisibility(responses) {
       const responseMapper = this.responseMapper(responses);
-      if (!_.isEmpty(this.activity[`${reproterms}visibility`])) {
+      if (!_.isEmpty(this.activity[`${reproterms}vis`])) {
         const visibilityMapper = {};
-        _.map(this.activity[`${reproterms}visibility`], (a) => {
-          let val = a['@value'];
-          if (_.isString(a['@value'])) {
-            val = this.evaluateString(a['@value'], responseMapper);
+        _.map(this.activity[`${reproterms}vis`], (a) => {
+          let val = a[`${reproterms}isVis`][0]['@value'];
+          if (_.isString(val)) {
+            val = this.evaluateString(val, responseMapper);
           }
-          if (responseMapper[a['@index']]) {
-            visibilityMapper[responseMapper[a['@index']].ref] = val;
+          if (responseMapper[a[`${reproterms}variableName`][0]['@value']]) {
+            visibilityMapper[responseMapper[a[`${reproterms}variableName`][0]['@value']].ref] = val;
           }
         });
         return visibilityMapper;
@@ -138,11 +138,12 @@ export default {
     },
     responseMapper(responses) {
       // a variable map is defined! great
-      const vmap = this.activity[`${reproterms}variableMap`][0]['@list'];
+      const vmap = this.activity[`${reproterms}variableMap`];
       const keyArr = _.map(vmap, (v) => {
         const key = v[`${reproterms}isAbout`][0]['@id'];
         const qId = v[`${reproterms}variableName`][0]['@value'];
         const val = responses[key];
+        // console.log(145, 'sec resp key in mapper', val.value);
         return { key, val, qId };
       });
       const outMapper = {};
@@ -166,6 +167,7 @@ export default {
           output = output.replace(k, 0);
         }
       });
+      // console.log(170, 'output', output);
       return safeEval(output);
     },
     restart() {
@@ -200,18 +202,20 @@ export default {
         // console.log(207, 'section resp obj', respData);
       this.$emit('saveResponse', this.context[index]['@id'], val);
       const currResponses = { ...this.responses };
+      // console.log(204, 'cur resp', currResponses, this.context[index]['@id'], val);
       currResponses[this.context[index]['@id']] = val;
       // TODO: add back branching logic
       this.visibility = this.getVisibility(currResponses);
 
       // TODO: add back scoring logic to this component.
-      if (!_.isEmpty(this.activity[`${reproterms}scoringLogic`])) {
+      if (!_.isEmpty(this.activity[`${reproterms}scoring_logic`])) {
         _.map(this.getScoring(this.responses), (score, key) => {
           if (!_.isNaN(score)) {
             this.scores[key] = score;
           }
         });
         if (!_.isEmpty(this.scores)) {
+          // console.log(216, 'section score', this.srcUrl, this.scores);
           this.$emit('saveScores', this.srcUrl, this.scores);
         }
       }
@@ -219,18 +223,24 @@ export default {
       this.$forceUpdate();
     },
     getScoring(responses) {
+      // console.log(225, 'responses', responses);
       const responseMapper = this.responseMapper(responses);
-      if (!_.isEmpty(this.activity[`${reproterms}scoringLogic`])) {
+      // console.log(227, 'response mapper', responseMapper);
+      if (!_.isEmpty(this.activity[`${reproterms}scoring_logic`])) {
         const scoreMapper = {};
-        _.map(this.activity[`${reproterms}scoringLogic`], (a) => {
-          let val = a['@value'];
-          if (_.isString(a['@value'])) {
-            val = this.evaluateString(a['@value'], responseMapper);
+        _.map(this.activity[`${reproterms}scoring_logic`], (a) => {
+          // console.log(231, 'logic a', a);
+          let scoreFormula = a[`${reproterms}jsExpression`][0]['@value'];
+          const scoreVariableName = a[`${reproterms}variableName`][0]['@value'];
+          if (_.isString(scoreFormula)) {
+            scoreFormula = this.evaluateString(scoreFormula, responseMapper);
+            // console.log(235, 'a.val', val);
           }
-          if (responseMapper[a['@index']]) {
-            scoreMapper[responseMapper[a['@index']].ref] = val;
+          if (responseMapper[scoreVariableName]) {
+            scoreMapper[responseMapper[scoreVariableName].ref] = scoreFormula;
           }
         });
+        // console.log(236, 'sec scoremapper', scoreMapper);
         return scoreMapper;
       }
       return {};
