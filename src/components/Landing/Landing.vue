@@ -90,7 +90,7 @@
             <BridgeImage style="margin-bottom: -6px" src="/static/images/about%20the%20study.svg"/>
           </div>
           <div class="text" style="padding-top: 1rem">
-            <h3>Understand your PD</h3>
+            <h3>Understand your Mental Health</h3>
             <p>Although your individual path is uncertain, seeing patterns over time may lead to a 
             better  understanding of your mental well being. Tracking your medication and other 
             factors (e.g. stress, exercise, noise) may provide additional insight into your symptoms 
