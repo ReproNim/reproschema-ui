@@ -1,65 +1,3 @@
-<!--<template>-->
-<!--<div class="landingPage mt-3 pt-3 text-left">-->
-<!--<section class="smooth-scroller" style="padding-top: 0">-->
-<!--<section style="height: 30vw; min-height: 15rem;-->
-<!--background: linear-gradient(#5A478F, #47337D)">-->
-<!--<div style="-->
-<!--height: 30vw;-->
-<!--min-height: 15rem;-->
-<!--background-image: url(/static/images/about%20the%20study.svg);-->
-<!--background-position: center;-->
-<!--background-size: contain;-->
-<!--background-repeat: no-repeat">-->
-<!--</div>-->
-<!--</section>-->
-<!--<br>-->
-<!--<section>-->
-<!--<div class="container">-->
-<!--<vue-markdown v-if="content"> {{content}} </vue-markdown>-->
-<!--<Loader v-else/>-->
-<!--<p style="margin-top: 2rem">-->
-<!--<router-link class="join-button" to="/study/intro">Join</router-link>-->
-<!--</p>-->
-<!--</div>-->
-<!--</section>-->
-<!--</section>-->
-<!--</div>-->
-<!--</template>-->
-
-<!--<style>-->
-<!--.landingPage img {-->
-<!--max-width: 250px;-->
-<!--}-->
-<!--</style>-->
-
-<!--<script>-->
-<!--import axios from 'axios';-->
-<!--import VueMarkdown from 'vue-markdown';-->
-<!--import Loader from '../Loader';-->
-
-<!--export default {-->
-<!--props: {-->
-<!--contentSrc: {-->
-<!--type: String,-->
-<!--},-->
-<!--},-->
-<!--components: {-->
-<!--VueMarkdown,-->
-<!--Loader,-->
-<!--},-->
-<!--data() {-->
-<!--return {-->
-<!--content: null,-->
-<!--};-->
-<!--},-->
-<!--mounted() {-->
-<!--axios.get(this.contentSrc).then((resp) => {-->
-<!--this.content = resp.data;-->
-<!--});-->
-<!--},-->
-<!--};-->
-<!--</script>-->
-
 <template>
   <div class="docked-layout">
     <section class="smooth-scroller" style="padding-top: 0">
@@ -67,7 +5,7 @@
         <div style="
           height: 30vw;
           min-height: 15rem;
-          background-image: url(/static/images/about%20the%20study.svg);
+          background-image: url(static/images/about%20the%20study.svg);
           background-position: center;
           background-size: contain;
           background-repeat: no-repeat">
@@ -77,9 +15,9 @@
       <section>
         <div class="container-fluid">
           <h2>Welcome to Voice Study</h2>
-          <p>We are trying to understand how your voice and language provides a window into your 
-          mental health. By collecting this data, we are hoping to move away from having to answer 
-          100s of questions about your symptoms to a more objective marker that can be readily 
+          <p>We are trying to understand how your voice and language provides a window into your
+          mental health. By collecting this data, we are hoping to move away from having to answer
+          100s of questions about your symptoms to a more objective marker that can be readily
           and privately collected.</p>
         </div>
       </section>
@@ -87,7 +25,7 @@
       <section>
         <div class="image container">
           <div class="image">
-            <BridgeImage style="margin-bottom: -6px" src="/static/images/about%20the%20study.svg"/>
+            <BridgeImage style="margin-bottom: -6px" src="static/images/about%20the%20study.svg"/>
           </div>
           <div class="text" style="padding-top: 1rem">
             <h3>Understand your Mental Health</h3>
@@ -103,14 +41,14 @@
       <section>
         <div class="image container">
           <div class="image">
-            <BridgeImage style="padding-top: 1.5rem" src="/static/images/tell%20your%20story.svg"/>
+            <BridgeImage style="padding-top: 1.5rem" src="static/images/tell%20your%20story.svg"/>
           </div>
           <div class="text">
             <h3>Telling your story</h3>
-            <p>Through Voice Up, you can tell your story of living with mental illness. It’s a tool 
-            to understand your symptoms, factors, and how these relate to your medication, your 
-            interactions, and your environment. If you do this every week, you will be able to see 
-            your changes over time. This can help you talk about your story with doctors and 
+            <p>Through Voice Up, you can tell your story of living with mental illness. It’s a tool
+            to understand your symptoms, factors, and how these relate to your medication, your
+            interactions, and your environment. If you do this every week, you will be able to see
+            your changes over time. This can help you talk about your story with doctors and
             caregivers. It is about you and how you live with mental illness.</p>
           </div>
         </div>
@@ -119,7 +57,7 @@
       <section>
         <div class="image container">
           <div class="image">
-            <BridgeImage style="transform: scale(0.7); padding-bottom: 1rem" src="/static/images/create your story.svg"/>
+            <BridgeImage style="transform: scale(0.7); padding-bottom: 1rem" src="static/images/create your story.svg"/>
           </div>
           <div class="text">
             <h3>Create your story</h3>
@@ -290,14 +228,6 @@ export default {
     height: 2rem;
     z-index: 1;
     border-radius: 2px;
-  }
-  .opener {
-    background: transparent url(/static/images/Maximize.svg) center center no-repeat;
-    background-size: contain;
-  }
-  .closer {
-    background: transparent url(/static/images/Minimize.svg) center center no-repeat;
-    background-size: contain;
   }
 
   nav.basic {

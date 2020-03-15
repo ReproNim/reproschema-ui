@@ -2,14 +2,15 @@
   <div id="app" class="">
     <div class="wrapper">
       <!-- Sidebar -->
-      <nav id="sidebar" v-bind:class="{'active':checkAdvance}" ref="sidebar">
+      <nav id="sidebar" v-bind:class="{'active':checkDisableBack}" ref="sidebar">
         <div class="sidebar-header">
           <h3>Activities</h3>
         </div>
         <div>
-          <select v-model="getDefaultLanguage">
+          <select v-model="selected_language">
             <option disabled value="">Select Language</option>
-            <option v-for="item in getListofLanguages" :value="item" :key="item">{{item}}</option>
+            <!--<option v-for="item in getListofLanguages" :value="item"
+            :key="item">{{item}}</option>-->
             <option value="en">English</option>
             <option value="es">Spanish</option>
           </select>
@@ -39,6 +40,11 @@
 
       <!-- Page Content -->
       <div id="content">
+        <nav class="navbar sticky-top navbar-custom">
+          <div class="navbar-brand">
+            Voice-up is a demo and not an actual study.
+          </div>
+        </nav>
         <!-- We'll fill this with dummy content -->
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
           <div class="container-fluid">
@@ -71,8 +77,6 @@
             v-on:clearResponses="clearResponses"
           />
         </b-container>
-        <div class="spacer"></div>
-        <Footer/>
       </div>
     </div>
   </div>
@@ -89,7 +93,6 @@ import { saveAs } from 'file-saver';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import circleProgress from './components/Circle/';
-import Footer from './components/Footer/';
 
 Vue.use(BootstrapVue);
 Vue.filter('reverse', value => value.slice().reverse());
@@ -114,36 +117,15 @@ function getVariableName(s, variableMap) {
   return mapper[s];
 }
 
-function getDisplayName(activityUrl, displayNameMap) {
-  // const dmap = displayNameMap;
-  const s = _.filter(displayNameMap, v1 => v1[`${reproterms}isAbout`][0]['@id'] === activityUrl);
-  const dName = _.filter(s[0]['http://schema.org/alternateName'], d => d['@language'] === 'en');
-
-  if (!Array.isArray(dName) || !dName.length) {
-    // array does not exist, is not an array, or is empty
-    // ⇒ do not attempt to process array
-    return s[0]['http://schema.org/alternateName'][0]['@value'];
-  }
-  return dName[0]['@value'];
-  // console.log(118, dName[0]['@value']);
-  // const mapper = {};
-  // _.map(dmap, (v) => {
-  //   const vr = _.filter(v[`${reproterms}variableName`], v1 => v1['@language'] === 'en');
-  //   const dName = _.filter(v['http://schema.org/alternateName'], v1 => v1['@language'] === 'en');
-  //   // mapper[vr[0]['@value']] = dName[0]['@value'];
-  // });
-}
-
 export default {
   name: 'App',
   components: {
     circleProgress,
-    Footer,
   },
   data() {
     return {
       sidebarActive: true,
-      selected_language: 'en',
+      selected_language: '',
       visibility: {},
       cache: {},
       isAnswered: false,
@@ -159,8 +141,30 @@ export default {
         this.$refs.sidebar.className = '';
       }
     },
+    getDefaultLanguage() {
+      return 'es';
+    },
+    getDisplayName(activityUrl, displayNameMap) {
+      // const dmap = displayNameMap;
+      const s = _.filter(displayNameMap, v1 => v1[`${reproterms}isAbout`][0]['@id'] === activityUrl);
+      const dName = _.filter(s[0]['http://schema.org/alternateName'], d => d['@language'] === this.selected_language);
+
+      if (!Array.isArray(dName) || !dName.length) {
+        // array does not exist, is not an array, or is empty
+        // ⇒ do not attempt to process array
+        return s[0]['http://schema.org/alternateName'][0]['@value'];
+      }
+      return dName[0]['@value'];
+      // console.log(118, dName[0]['@value']);
+      // const mapper = {};
+      // _.map(dmap, (v) => {
+      //   const vr = _.filter(v[`${reproterms}variableName`], v1 => v1['@language'] === 'en');
+      //   const dName = _.filter(v['http://schema.org/alternateName'], v1 => v1['@language'] === 'en');
+      //   // mapper[vr[0]['@value']] = dName[0]['@value'];
+      // });
+    },
     setActivity(index) {
-      if (!this.checkAdvance) { // check if autoadvance not enabled
+      if (!this.checkDisableBack) { // check if disableBack not enabled
         if (this.$route.query.url) {
           this.$router.push(`/activities/${index}?url=${this.$route.query.url}`);
         } else {
@@ -183,7 +187,6 @@ export default {
       }
     },
     saveResponse(key, value) {
-      // console.log(152, key, value);
       let needsVizUpdate = false;
       if (this.currentResponse[key] !== value && this.progress[this.activityIndex] === 100) {
         // there has been a change in an already completed activity
@@ -198,7 +201,6 @@ export default {
       this.isAnswered = true;
     },
     saveScores(key, scoreObj) {
-      // console.log(168, key, scoreObj);
       this.$store.dispatch('saveScores', { key, scoreObj });
     },
     clearResponses() {
@@ -209,7 +211,8 @@ export default {
       // TODO: this is a hack. the jsonld expander should give us this info.
       if (url) {
         if (!_.isEmpty(this.$store.state.schema)) {
-          const dname = getDisplayName(url, this.$store.state.schema[`${reproterms}displayNameMap`]);
+          console.log(213, this.$store.state.schema);
+          const dname = this.getDisplayName(url, this.$store.state.schema[`${reproterms}displayNameMap`]);
           return dname;
           // const nameMap = this.$store.state.schema[`${reproterms}activity_display_name`][0];
           // if (url in nameMap) {
@@ -245,9 +248,7 @@ export default {
         // console.log('making request', request, 'cache', this.cache);
         const resp = await axios(request);
         // this.visibility[index] = resp.data;
-        // console.log(223, this.cache[cacheKey], resp.data);
         this.cache[cacheKey] = resp.data.qualified;
-
         return resp.data.qualified;
       } else if (_.isString(cond)) {
         // todo: implement client-side evaluation!
@@ -358,6 +359,7 @@ export default {
     //   this.$router.push('/activities/0');
     // }
     // `http://api.ipstack.com/check?access_key=${accessKey}&hostname=1`
+    this.selected_language = this.getDefaultLanguage;
     axios.get('https://api.muctool.de/whois').then((resp) => {
       // console.log(32, resp.data.ip);
       this.clientIp = resp.data.ip;
@@ -498,6 +500,14 @@ export default {
       // return all true's:
       return _.mapValues(this.schemaOrder, () => true);
     },
+    checkDisableBack() {
+      if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema[`${reproterms}allow`]) {
+        const allowList = _.map(this.$store.state.schema[`${reproterms}allow`][0]['@list'],
+          u => u['@id']);
+        return allowList.includes(`${reproterms}disable_back`); // if true then hide sidebar on-load and activities cannot be clicked
+      }
+      return false;
+    },
     checkAdvance() {
       if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema[`${reproterms}allow`]) {
         const allowList = _.map(this.$store.state.schema[`${reproterms}allow`][0]['@list'],
@@ -614,5 +624,20 @@ export default {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+  }
+  .navbar-custom {
+    align-items: baseline;
+    background-color: #219c6d;
+    color: floralwhite;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    padding: .25rem .75rem .25rem .75rem;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+  }
+  .navbar-brand {
+    font-size: 1.75rem;
   }
 </style>
