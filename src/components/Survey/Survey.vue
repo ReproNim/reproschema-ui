@@ -289,7 +289,6 @@ export default {
       if (!_.isEmpty(this.activity[`${reproterms}visibility`])) {
         const visibilityMapper = {};
         _.map(this.activity[`${reproterms}visibility`], (a) => {
-          console.log(292, a);
           let val = a[`${reproterms}isVis`][0]['@value'];
           if (_.isString(val)) {
             val = this.evaluateString(val, responseMapper);
@@ -325,6 +324,7 @@ export default {
     nextActivity1() {
       const currentIndex = parseInt(this.$store.state.activityIndex);
       const nextIndex = currentIndex + 1;
+      console.log(325, nextIndex, this.actVisibility);
       if (this.actVisibility[nextIndex]) {
         this.$router.push(`/activities/${nextIndex}`);
       }
@@ -342,7 +342,7 @@ export default {
     actVisibility: {
       deep: true,
       handler(newVal) {
-        newVal.shift();
+        // newVal.shift();
         this.isVis = _.some(newVal);
       },
     },
