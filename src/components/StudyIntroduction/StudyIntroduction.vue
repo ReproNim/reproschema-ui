@@ -4,7 +4,7 @@
       <div class="container">
         <div class="screen" v-show="step === 1">
           <div class="panel">
-            <BridgeImage src="/static/images/about%20the%20study.svg"/>
+            <BridgeImage src="static/images/about%20the%20study.svg"/>
 
             <h3>About the study</h3>
             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eu sagittis leo,
@@ -16,7 +16,7 @@
         </div>
         <div class="screen" v-show="step === 2">
           <div class="panel">
-            <BridgeImage src="/static/images/procedures%20activities.svg"/>
+            <BridgeImage src="static/images/procedures%20activities.svg"/>
             <h3>How does the study work?</h3>
             <p>
               1. Answer questions to determine if you are eligible for this study <br>
@@ -29,7 +29,7 @@
         </div>
         <div class="screen" v-show="step === 3">
           <div class="panel">
-            <BridgeImage src="/static/images/how%20long%20does%20it%20last.svg"/>
+            <BridgeImage src="static/images/how%20long%20does%20it%20last.svg"/>
             <h3>How long does it last?</h3>
             <p>We will ask you to participate for 2 weeks every three months.
               We would like you to participate for 2 years, but you can participate
@@ -38,7 +38,7 @@
         </div>
         <div class="screen" v-show="step === 4">
           <div class="panel">
-            <BridgeImage src="/static/images/benefits%20and%20risks.svg"/>
+            <BridgeImage src="static/images/benefits%20and%20risks.svg"/>
             <h3>What are the benefits and risks?</h3>
             <p>You may not directly benefit from taking part but seeing trends in your data
               may be interesting to you. You may help researchers better understand PD.</p>
@@ -49,10 +49,10 @@
         </div>
       </div>
     </section>
-    <div class="buttons">
-      <button @click="doBack" :disabled="this.step === 1">Back</button>
-      <button @click="doNext">{{nextName}}</button>
-    </div>
+      <div class="buttons">
+        <button @click="doBack" :disabled="this.step === 1">Back</button>
+        <button @click="doNext">{{nextName}}</button>
+      </div>
   </div>
 </template>
 
