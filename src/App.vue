@@ -625,12 +625,12 @@ export default {
     min-height: 100vh;
   }
   .navbar-custom {
-    align-items: baseline;
+    align-items:center;
     background-color: #219c6d;
     color: floralwhite;
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-around;
+    justify-content: center!important;
     padding: .25rem .75rem .25rem .75rem;
     left: 0;
     bottom: 0;
