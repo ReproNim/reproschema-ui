@@ -211,7 +211,6 @@ export default {
       // TODO: this is a hack. the jsonld expander should give us this info.
       if (url) {
         if (!_.isEmpty(this.$store.state.schema)) {
-          console.log(213, this.$store.state.schema);
           const dname = this.getDisplayName(url, this.$store.state.schema[`${reproterms}displayNameMap`]);
           return dname;
           // const nameMap = this.$store.state.schema[`${reproterms}activity_display_name`][0];
@@ -437,7 +436,7 @@ export default {
     },
     visibilityConditions() {
       if (this.schema[`${reproterms}visibility`]) {
-        console.log(423, this.schema[`${reproterms}visibility`]);
+        // console.log(423, this.schema[`${reproterms}visibility`]);
         // console.log(424, this.schema[`${reproterms}vis`]);
         return _.map(this.schemaOrder, (s) => {
           let keyName = '';
@@ -626,12 +625,12 @@ export default {
     min-height: 100vh;
   }
   .navbar-custom {
-    align-items: baseline;
+    align-items:center;
     background-color: #219c6d;
     color: floralwhite;
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-around;
+    justify-content: center!important;
     padding: .25rem .75rem .25rem .75rem;
     left: 0;
     bottom: 0;

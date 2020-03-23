@@ -82,8 +82,8 @@ export default {
         const activeValueChoices = _.filter(v['http://schema.org/name'], ac => ac['@language'] === this.selected_language);
         return (activeValueChoices[0]['@value']);
       });
-    } else if (this.constraints['https://schema.org/DigitalDocument']) { // if choice list defined in external file
-      axios.get(this.constraints['https://schema.org/DigitalDocument'][0]['@id'])
+    } else if (this.constraints['http://schema.org/DigitalDocument']) { // if choice list defined in external file
+      axios.get(this.constraints['http://schema.org/DigitalDocument'][0]['@id'])
         .then((resp) => {
           if (this.inputType === 'selectCountry') {
             this.options = _.map(resp.data, c => c.country);
