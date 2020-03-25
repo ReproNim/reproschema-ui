@@ -358,7 +358,9 @@ export default {
     //   this.$router.push('/activities/0');
     // }
     // `http://api.ipstack.com/check?access_key=${accessKey}&hostname=1`
-    this.selected_language = this.getDefaultLanguage;
+    if (this.$route.query.lang) {
+      this.selected_language = this.$route.query.lang;
+    } else this.selected_language = 'en';
     axios.get('https://api.muctool.de/whois').then((resp) => {
       // console.log(32, resp.data.ip);
       this.clientIp = resp.data.ip;
