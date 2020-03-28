@@ -361,10 +361,10 @@ export default {
     if (this.$route.query.lang) {
       this.selected_language = this.$route.query.lang;
     } else this.selected_language = 'en';
-    axios.get('https://api.muctool.de/whois').then((resp) => {
-      // console.log(32, resp.data.ip);
-      this.clientIp = resp.data.ip;
-    });
+    // axios.get('https://api.muctool.de/whois').then((resp) => {
+    //   // console.log(32, resp.data.ip);
+    //   this.clientIp = resp.data.ip;
+    // });
     if (this.$route.params.id) {
       this.$store.dispatch('setActivityIndex', this.$route.params.id);
     }
@@ -401,12 +401,6 @@ export default {
         return order;
       }
       return [];
-    },
-    getDefaultLanguage() {
-      if (this.schema['http://www.w3.org/2004/02/skos/core#prefLabel']) {
-        return this.schema['http://www.w3.org/2004/02/skos/core#prefLabel'][0]['@language'];
-      }
-      return 'en'; // default to english if unable to get from schema
     },
     getListofLanguages() {
       return ['en', 'es'];
