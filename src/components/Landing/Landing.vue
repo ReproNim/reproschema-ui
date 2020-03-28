@@ -1,7 +1,8 @@
 <template>
   <div class="docked-layout">
-    <section class="smooth-scroller" style="padding-top: 0">
-      <section style="height: 30vw; min-height: 15rem; background: linear-gradient(#268762, #15ac7f)">
+    <section id="smooth-scroller" class="smooth-scroller" style="padding-top: 0">
+      <section style="height: 30vw; min-height: 15rem;
+      background: linear-gradient(#268762, #15ac7f)">
         <div style="
           height: 30vw;
           min-height: 15rem;
@@ -12,69 +13,12 @@
         </div>
       </section>
       <br>
-      <section>
-        <div class="container-fluid">
-          <h2>Welcome to Voice Study</h2>
-          <p>We are trying to understand how your voice and language provides a window into your
-          mental health. By collecting this data, we are hoping to move away from having to answer
-          100s of questions about your symptoms to a more objective marker that can be readily
-          and privately collected.</p>
-        </div>
-      </section>
-
-      <section>
-        <div class="image container">
-          <div class="image">
-            <BridgeImage style="margin-bottom: -6px" src="static/images/about%20the%20study.svg"/>
-          </div>
-          <div class="text" style="padding-top: 1rem">
-            <h3>Understand your Mental Health</h3>
-            <p>Although your individual path is uncertain, seeing patterns over time may lead to a 
-            better  understanding of your mental well being. Tracking your medication and other 
-            factors (e.g. stress, exercise, noise) may provide additional insight into your symptoms 
-            and your ability to  complete activities.  Understanding this may provide insights into 
-            your day to day health and lifestyle.</p>
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <div class="image container">
-          <div class="image">
-            <BridgeImage style="padding-top: 1.5rem" src="static/images/tell%20your%20story.svg"/>
-          </div>
-          <div class="text">
-            <h3>Telling your story</h3>
-            <p>Through Voice Up, you can tell your story of living with mental illness. It’s a tool
-            to understand your symptoms, factors, and how these relate to your medication, your
-            interactions, and your environment. If you do this every week, you will be able to see
-            your changes over time. This can help you talk about your story with doctors and
-            caregivers. It is about you and how you live with mental illness.</p>
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <div class="image container">
-          <div class="image">
-            <BridgeImage style="transform: scale(0.7); padding-bottom: 1rem" src="static/images/create your story.svg"/>
-          </div>
-          <div class="text">
-            <h3>Create your story</h3>
-            <p>In just a minute you can see if you are eligible to participate in the voice study.
-              Find out now!</p>
-
-            <p style="margin-top: 2rem">
-              <router-link class="join-button" to="/study/intro">Join</router-link>
-            </p>
-            <!--<div class="container">-->
-            <!--<vue-markdown v-if="content"> {{content}} </vue-markdown>-->
-            <!--<Loader v-else/>-->
-            <!--</div>-->
-          </div>
-        </div>
-      </section>
+      <vue-markdown v-if="content"> {{content}} </vue-markdown>
+      <Loader v-else/>
     </section>
+    <p style="margin-top: 2rem">
+      <button class="join-button" @click="doNext">Join</button>
+    </p>
   </div>
 </template>
 
@@ -100,9 +44,35 @@ export default {
       content: null,
     };
   },
+  methods: {
+    doBack() {
+      if (this.step > 1) {
+        this.step -= 1;
+      }
+    },
+    doNext() {
+      this.$router.push('/activities/0');
+    },
+  },
   mounted() {
+    // eslint-disable-next-line no-underscore-dangle
+    // console.log(this.$options._scopeId);
     axios.get(this.contentSrc).then((resp) => {
       this.content = resp.data;
+      // eslint-disable-next-line no-unused-vars
+    }).then((resp1) => {
+      // HTML injected into a component cannot be styled in the component?
+      // https://forum.vuejs.org/t/html-injected-into-a-component-from-a-vuex-store-cannot-be-styled-in-the-component/13691/24
+      const rootnode = document.getElementById('smooth-scroller');
+      const treeWalker = document.createTreeWalker(rootnode, NodeFilter.SHOW_ELEMENT, null);
+      let currentNode = treeWalker.currentNode;
+      while (currentNode) {
+        currentNode = treeWalker.nextNode();
+        if (currentNode) {
+          // eslint-disable-next-line no-underscore-dangle
+          currentNode.setAttribute(this.$options._scopeId, '');
+        }
+      }
     });
   },
 };
