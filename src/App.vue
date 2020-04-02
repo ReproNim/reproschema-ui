@@ -5,7 +5,6 @@
       <nav id="sidebar" v-bind:class="{'active':checkDisableBack}" ref="sidebar">
         <div class="sidebar-header">
           <h3>Activities</h3>
-          {{ reprotermsUrl }}
         </div>
         <div>
           <select v-model="selected_language">
