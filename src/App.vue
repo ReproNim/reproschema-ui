@@ -5,6 +5,7 @@
       <nav id="sidebar" v-bind:class="{'active':checkDisableBack}" ref="sidebar">
         <div class="sidebar-header">
           <h3>Activities</h3>
+          {{ reprotermsUrl }}
         </div>
         <div>
           <select v-model="selected_language">
@@ -468,6 +469,7 @@ export default {
               _.map(payloadList, (p) => {
                 const item = p['@value'];
                 const index = this.schemaOrder.indexOf(this.schemaNameMapper[item]);
+                console.log(472, this.scores);
                 payload[this.schemaNameMapper[item]] = this.scores[index];
               });
               return {

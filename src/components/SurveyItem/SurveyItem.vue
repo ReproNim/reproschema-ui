@@ -13,6 +13,7 @@
                        :init="init"
                        :responses="responses"
                        :selected_language="selected_language"
+                       :reprotermsUrl="reprotermsUrl"
                        :ipAddress="clientIp"
                        :showPassOptions="showPassOptions"
                        v-on:skip="sendSkip"
@@ -29,6 +30,8 @@
                    :responses="mp_responses"
                    :srcUrl="item['@id']"
                    :showPassOptions="showPassOptions"
+                   :selected_language="selected_language"
+                   :reprotermsUrl="reprotermsUrl"
                    :ipAddress="clientIp"
                    v-on:skip="sendSkip"
                    v-on:dontKnow="sendDontKnow"
@@ -44,6 +47,8 @@
                      :responses="mp_responses"
                      :srcUrl="item['@id']"
                      :showPassOptions="showPassOptions"
+                     :selected_language="selected_language"
+                     :reprotermsUrl="reprotermsUrl"
                      :ipAddress="clientIp"
                      v-on:skip="sendSkip"
                      v-on:dontKnow="sendDontKnow"
@@ -95,12 +100,15 @@ import Loader from '../Loader/';
 import MultiPart from '../MultiPart';
 import Section from '../Section';
 
-const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
+// const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
 
 
 export default {
   name: 'SurveyItem',
   props: {
+    reprotermsUrl: {
+      type: String,
+    },
     item: {
       type: Object,
     },
@@ -169,15 +177,16 @@ export default {
     },
     ui() {
       /* eslint-disable */
-        if (this.data[`${reproterms}inputType`]) {
-          return this.data[`${reproterms}inputType`][0]['@value'];
+        if (this.data[`${this.reprotermsUrl}inputType`]) {
+          // console.log(180, this.data[`${this.reprotermsUrl}inputType`]);
+          return this.data[`${this.reprotermsUrl}inputType`][0]['@value'];
         }
         return 'N/A';
         /* eslint-enable */
     },
     widgetType() {
-      if (this.data[`${reproterms}readOnly`]) {
-        return this.data[`${reproterms}readOnly`][0]['@value'];
+      if (this.data[`${this.reprotermsUrl}readOnly`]) {
+        return this.data[`${this.reprotermsUrl}readOnly`][0]['@value'];
       }
       return false;
     },
@@ -195,32 +204,33 @@ export default {
       return null;
     },
     itemPreamble() {
-      if (this.data[`${reproterms}preamble`]) {
-        const activePreamble = _.filter(this.data[`${reproterms}preamble`], q => q['@language'] === this.selected_language);
+      if (this.data[`${this.reprotermsUrl}preamble`]) {
+        const activePreamble = _.filter(this.data[`${this.reprotermsUrl}preamble`], q => q['@language'] === this.selected_language);
         return activePreamble[0]['@value'];
       }
       return null;
     },
     valueConstraints() {
-      if (this.data[`${reproterms}valueconstraints`]) {
+      if (this.data[`${this.reprotermsUrl}valueconstraints`]) {
         // eslint-disable-next-line
-          return this.valueC;
+        // console.log(216, this.data[`${this.reprotermsUrl}valueconstraints`]);
+        return this.valueC;
       }
       /* eslint-enable */
       return { requiredValue: false };
     },
     findPassOptions() {
-      if (this.data[`${reproterms}valueconstraints`]) {
+      if (this.data[`${this.reprotermsUrl}valueconstraints`]) {
         // when valueConstraints is a remote object
-        if (Object.keys(this.data[`${reproterms}valueconstraints`][0]).indexOf('@id') > -1) {
+        if (Object.keys(this.data[`${this.reprotermsUrl}valueconstraints`][0]).indexOf('@id') > -1) {
           this.getRequiredVal();
           return this.requireVal;
         }
         // when valueConstraints in embedded in item object itself
-        if (this.data[`${reproterms}valueconstraints`][0]) {
+        if (this.data[`${this.reprotermsUrl}valueconstraints`][0]) {
           // make sure the requiredValue key is defined
-          if (this.data[`${reproterms}valueconstraints`][0][`${reproterms}requiredValue`]) {
-            return this.data[`${reproterms}valueconstraints`][0][`${reproterms}requiredValue`][0]['@value'];
+          if (this.data[`${this.reprotermsUrl}valueconstraints`][0][`${this.reprotermsUrl}requiredValue`]) {
+            return this.data[`${this.reprotermsUrl}valueconstraints`][0][`${this.reprotermsUrl}requiredValue`][0]['@value'];
           }
         }
       }
@@ -229,39 +239,71 @@ export default {
   },
   methods: {
     getRequiredVal() {
-      jsonld.expand(this.data[`${reproterms}valueconstraints`][0]['@id'])
+      jsonld.expand(this.data[`${this.reprotermsUrl}valueconstraints`][0]['@id'])
         .then((rsp) => {
-          this.requireVal = rsp[0][`${reproterms}requiredValue`][0]['@value'];
-          // console.log(143, this.requireVal);
+          // console.log(237, rsp);
+          this.requireVal = rsp[0][`${this.reprotermsUrl}requiredValue`][0]['@value'];
+        }).catch((e) => {
+          // console.log(240, 'constraint error', e);
+          jsonld.expand(`${this.data[`${this.reprotermsUrl}valueconstraints`][0]['@id']}.jsonld`).then((resp) => {
+            // console.log(250, resp);
+            this.requireVal = resp[0][`${this.reprotermsUrl}requiredValue`][0]['@value'];
+          }).catch((e1) => {
+            // console.log(252, e1);
+          });
         });
     },
+    getValueConstraintsData(url) {
+      jsonld.expand(url).then((rsp) => {
+        this.valueC = rsp[0];
+      }).catch((e) => {
+        // console.log(254, e);
+        jsonld.expand(`${url}.jsonld`).then((rsp) => {
+          this.valueC = rsp[0];
+        }).catch((e2) => {
+          // console.log(267, e2);
+        });
+      });
+    },
+    processActivityData(resp) {
+      // console.log(247, resp);
+      if (resp.length) {
+        this.data = resp[0];
+        if (this.data[`${this.reprotermsUrl}valueconstraints`]) {
+          if (Object.keys(this.data[`${this.reprotermsUrl}valueconstraints`][0]).indexOf('@id') > -1) {
+            // console.log(260, this.data[`${this.reprotermsUrl}valueconstraints`][0]['@id']);
+            this.getValueConstraintsData(this.data[`${this.reprotermsUrl}valueconstraints`][0]['@id']);
+          } else {
+            this.valueC = this.data[`${this.reprotermsUrl}valueconstraints`][0];
+          }
+        } else {
+          // console.log(this.data);
+          // throw Error('This is not a properly formatted jsonld schema');
+          // console.info('there are no value constraints');
+          this.valueC = {
+            '@value': null,
+          };
+        }
+        this.status = 'ready';
+      }
+    },
     getData() {
+      // console.log(242, this.item['@id']);
       jsonld.expand(this.item['@id'], {
         onDownloadProgress() {
           // TODO: for some reason pEvent has total defined as 0.
           // so a progress bar won't work here.
         },
       }).then((resp) => {
-        if (resp.length) {
-          this.data = resp[0];
-          if (this.data[`${reproterms}valueconstraints`]) {
-            if (Object.keys(this.data[`${reproterms}valueconstraints`][0]).indexOf('@id') > -1) {
-              jsonld.expand(this.data[`${reproterms}valueconstraints`][0]['@id']).then((rsp) => {
-                this.valueC = rsp[0];
-              });
-            } else {
-              this.valueC = this.data[`${reproterms}valueconstraints`][0];
-            }
-          } else {
-            // console.log(this.data);
-            // throw Error('This is not a properly formatted jsonld schema');
-            // console.info('there are no value constraints');
-            this.valueC = {
-              '@value': null,
-            };
-          }
-          this.status = 'ready';
-        }
+        this.processActivityData(resp);
+      }).catch((e) => {
+        // console.log(270, e);
+        jsonld.expand(`${this.item['@id']}.jsonld`).then((resp) => {
+          // console.log(272, 'success', resp);
+          this.processActivityData(resp);
+        }).catch((e1) => {
+          // console.log(this.item['@id'], e1);
+        });
       });
     },
     sendSkip(doSkip) {
@@ -292,7 +334,7 @@ export default {
       this.sendNext();
     },
     setScore(key, scoreObj) {
-      // console.log(291, 'score obj', scoreObj, this.index);
+      console.log(291, 'score obj', scoreObj, this.index);
       this.$emit('setScores', scoreObj, this.index);
     },
     setMPResponse(index, value) {

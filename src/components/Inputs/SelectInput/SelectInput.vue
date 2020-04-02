@@ -30,11 +30,11 @@ import axios from 'axios';
 import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
 
-const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
+// const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
 
 export default {
   name: 'SelectInput',
-  props: ['constraints', 'init', 'selected_language', 'inputType'],
+  props: ['reprotermsUrl', 'constraints', 'init', 'selected_language', 'inputType'],
   components: {
     Multiselect,
   },
@@ -96,8 +96,8 @@ export default {
   computed: {
     multipleAllowed() {
       // console.log(93, 'here', this.constraints);
-      if (this.constraints[`${reproterms}multipleChoice`]) {
-        // console.log(94, this.constraints[reproterms+'multipleChoice']);
+      if (this.constraints[`${this.reprotermsUrl}multipleChoice`]) {
+        // console.log(94, this.constraints[this.reprotermsUrl+'multipleChoice']);
         return true;
       } return false;
     },

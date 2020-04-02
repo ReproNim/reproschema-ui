@@ -30,6 +30,7 @@
             :responses="responses"
             :selected_language="selected_language"
             :showPassOptions="showPassOptions"
+            :reprotermsUrl="reprotermsUrl"
           />
         </transition>
       </div>
@@ -59,11 +60,14 @@ Vue.use(VuejsDialog);
 
 const safeEval = require('safe-eval');
 
-const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
+// const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
 
 export default {
   name: 'Section',
   props: {
+    reprotermsUrl: {
+      type: String,
+    },
     srcUrl: {
       type: String,
     },
@@ -121,15 +125,15 @@ export default {
     },
     getVisibility(responses) {
       const responseMapper = this.responseMapper(responses);
-      if (!_.isEmpty(this.activity[`${reproterms}vis`])) {
+      if (!_.isEmpty(this.activity[`${this.reprotermsUrl}vis`])) {
         const visibilityMapper = {};
-        _.map(this.activity[`${reproterms}vis`], (a) => {
-          let val = a[`${reproterms}isVis`][0]['@value'];
+        _.map(this.activity[`${this.reprotermsUrl}vis`], (a) => {
+          let val = a[`${this.reprotermsUrl}isVis`][0]['@value'];
           if (_.isString(val)) {
             val = this.evaluateString(val, responseMapper);
           }
-          if (responseMapper[a[`${reproterms}variableName`][0]['@value']]) {
-            visibilityMapper[responseMapper[a[`${reproterms}variableName`][0]['@value']].ref] = val;
+          if (responseMapper[a[`${this.reprotermsUrl}variableName`][0]['@value']]) {
+            visibilityMapper[responseMapper[a[`${this.reprotermsUrl}variableName`][0]['@value']].ref] = val;
           }
         });
         return visibilityMapper;
@@ -138,10 +142,10 @@ export default {
     },
     responseMapper(responses) {
       // a variable map is defined! great
-      const vmap = this.activity[`${reproterms}variableMap`];
+      const vmap = this.activity[`${this.reprotermsUrl}variableMap`];
       const keyArr = _.map(vmap, (v) => {
-        const key = v[`${reproterms}isAbout`][0]['@id'];
-        const qId = v[`${reproterms}variableName`][0]['@value'];
+        const key = v[`${this.reprotermsUrl}isAbout`][0]['@id'];
+        const qId = v[`${this.reprotermsUrl}variableName`][0]['@value'];
         const val = responses[key];
         // console.log(145, 'sec resp key in mapper', val.value);
         return { key, val, qId };
@@ -208,14 +212,14 @@ export default {
       this.visibility = this.getVisibility(currResponses);
 
       // TODO: add back scoring logic to this component.
-      if (!_.isEmpty(this.activity[`${reproterms}scoring_logic`])) {
+      if (!_.isEmpty(this.activity[`${this.reprotermsUrl}scoringLogic`])) {
         _.map(this.getScoring(this.responses), (score, key) => {
           if (!_.isNaN(score)) {
             this.scores[key] = score;
           }
         });
         if (!_.isEmpty(this.scores)) {
-          // console.log(216, 'section score', this.srcUrl, this.scores);
+          console.log(216, 'section score', this.srcUrl, this.scores);
           this.$emit('saveScores', this.srcUrl, this.scores);
         }
       }
@@ -226,12 +230,12 @@ export default {
       // console.log(225, 'responses', responses);
       const responseMapper = this.responseMapper(responses);
       // console.log(227, 'response mapper', responseMapper);
-      if (!_.isEmpty(this.activity[`${reproterms}scoring_logic`])) {
+      if (!_.isEmpty(this.activity[`${this.reprotermsUrl}scoringLogic`])) {
         const scoreMapper = {};
-        _.map(this.activity[`${reproterms}scoring_logic`], (a) => {
+        _.map(this.activity[`${this.reprotermsUrl}scoringLogic`], (a) => {
           // console.log(231, 'logic a', a);
-          let scoreFormula = a[`${reproterms}jsExpression`][0]['@value'];
-          const scoreVariableName = a[`${reproterms}variableName`][0]['@value'];
+          let scoreFormula = a[`${this.reprotermsUrl}jsExpression`][0]['@value'];
+          const scoreVariableName = a[`${this.reprotermsUrl}variableName`][0]['@value'];
           if (_.isString(scoreFormula)) {
             scoreFormula = this.evaluateString(scoreFormula, responseMapper);
             // console.log(235, 'a.val', val);
@@ -240,7 +244,7 @@ export default {
             scoreMapper[responseMapper[scoreVariableName].ref] = scoreFormula;
           }
         });
-        // console.log(236, 'sec scoremapper', scoreMapper);
+        console.log(236, 'sec scoremapper', scoreMapper);
         return scoreMapper;
       }
       return {};
@@ -290,7 +294,7 @@ export default {
       }
     },
     order() {
-      return this.activity[`${reproterms}order`][0]['@list'];
+      return this.activity[`${this.reprotermsUrl}order`][0]['@list'];
     },
   },
   watch: {
@@ -315,8 +319,8 @@ export default {
       });
     },
     context() {
-      if (this.activity[`${reproterms}order`]) {
-        const keys = this.activity[`${reproterms}order`][0]['@list'];
+      if (this.activity[`${this.reprotermsUrl}order`]) {
+        const keys = this.activity[`${this.reprotermsUrl}order`][0]['@list'];
         return keys;
       }
       return [{}];
@@ -329,21 +333,21 @@ export default {
         return {};
       },
       preambleText() {
-        if (this.activity[`${reproterms}preamble`]) {
-          const activePreamble = _.filter(this.activity[`${reproterms}preamble`],
+        if (this.activity[`${this.reprotermsUrl}preamble`]) {
+          const activePreamble = _.filter(this.activity[`${this.reprotermsUrl}preamble`],
             p => p['@language'] === this.selected_language);
           return activePreamble[0]['@value'];
         }
         return '';
       },
       findPassOptions() {
-        if (this.activity[reproterms+'allow']) {
+        if (this.activity[this.reprotermsUrl+'allow']) {
           let isSkip = false;
           let isDontKnow = false;
-          _.map(this.activity[`${reproterms}allow`][0]['@list'], s => {
-            if (s['@id'] === `${reproterms}refused_to_answer`) {
+          _.map(this.activity[`${this.reprotermsUrl}allow`][0]['@list'], s => {
+            if (s['@id'] === `${this.reprotermsUrl}refused_to_answer`) {
               isSkip = true;
-            } else if (s['@id'] === `${reproterms}dont_know_answer`) {
+            } else if (s['@id'] === `${this.reprotermsUrl}dont_know_answer`) {
               isDontKnow = true;
             }
           });
