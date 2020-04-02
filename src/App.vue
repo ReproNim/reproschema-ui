@@ -1,5 +1,10 @@
 <template>
   <div id="app" class="">
+    <nav class="navbar sticky-top navbar-custom">
+      <div class="navbar-brand">
+        This service is a demonstration for the ReproNim project.
+      </div>
+    </nav>
     <div class="wrapper">
       <!-- Sidebar -->
       <nav id="sidebar" v-bind:class="{'active':checkDisableBack}" ref="sidebar">
@@ -40,11 +45,6 @@
 
       <!-- Page Content -->
       <div id="content">
-        <nav class="navbar sticky-top navbar-custom">
-          <div class="navbar-brand">
-            This service is a demonstration for the ReproNim project.
-          </div>
-        </nav>
         <!-- We'll fill this with dummy content -->
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
           <div class="container-fluid">
