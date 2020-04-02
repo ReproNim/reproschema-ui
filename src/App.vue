@@ -42,7 +42,7 @@
       <div id="content">
         <nav class="navbar sticky-top navbar-custom">
           <div class="navbar-brand">
-            Voice-up is a demo and not an actual study.
+            This service is a demonstration for the ReproNim project.
           </div>
         </nav>
         <!-- We'll fill this with dummy content -->
