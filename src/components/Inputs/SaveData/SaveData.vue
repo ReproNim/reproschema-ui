@@ -48,6 +48,7 @@ export default {
     uploadZipData() {
       const Response = this.$store.state.responses;
       const totalScores = this.$store.state.scores;
+      console.log(61, this.$store.state.scores);
       const totalResponse = { response: Response, scores: totalScores };
       this.formatData(totalResponse);
     },
@@ -56,6 +57,7 @@ export default {
       const fileUploadData = {};
       const JSONdata = {};
       const JSONscores = {};
+      // const jsonData = {};
       // sort out blobs from JSONdata
       _.map(data.response, (val, key) => {
         if (val instanceof Blob) {
@@ -94,19 +96,22 @@ export default {
         jszip.folder('data').file(`voice_item_${f + 1}.wav`, val);
         f += 1;
       });
+      // jsonData.score = JSONscores[0];
+      console.log(99, JSONscores);
       jszip.generateAsync({ type: 'blob' })
         .then((myzipfile) => {
-          // axios.post('http://localhost:8000/check', JSONscores[0], {
-          axios.post('https://sig.mit.edu/vb/check', JSONscores[0], {
+          axios.post('http://localhost:8000/check', JSONscores[0], {
+          // axios.post('https://sig.mit.edu/vb/check', JSONscores[0], {
             ContentType: 'application/json',
           })
             .then((response) => {
+              console.log(104, response);
               const formData = new FormData();
               formData.append('file', myzipfile);
               formData.append('token', response.data.token);
-              formData.append('clientIP', this.ipAddress);
-              // axios.post('http://localhost:8000/submit', formData, {
-              axios.post('https://sig.mit.edu/vb/submit', formData, {
+              // formData.append('clientIP', this.ipAddress);
+              axios.post('http://localhost:8000/submit', formData, {
+              // axios.post('https://sig.mit.edu/vb/submit', formData, {
                 'Content-Type': 'multipart/form-data',
               }).then((res) => {
                 this.hasData = true;
@@ -114,8 +119,8 @@ export default {
                 // console.log('SUCCESS!!', res);
                 this.$emit('valueChanged', { status: res.status });
               })
-                .catch(() => {
-                  console.log('FAILURE!!');
+                .catch((e) => {
+                  console.log('FAILURE!!', e);
                 });
             })
             .catch((error) => {

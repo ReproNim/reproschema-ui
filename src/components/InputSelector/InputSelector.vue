@@ -17,6 +17,7 @@
       <Radio
         :constraints="valueConstraints"
         :selected_language="selected_language"
+        :reprotermsUrl="reprotermsUrl"
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
@@ -129,6 +130,7 @@
       <SelectInput
         :constraints="valueConstraints"
         :selected_language="selected_language"
+        :reprotermsUrl="reprotermsUrl"
         :inputType="inputType"
         :init="init" v-on:valueChanged="sendData"/>
     </div>
@@ -208,6 +210,9 @@ import Static from '../Inputs/Static';
 export default {
   name: 'InputSelector',
   props: {
+    reprotermsUrl: {
+      type: String,
+    },
     inputType: {
       type: String,
     },

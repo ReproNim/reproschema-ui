@@ -70,6 +70,7 @@ export default {
   },
   computed: {
     recordingTime() {
+      console.log(73, this.constraints);
       return this.constraints['http://schema.org/maxValue'][0]['@value'];
     },
     generateNumber() {
@@ -137,6 +138,7 @@ export default {
     },
   },
   mounted() {
+    console.log(141, this.constraints);
     this.recording = new Audio();
     this.recording.onended = this.endPlay;
     const AudioContext = window.AudioContext || window.webkitAudioContext;

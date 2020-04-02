@@ -20,6 +20,7 @@
         v-on:setData="setResponse"
         :responses="responses"
         :selected_language="selected_language"
+        :reprotermsUrl="reprotermsUrl"
         :score="score"
         :showPassOptions="showPassOptions"
       />
@@ -43,11 +44,14 @@ import Loader from '../Loader/';
 
 const safeEval = require('safe-eval');
 
-const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
+// const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
 
 export default {
   name: 'MultiPart',
   props: {
+    reprotermsUrl: {
+      type: String,
+    },
     srcUrl: {
       type: String,
     },
@@ -81,12 +85,13 @@ export default {
   mounted() {
     if (this.srcUrl) {
       // eslint-disable-next-line
+      console.log(87, 'multi mounted', this.srcUrl);
       this.getData();
     }
   },
   methods: {
     getData() {
-      // this.$store.dispatch('getActivityData');
+      console.log(93, 'multi getdata', this.srcUrl);
       jsonld.expand(this.srcUrl).then((resp) => {
         this.activity = resp[0];
         this.listShow = [0];
@@ -100,13 +105,15 @@ export default {
           }
           this.visibility = this.getVisibility(this.responses);
         });
+      }).catch((e) => {
+        console.log(106, 'multi error', e);
       });
     },
     getVisibility(responses) {
       const responseMapper = this.responseMapper(responses);
-      if (!_.isEmpty(this.activity[`${reproterms}visibility`])) {
+      if (!_.isEmpty(this.activity[`${this.reprotermsUrl}visibility`])) {
         const visibilityMapper = {};
-        _.map(this.activity[`${reproterms}visibility`], (a) => {
+        _.map(this.activity[`${this.reprotermsUrl}visibility`], (a) => {
           let val = a['@value'];
           if (_.isString(a['@value'])) {
             val = this.evaluateString(a['@value'], responseMapper);
@@ -124,11 +131,11 @@ export default {
       const keys = _.map(this.order, c => c['@id']); // Object.keys(this.responses);
 
       // a variable map is defined! great
-      if (this.activity[`${reproterms}variableMap`]) {
-        const vmap = this.activity[`${reproterms}variableMap`][0]['@list'];
+      if (this.activity[`${this.reprotermsUrl}variableMap`]) {
+        const vmap = this.activity[`${this.reprotermsUrl}variableMap`][0]['@list'];
         const keyArr = _.map(vmap, (v) => {
-          const key = v[`${reproterms}isAbout`][0]['@id'];
-          const qId = v[`${reproterms}variableName`][0]['@value'];
+          const key = v[`${this.reprotermsUrl}isAbout`][0]['@id'];
+          const qId = v[`${this.reprotermsUrl}variableName`][0]['@value'];
           const val = responses[key];
           return { key, val, qId };
         });
@@ -205,7 +212,7 @@ export default {
       // this.visibility = this.getVisibility(currResponses);
 
       // TODO: add back scoring logic to this component.
-      // if (!_.isEmpty(this.activity[reproterms+'scoringLogic'])) {
+      // if (!_.isEmpty(this.activity[this.reprotermsUrl+'scoringLogic'])) {
       //   this.evaluateScoringLogic();
       // }
       this.updateProgress();
@@ -236,18 +243,18 @@ export default {
       return this.context[this.currentIndex];
     },
     order() {
-      return this.activity[`${reproterms}order`][0]['@list'];
+      return this.activity[`${this.reprotermsUrl}order`][0]['@list'];
     },
     context() {
-      if (this.activity[`${reproterms}order`]) {
-        const keys = this.activity[`${reproterms}order`][0]['@list'];
+      if (this.activity[`${this.reprotermsUrl}order`]) {
+        const keys = this.activity[`${this.reprotermsUrl}order`][0]['@list'];
         return keys;
       }
       return [{}];
     },
     preambleText() {
-      if (this.activity[`${reproterms}preamble`]) {
-        const activePreamble = _.filter(this.activity[`${reproterms}preamble`],
+      if (this.activity[`${this.reprotermsUrl}preamble`]) {
+        const activePreamble = _.filter(this.activity[`${this.reprotermsUrl}preamble`],
           p => p['@language'] === this.selected_language);
         return activePreamble[0]['@value'];
       }
