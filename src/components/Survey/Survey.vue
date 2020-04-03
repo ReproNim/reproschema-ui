@@ -46,7 +46,7 @@
             :selected_language="selected_language"
             :clientIp="ipAddress"
             :showPassOptions="findPassOptions"
-            :score="score"
+            :reprotermsUrl="reprotermsUrl"
           />
         </transition>
       </div>
@@ -84,22 +84,23 @@ import _ from 'lodash';
 import SurveyItem from '../SurveyItem/';
 import Loader from '../Loader/';
 
+// const jsonld = require('jsonld');
 
 Vue.component('survey-item', SurveyItem);
 const safeEval = require('safe-eval');
 
-const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
+// const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
 
 export default {
   name: 'Survey',
-  props: ['srcUrl', 'responses', 'selected_language', 'progress', 'autoAdvance', 'actVisibility', 'nextActivity', 'ipAddress'],
+  props: ['reprotermsUrl', 'srcUrl', 'responses', 'selected_language', 'progress', 'autoAdvance', 'actVisibility', 'nextActivity', 'ipAddress'],
   data() {
     return {
       activity: {},
       listShow: [],
       parsedJSONLD: {},
       visibility: {},
-      score: 0,
+      scores: {},
       isSkip: false,
       isDontKnow: false,
       isVis: false,
@@ -110,9 +111,9 @@ export default {
   },
   methods: {
     getData() {
-      // this.$store.dispatch('getActivityData');
       jsonld.expand(this.srcUrl).then((resp) => {
         this.activity = resp[0];
+        // console.log(117, this.activity);
         this.listShow = [0];
         this.$nextTick(() => {
           // set listShow if there are responses for items in the context
@@ -131,29 +132,27 @@ export default {
         });
       });
     },
-    evaluateScoringLogic() {
-      const scoringLogic = (this.activity[`${reproterms}scoringLogic`][0][`${reproterms}jsExpression`][0]['@value']);
-      // console.log(138, this.activity[`${reproterms}scoring_logic`]);
-      if (this.responses) {
-        let str = '';
-        _.forOwn(this.responses, (val, key) => {
-          const qId = (key.split(/\/items\//))[1]; // split url to get the scoring key
-          if (scoringLogic) {
-            if (isNaN(val)) {
-              str += `const ${qId}=0; `;
-            } else {
-              str += `const ${qId}=${val}; `;
-            }
+    getScoring(responses) {
+      // console.log(225, 'responses', responses);
+      const responseMapper = this.responseMapper(responses);
+      // console.log(227, 'response mapper', responseMapper);
+      if (!_.isEmpty(this.activity[`${this.reprotermsUrl}scoringLogic`])) {
+        const scoreMapper = {};
+        _.map(this.activity[`${this.reprotermsUrl}scoringLogic`], (a) => {
+          // console.log(231, 'logic a', a);
+          let scoreFormula = a[`${this.reprotermsUrl}jsExpression`][0]['@value'];
+          const scoreVariableName = a[`${this.reprotermsUrl}variableName`][0]['@value'];
+          if (_.isString(scoreFormula)) {
+            scoreFormula = this.evaluateString(scoreFormula, responseMapper);
+            // console.log(235, 'a.val', val);
+          }
+          if (responseMapper[scoreVariableName]) {
+            scoreMapper[responseMapper[scoreVariableName].ref] = scoreFormula;
           }
         });
-        try {
-          // eslint-disable-next-line
-            this.score = eval(`${str}  ${scoringLogic}`);
-          // console.log('TOTAL SCORING LOGIC::::', this.score);
-        } catch (e) {
-          // Do nothing
-        }
+        return scoreMapper;
       }
+      return {};
     },
     nextQuestion(idx, skip, dontKnow) {
       if (idx === 8 && (this.context[idx]['@id']).split('items/')[1] === 'phq9_9') {
@@ -174,14 +173,14 @@ export default {
       if (skip) {
         this.$emit('saveResponse', this.context[idx]['@id'], 'skipped');
         this.setResponse('skipped', idx);
-        // if (!_.isEmpty(this.activity[reproterms+'scoringLogic'])) {
+        // if (!_.isEmpty(this.activity[this.reprotermsUrl+'scoringLogic'])) {
         //   this.evaluateScoringLogic();
         // }
       }
       if (dontKnow) {
         this.$emit('saveResponse', this.context[idx]['@id'], 'dontKnow');
         this.setResponse('dontknow', idx);
-        // if (!_.isEmpty(this.activity[reproterms+'scoringLogic'])) {
+        // if (!_.isEmpty(this.activity[this.reprotermsUrl+'scoringLogic'])) {
         //   this.evaluateScoringLogic();
         // }
       }
@@ -233,14 +232,23 @@ export default {
         currResponses[this.context[index]['@id']] = val;
       }
       this.visibility = this.getVisibility(currResponses);
-      if (!_.isEmpty(this.activity[`${reproterms}scoring_logic`])) {
-        // TODO: if you uncomment the scoring logic evaluation, things break w/ multipart.
-        this.evaluateScoringLogic();
+      // if (!_.isEmpty(this.activity[`${this.reprotermsUrl}scoringLogic`])) {
+      //   // TODO: if you uncomment the scoring logic evaluation, things break w/ multipart.
+      //   this.evaluateScoringLogic();
+      // }
+      if (!_.isEmpty(this.activity[`${this.reprotermsUrl}scoringLogic`])) {
+        _.map(this.getScoring(this.responses), (score, key) => {
+          if (!_.isNaN(score)) {
+            this.scores[key] = score;
+          }
+        });
+        if (!_.isEmpty(this.scores)) {
+          this.$emit('saveScores', this.srcUrl, this.scores);
+        }
       }
       this.updateProgress();
     },
     setScore(scoreObj, index) {
-      // console.log(236, 'set score in survey', this.context[index]['@id'], scoreObj);
       this.$emit('saveScores', this.context[index]['@id'], scoreObj);
     },
     restart() {
@@ -267,11 +275,11 @@ export default {
     responseMapper(responses) {
       const keys = _.map(this.order(), c => c['@id']); // Object.keys(this.responses);
       // a variable map is defined! great
-      if (this.activity[`${reproterms}variableMap`]) {
-        const vmap = this.activity[`${reproterms}variableMap`];
+      if (this.activity[`${this.reprotermsUrl}variableMap`]) {
+        const vmap = this.activity[`${this.reprotermsUrl}variableMap`];
         const keyArr = _.map(vmap, (v) => {
-          const key = v[`${reproterms}isAbout`][0]['@id'];
-          const qId = v[`${reproterms}variableName`][0]['@value'];
+          const key = v[`${this.reprotermsUrl}isAbout`][0]['@id'];
+          const qId = v[`${this.reprotermsUrl}variableName`][0]['@value'];
           const val = responses[key];
           return { key, val, qId };
         });
@@ -301,15 +309,15 @@ export default {
     },
     getVisibility(responses) {
       const responseMapper = this.responseMapper(responses);
-      if (!_.isEmpty(this.activity[`${reproterms}visibility`])) {
+      if (!_.isEmpty(this.activity[`${this.reprotermsUrl}visibility`])) {
         const visibilityMapper = {};
-        _.map(this.activity[`${reproterms}visibility`], (a) => {
-          let val = a[`${reproterms}isVis`][0]['@value'];
+        _.map(this.activity[`${this.reprotermsUrl}visibility`], (a) => {
+          let val = a[`${this.reprotermsUrl}isVis`][0]['@value'];
           if (_.isString(val)) {
             val = this.evaluateString(val, responseMapper);
           }
-          if (responseMapper[a[`${reproterms}variableName`][0]['@value']]) {
-            visibilityMapper[responseMapper[a[`${reproterms}variableName`][0]['@value']].ref] = val;
+          if (responseMapper[a[`${this.reprotermsUrl}variableName`][0]['@value']]) {
+            visibilityMapper[responseMapper[a[`${this.reprotermsUrl}variableName`][0]['@value']].ref] = val;
           }
           // visibilityMapper[responseMapper[a['@index']].ref] = val;
         });
@@ -326,15 +334,15 @@ export default {
       this.$emit('updateProgress', progress);
     },
     order() {
-      if (this.activity[`${reproterms}shuffle`][0]['@value']) { // when shuffle is true
-        const orderList = this.activity[`${reproterms}order`][0]['@list'];
+      if (this.activity[`${this.reprotermsUrl}shuffle`][0]['@value']) { // when shuffle is true
+        const orderList = this.activity[`${this.reprotermsUrl}order`][0]['@list'];
         const listToShuffle = orderList.slice(1, orderList.length - 3);
         const newList = _.shuffle(listToShuffle);
         newList.unshift(orderList[0]);
         newList.push(orderList[orderList.length - 3],
           orderList[orderList.length - 2], orderList[orderList.length - 1]);
         return newList;
-      } return this.activity[`${reproterms}order`][0]['@list'];
+      } return this.activity[`${this.reprotermsUrl}order`][0]['@list'];
     },
     nextActivity1() {
       const currentIndex = parseInt(this.$store.state.activityIndex);
@@ -394,7 +402,7 @@ export default {
         if (state.activities.length && state.activityIndex != null) {
           if (state.activities[state.activityIndex].activity) {
             const currentActivity = state.activities[state.activityIndex].activity;
-            const actList = currentActivity[`${reproterms}order`][0]['@list'];
+            const actList = currentActivity[`${this.reprotermsUrl}order`][0]['@list'];
             return actList;
           }
         }
@@ -413,7 +421,7 @@ export default {
     },
     context() {
       /* eslint-disable */
-        if (this.activity[reproterms+'order']) {
+        if (this.activity[this.reprotermsUrl+'order']) {
           const keys = this.order();
 
           // if (!_.isEmpty(this.visibility)) {
@@ -431,13 +439,13 @@ export default {
         }
         return {};
       },
-      preambleText() {
-        if (this.activity[`${reproterms}preamble`]) {
-          const activePreamble = _.filter(this.activity[`${reproterms}preamble`], p => p['@language'] === this.selected_language);
+    preambleText() {
+        if (this.activity[`${this.reprotermsUrl}preamble`]) {
+          const activePreamble = _.filter(this.activity[`${this.reprotermsUrl}preamble`], p => p['@language'] === this.selected_language);
           if (!Array.isArray(activePreamble) || !activePreamble.length) {
             // array does not exist, is not an array, or is empty
             // ⇒ do not attempt to process array
-            return this.activity[`${reproterms}preamble`][0]['@value'];
+            return this.activity[`${this.reprotermsUrl}preamble`][0]['@value'];
           }
           else {
             return activePreamble[0]['@value'];
@@ -448,19 +456,19 @@ export default {
       /**
        * we need to keep an eye on the store.
        */
-      readyForActivity() {
+    readyForActivity() {
         if (this.$store) {
           return this.$store.getters.readyForActivity;
         }
       },
-      findPassOptions() {
-        if (this.activity[reproterms+'allow']) {
+    findPassOptions() {
+        if (this.activity[this.reprotermsUrl+'allow']) {
           let isSkip = false;
           let isDontKnow = false;
-          _.map(this.activity[reproterms+'allow'][0]['@list'], s => {
-            if (s['@id'] === `${reproterms}refused_to_answer`) {
+          _.map(this.activity[this.reprotermsUrl+'allow'][0]['@list'], s => {
+            if (s['@id'] === `${this.reprotermsUrl}refused_to_answer`) {
               isSkip = true;
-            } else if (s['@id'] === `${reproterms}dont_know_answer`) {
+            } else if (s['@id'] === `${this.reprotermsUrl}dont_know_answer`) {
               isDontKnow = true;
             }
           });
@@ -471,14 +479,14 @@ export default {
         }
         else return null;
       },
-      activityUrl() {
+    activityUrl() {
         return this.srcUrl;
       },
-      currentActivityIndex() {
+    currentActivityIndex() {
         return parseInt(this.$store.state.activityIndex);
       },
-    },
-    mounted() {
+  },
+  mounted() {
       if (this.srcUrl) {
         // eslint-disable-next-line
         // console.log(46, this.srcUrl);

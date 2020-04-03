@@ -1,7 +1,8 @@
 <template>
   <div class="inputContent">
     <div class="lead scroll mb-3 pr-3 pl-3" v-if="preamble">
-      <p :class="{'text-justify': inputType==='audioPassageRecord'}" v-html="preamble">{{ preamble }}</p>
+      <p :class="{'text-justify': inputType==='audioPassageRecord'}"
+         v-html="preamble">{{ preamble }}</p>
     </div>
     <div class="lead scroll mb-3 pr-3 pl-3" v-if="title">
       <p :class="{'text-justify': inputType==='audioPassageRecord'}" v-html="title">{{ title }}</p>
@@ -17,6 +18,7 @@
       <Radio
         :constraints="valueConstraints"
         :selected_language="selected_language"
+        :reprotermsUrl="reprotermsUrl"
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
@@ -129,6 +131,7 @@
       <SelectInput
         :constraints="valueConstraints"
         :selected_language="selected_language"
+        :reprotermsUrl="reprotermsUrl"
         :inputType="inputType"
         :init="init" v-on:valueChanged="sendData"/>
     </div>
@@ -208,6 +211,9 @@ import Static from '../Inputs/Static';
 export default {
   name: 'InputSelector',
   props: {
+    reprotermsUrl: {
+      type: String,
+    },
     inputType: {
       type: String,
     },

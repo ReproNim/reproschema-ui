@@ -56,6 +56,7 @@ export default {
       const fileUploadData = {};
       const JSONdata = {};
       const JSONscores = {};
+      // const jsonData = {};
       // sort out blobs from JSONdata
       _.map(data.response, (val, key) => {
         if (val instanceof Blob) {
@@ -94,19 +95,20 @@ export default {
         jszip.folder('data').file(`voice_item_${f + 1}.wav`, val);
         f += 1;
       });
+      // jsonData.score = JSONscores[0];
       jszip.generateAsync({ type: 'blob' })
         .then((myzipfile) => {
-          // axios.post('http://localhost:8000/check', JSONscores[0], {
-          axios.post('https://sig.mit.edu/vb/check', JSONscores[0], {
+          axios.post('http://localhost:8000/check', JSONscores[0], {
+          // axios.post('https://sig.mit.edu/vb/check', JSONscores[0], {
             ContentType: 'application/json',
           })
             .then((response) => {
               const formData = new FormData();
               formData.append('file', myzipfile);
               formData.append('token', response.data.token);
-              formData.append('clientIP', this.ipAddress);
-              // axios.post('http://localhost:8000/submit', formData, {
-              axios.post('https://sig.mit.edu/vb/submit', formData, {
+              // formData.append('clientIP', this.ipAddress);
+              axios.post('http://localhost:8000/submit', formData, {
+              // axios.post('https://sig.mit.edu/vb/submit', formData, {
                 'Content-Type': 'multipart/form-data',
               }).then((res) => {
                 this.hasData = true;
@@ -114,12 +116,14 @@ export default {
                 // console.log('SUCCESS!!', res);
                 this.$emit('valueChanged', { status: res.status });
               })
-                .catch(() => {
-                  console.log('FAILURE!!');
+                // eslint-disable-next-line no-unused-vars
+                .catch((e) => {
+                  // console.log('FAILURE!!', e);
                 });
             })
+            // eslint-disable-next-line no-unused-vars
             .catch((error) => {
-              console.log(error);
+              // console.log(error);
             });
         });
     },

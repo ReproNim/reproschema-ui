@@ -1,5 +1,10 @@
 <template>
   <div id="app" class="">
+    <nav class="navbar sticky-top navbar-custom">
+      <div class="navbar-brand">
+        This service is a demonstration for the ReproNim project.
+      </div>
+    </nav>
     <div class="wrapper">
       <!-- Sidebar -->
       <nav id="sidebar" v-bind:class="{'active':checkDisableBack}" ref="sidebar">
@@ -40,11 +45,6 @@
 
       <!-- Page Content -->
       <div id="content">
-        <nav class="navbar sticky-top navbar-custom">
-          <div class="navbar-brand">
-            Voice-up is a demo and not an actual study.
-          </div>
-        </nav>
         <!-- We'll fill this with dummy content -->
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
           <div class="container-fluid">
@@ -64,6 +64,7 @@
         </nav>
         <b-container>
           <router-view
+            :reprotermsUrl="reprotermsUrl"
             :srcUrl="srcUrl" :responses="responses[activityIndex]"
             :selected_language="selected_language"
             :ipAddress="clientIp"
@@ -97,24 +98,13 @@ import circleProgress from './components/Circle/';
 Vue.use(BootstrapVue);
 Vue.filter('reverse', value => value.slice().reverse());
 
-const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
+// let this.reprotermsUrl = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
 
 function getFilename(s) {
   const folders = s.split('/');
   const N = folders.length;
   const filename = folders[N - 1].split('.')[0];
   return filename;
-}
-
-function getVariableName(s, variableMap) {
-  const vmap = variableMap;
-  const mapper = {};
-  _.map(vmap, (v) => {
-    const uri = v[`${reproterms}isAbout`][0]['@id'];
-    const variable = v[`${reproterms}variableName`][0]['@value'];
-    mapper[uri] = variable;
-  });
-  return mapper[s];
 }
 
 export default {
@@ -130,6 +120,7 @@ export default {
       cache: {},
       isAnswered: false,
       clientIp: '',
+      reproterms2: '',
       // responses: [],
     };
   },
@@ -141,12 +132,19 @@ export default {
         this.$refs.sidebar.className = '';
       }
     },
-    getDefaultLanguage() {
-      return 'es';
+    getVariableName(s, variableMap) {
+      const vmap = variableMap;
+      const mapper = {};
+      _.map(vmap, (v) => {
+        const uri = v[`${this.reprotermsUrl}isAbout`][0]['@id'];
+        const variable = v[`${this.reprotermsUrl}variableName`][0]['@value'];
+        mapper[uri] = variable;
+      });
+      return mapper[s];
     },
     getDisplayName(activityUrl, displayNameMap) {
       // const dmap = displayNameMap;
-      const s = _.filter(displayNameMap, v1 => v1[`${reproterms}isAbout`][0]['@id'] === activityUrl);
+      const s = _.filter(displayNameMap, v1 => v1[`${this.reprotermsUrl}isAbout`][0]['@id'] === activityUrl);
       const dName = _.filter(s[0]['http://schema.org/alternateName'], d => d['@language'] === this.selected_language);
 
       if (!Array.isArray(dName) || !dName.length) {
@@ -155,13 +153,6 @@ export default {
         return s[0]['http://schema.org/alternateName'][0]['@value'];
       }
       return dName[0]['@value'];
-      // console.log(118, dName[0]['@value']);
-      // const mapper = {};
-      // _.map(dmap, (v) => {
-      //   const vr = _.filter(v[`${reproterms}variableName`], v1 => v1['@language'] === 'en');
-      //   const dName = _.filter(v['http://schema.org/alternateName'], v1 => v1['@language'] === 'en');
-      //   // mapper[vr[0]['@value']] = dName[0]['@value'];
-      // });
     },
     setActivity(index) {
       if (!this.checkDisableBack) { // check if disableBack not enabled
@@ -192,8 +183,6 @@ export default {
         // there has been a change in an already completed activity
         needsVizUpdate = true;
       }
-      // const flag = 'response';
-      // console.log(150, flag, key, value);
       this.$store.dispatch('saveResponse', { key, value });
       if (needsVizUpdate) {
         this.setVisbility();
@@ -211,15 +200,8 @@ export default {
       // TODO: this is a hack. the jsonld expander should give us this info.
       if (url) {
         if (!_.isEmpty(this.$store.state.schema)) {
-          const dname = this.getDisplayName(url, this.$store.state.schema[`${reproterms}displayNameMap`]);
+          const dname = this.getDisplayName(url, this.$store.state.schema[`${this.reprotermsUrl}displayNameMap`]);
           return dname;
-          // const nameMap = this.$store.state.schema[`${reproterms}activity_display_name`][0];
-          // if (url in nameMap) {
-          //   const mappedUrl = nameMap[url][0]['@id'];
-          //   const folders = mappedUrl.split('/');
-          //   const N = folders.length;
-          //   return folders[N - 1].split('_schema')[0].split('.jsonld')[0];
-          // }
         }
       }
       return null;
@@ -350,7 +332,11 @@ export default {
   created() {
     const url = this.$route.query.url;
     // console.log('url is', url);
-    this.$store.dispatch('getBaseSchema', url);
+    if (url) {
+      this.$store.dispatch('getReproTerm', url).then(() => {
+        this.$store.dispatch('getBaseSchema', url);
+      });
+    } else this.$store.dispatch('getBaseSchema', url);
   },
   mounted() {
     // console.log(329, this.$route.query.uid, this.$route.query.consented);
@@ -372,6 +358,9 @@ export default {
   computed: {
     srcUrl() {
       return this.$store.getters.srcUrl;
+    },
+    reprotermsUrl() {
+      return this.$store.getters.getTermsUrl;
     },
     schema() {
       return this.$store.state.schema;
@@ -396,7 +385,7 @@ export default {
     },
     schemaOrder() {
       if (!_.isEmpty(this.$store.state.schema)) {
-        const order = _.map(this.$store.state.schema[`${reproterms}order`][0]['@list'],
+        const order = _.map(this.$store.state.schema[`${this.reprotermsUrl}order`][0]['@list'],
           u => u['@id']);
         return order;
       }
@@ -406,11 +395,11 @@ export default {
       return ['en', 'es'];
     },
     allowExport() {
-      if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema[`${reproterms}allow`]) {
-        // console.log(351, this.$store.state.schema[reproterms+'allow'][0]['@list']);
-        const allowList = _.map(this.$store.state.schema[`${reproterms}allow`][0]['@list'],
+      if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema[`${this.reprotermsUrl}allow`]) {
+        // console.log(351, this.$store.state.schema[this.reprotermsUrl+'allow'][0]['@list']);
+        const allowList = _.map(this.$store.state.schema[`${this.reprotermsUrl}allow`][0]['@list'],
           u => u['@id']);
-        return allowList.includes(`${reproterms}allow_export`);
+        return allowList.includes(`${this.reprotermsUrl}allow_export`);
       }
       return false;
     },
@@ -419,8 +408,8 @@ export default {
       if (this.schemaOrder) {
         _.map(this.schemaOrder, (s) => {
           let fname = '';
-          if (this.schema[`${reproterms}variableMap`]) {
-            fname = getVariableName(s, this.schema[`${reproterms}variableMap`]);
+          if (this.schema[`${this.reprotermsUrl}variableMap`]) {
+            fname = this.getVariableName(s, this.schema[`${this.reprotermsUrl}variableMap`]);
           } else {
             // TODO: remove this backwards compatibility else
             fname = getFilename(s);
@@ -431,13 +420,11 @@ export default {
       return output;
     },
     visibilityConditions() {
-      if (this.schema[`${reproterms}visibility`]) {
-        // console.log(423, this.schema[`${reproterms}visibility`]);
-        // console.log(424, this.schema[`${reproterms}vis`]);
+      if (this.schema[`${this.reprotermsUrl}visibility`]) {
         return _.map(this.schemaOrder, (s) => {
           let keyName = '';
-          if (this.schema[`${reproterms}variableMap`]) {
-            keyName = getVariableName(s, this.schema[`${reproterms}variableMap`]);
+          if (this.schema[`${this.reprotermsUrl}variableMap`]) {
+            keyName = this.getVariableName(s, this.schema[`${this.reprotermsUrl}variableMap`]);
           } else {
             // TODO: remove this backwards compatibility else
             keyName = getFilename(s);
@@ -446,36 +433,33 @@ export default {
           // look through the "https://schema.repronim.org/visibility" field
           // and reformat nicely
 
-          let condition = _.filter(this.schema[`${reproterms}visibility`], c => c['@index'] === keyName);
-          const condition1 = _.filter(this.schema[`${reproterms}vis`], c => c[`${reproterms}variableName`][0]['@value'] === keyName);
+          let condition = _.filter(this.schema[`${this.reprotermsUrl}visibility`], c => c['@index'] === keyName);
+          const condition1 = _.filter(this.schema[`${this.reprotermsUrl}vis`], c => c[`${this.reprotermsUrl}variableName`][0]['@value'] === keyName);
           if (condition.length === 1) {
             condition = condition[0];
 
             // check which keys are in this condition:
-            console.log(442, condition);
-            console.log(443, 'cond1', condition1);
-            const conditionKeys = Object.keys(condition);
-            console.log(446, 'cond keys', conditionKeys);
-            console.log(447, 'cond1 isVis keys', Object.keys(condition1[0][`${reproterms}isVis`][0]));
-            console.log(448, 'cond1 variable keys', Object.keys(condition1[0][`${reproterms}variableName`][0]));
-
-            if ('@value' in condition1[0][`${reproterms}isVis`][0]) {
-              return condition1[0][`${reproterms}isVis`][0]['@value'];
+            // console.log(442, condition);
+            // console.log(443, 'cond1', condition1);
+            // const conditionKeys = Object.keys(condition);
+            // console.log(446, 'cond keys', conditionKeys);
+            if ('@value' in condition1[0][`${this.reprotermsUrl}isVis`][0]) {
+              return condition1[0][`${this.reprotermsUrl}isVis`][0]['@value'];
             }
             // if (conditionKeys.indexOf('@value') > -1) {
             //   return condition['@value'];
             // }
-            if (('http://schema.org/httpMethod' in condition1[0][`${reproterms}isVis`][0]) &&
-                ('http://schema.org/url' in condition1[0][`${reproterms}isVis`][0]) &&
-                (`${reproterms}payload` in condition1[0][`${reproterms}isVis`][0])) {
+            if (('http://schema.org/httpMethod' in condition1[0][`${this.reprotermsUrl}isVis`][0]) &&
+                ('http://schema.org/url' in condition1[0][`${this.reprotermsUrl}isVis`][0]) &&
+                (`${this.reprotermsUrl}payload` in condition1[0][`${this.reprotermsUrl}isVis`][0])) {
               // if (conditionKeys.indexOf('http://schema.org/httpMethod') > -1 &&
               //   conditionKeys.indexOf('http://schema.org/url') > -1 &&
-              //   conditionKeys.indexOf(`${reproterms}payload`) > -1
+              //   conditionKeys.indexOf(`${this.reprotermsUrl}payload`) > -1
               // ) {
               // lets fill the payload here.
               const payload = {};
-              // const payloadList = condition[`${reproterms}payload`];
-              const payloadList = condition1[0][`${reproterms}isVis`][0][`${reproterms}payload`];
+              // const payloadList = condition[`${this.reprotermsUrl}payload`];
+              const payloadList = condition1[0][`${this.reprotermsUrl}isVis`][0][`${this.reprotermsUrl}payload`];
               _.map(payloadList, (p) => {
                 const item = p['@value'];
                 const index = this.schemaOrder.indexOf(this.schemaNameMapper[item]);
@@ -496,18 +480,18 @@ export default {
       return _.mapValues(this.schemaOrder, () => true);
     },
     checkDisableBack() {
-      if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema[`${reproterms}allow`]) {
-        const allowList = _.map(this.$store.state.schema[`${reproterms}allow`][0]['@list'],
+      if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema[`${this.reprotermsUrl}allow`]) {
+        const allowList = _.map(this.$store.state.schema[`${this.reprotermsUrl}allow`][0]['@list'],
           u => u['@id']);
-        return allowList.includes(`${reproterms}disable_back`); // if true then hide sidebar on-load and activities cannot be clicked
+        return allowList.includes(`${this.reprotermsUrl}disable_back`); // if true then hide sidebar on-load and activities cannot be clicked
       }
       return false;
     },
     checkAdvance() {
-      if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema[`${reproterms}allow`]) {
-        const allowList = _.map(this.$store.state.schema[`${reproterms}allow`][0]['@list'],
+      if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema[`${this.reprotermsUrl}allow`]) {
+        const allowList = _.map(this.$store.state.schema[`${this.reprotermsUrl}allow`][0]['@list'],
           u => u['@id']);
-        return allowList.includes(`${reproterms}auto_advance`);
+        return allowList.includes(`${this.reprotermsUrl}auto_advance`);
       }
       return false;
     },
