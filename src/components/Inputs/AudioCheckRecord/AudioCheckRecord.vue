@@ -137,9 +137,9 @@ export default {
               }
             };
           })
+          // eslint-disable-next-line no-unused-vars
           .catch((err) => {
             /* handle the error */
-            console.log(err);
             this.supported = false;
           });
       }

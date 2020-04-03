@@ -198,12 +198,12 @@ export default {
       }
     },
     setResponse(val, index) {
-      const t1 = performance.now();
+      // const t1 = performance.now();
       // console.log(202, 'end of a section-question', index, 'is', t1);
-      const respData = { startedAt: this.t0 / 1000,
-        recordedAt: t1 / 1000,
-        value: val };
-        // console.log(207, 'section resp obj', respData);
+      // const respData = { startedAt: this.t0 / 1000,
+      //   recordedAt: t1 / 1000,
+      //   value: val };
+      // console.log(207, 'section resp obj', respData);
       this.$emit('saveResponse', this.context[index]['@id'], val);
       const currResponses = { ...this.responses };
       // console.log(204, 'cur resp', currResponses, this.context[index]['@id'], val);
@@ -219,7 +219,6 @@ export default {
           }
         });
         if (!_.isEmpty(this.scores)) {
-          console.log(216, 'section score', this.srcUrl, this.scores);
           this.$emit('saveScores', this.srcUrl, this.scores);
         }
       }
@@ -244,7 +243,6 @@ export default {
             scoreMapper[responseMapper[scoreVariableName].ref] = scoreFormula;
           }
         });
-        console.log(236, 'sec scoremapper', scoreMapper);
         return scoreMapper;
       }
       return {};

@@ -133,7 +133,6 @@ export default {
       }
     },
     getVariableName(s, variableMap) {
-      console.log(111, this.reprotermsUrl);
       const vmap = variableMap;
       const mapper = {};
       _.map(vmap, (v) => {
@@ -333,9 +332,11 @@ export default {
   created() {
     const url = this.$route.query.url;
     // console.log('url is', url);
-    this.$store.dispatch('getReproTerm', url).then(() => {
-      this.$store.dispatch('getBaseSchema', url);
-    });
+    if (url) {
+      this.$store.dispatch('getReproTerm', url).then(() => {
+        this.$store.dispatch('getBaseSchema', url);
+      });
+    } else this.$store.dispatch('getBaseSchema', url);
   },
   mounted() {
     // console.log(329, this.$route.query.uid, this.$route.query.consented);
@@ -384,7 +385,6 @@ export default {
     },
     schemaOrder() {
       if (!_.isEmpty(this.$store.state.schema)) {
-        console.log(396, this.reprotermsUrl, this.$store.state.schema);
         const order = _.map(this.$store.state.schema[`${this.reprotermsUrl}order`][0]['@list'],
           u => u['@id']);
         return order;
@@ -421,8 +421,6 @@ export default {
     },
     visibilityConditions() {
       if (this.schema[`${this.reprotermsUrl}visibility`]) {
-        // console.log(423, this.schema[`${this.reprotermsUrl}visibility`]);
-        // console.log(424, this.schema[`${this.reprotermsUrl}vis`]);
         return _.map(this.schemaOrder, (s) => {
           let keyName = '';
           if (this.schema[`${this.reprotermsUrl}variableMap`]) {
@@ -441,13 +439,10 @@ export default {
             condition = condition[0];
 
             // check which keys are in this condition:
-            console.log(442, condition);
-            console.log(443, 'cond1', condition1);
-            const conditionKeys = Object.keys(condition);
-            console.log(446, 'cond keys', conditionKeys);
-            console.log(447, 'cond1 isVis keys', Object.keys(condition1[0][`${this.reprotermsUrl}isVis`][0]));
-            console.log(448, 'cond1 variable keys', Object.keys(condition1[0][`${this.reprotermsUrl}variableName`][0]));
-
+            // console.log(442, condition);
+            // console.log(443, 'cond1', condition1);
+            // const conditionKeys = Object.keys(condition);
+            // console.log(446, 'cond keys', conditionKeys);
             if ('@value' in condition1[0][`${this.reprotermsUrl}isVis`][0]) {
               return condition1[0][`${this.reprotermsUrl}isVis`][0]['@value'];
             }
@@ -468,7 +463,6 @@ export default {
               _.map(payloadList, (p) => {
                 const item = p['@value'];
                 const index = this.schemaOrder.indexOf(this.schemaNameMapper[item]);
-                console.log(472, this.scores);
                 payload[this.schemaNameMapper[item]] = this.scores[index];
               });
               return {

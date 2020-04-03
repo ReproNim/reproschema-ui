@@ -85,13 +85,12 @@ export default {
   mounted() {
     if (this.srcUrl) {
       // eslint-disable-next-line
-      console.log(87, 'multi mounted', this.srcUrl);
+      // console.log(87, this.srcUrl);
       this.getData();
     }
   },
   methods: {
     getData() {
-      console.log(93, 'multi getdata', this.srcUrl);
       jsonld.expand(this.srcUrl).then((resp) => {
         this.activity = resp[0];
         this.listShow = [0];
@@ -105,8 +104,9 @@ export default {
           }
           this.visibility = this.getVisibility(this.responses);
         });
+        // eslint-disable-next-line no-unused-vars
       }).catch((e) => {
-        console.log(106, 'multi error', e);
+        // console.log(106, 'multi error', e);
       });
     },
     getVisibility(responses) {

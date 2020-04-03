@@ -20,7 +20,6 @@ const state = {
   activityReady: false,
   termUrl: 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/',
 };
-// const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
 
 const getters = {
   // eslint-disable-next-line
@@ -45,9 +44,7 @@ const mutations = {
   setReprotermUrl(state, url) {
     axios.get(url).then((response) => {
       const ctx = _.filter(response.data['@context'], c => c.includes('contexts/generic'));
-      console.log(40, ctx);
       axios.get(ctx[0]).then((resp) => {
-        console.log(46, resp.data['@context'].reproterms);
         state.termUrl = resp.data['@context'].reproterms;
       });
     });

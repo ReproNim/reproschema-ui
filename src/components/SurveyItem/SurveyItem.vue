@@ -121,9 +121,6 @@ export default {
     responses: {
       type: Object,
     },
-    score: {
-      type: Number,
-    },
     selected_language: {
       type: String,
     },
@@ -243,11 +240,13 @@ export default {
         .then((rsp) => {
           // console.log(237, rsp);
           this.requireVal = rsp[0][`${this.reprotermsUrl}requiredValue`][0]['@value'];
+          // eslint-disable-next-line no-unused-vars
         }).catch((e) => {
           // console.log(240, 'constraint error', e);
           jsonld.expand(`${this.data[`${this.reprotermsUrl}valueconstraints`][0]['@id']}.jsonld`).then((resp) => {
             // console.log(250, resp);
             this.requireVal = resp[0][`${this.reprotermsUrl}requiredValue`][0]['@value'];
+            // eslint-disable-next-line no-unused-vars
           }).catch((e1) => {
             // console.log(252, e1);
           });
@@ -256,10 +255,12 @@ export default {
     getValueConstraintsData(url) {
       jsonld.expand(url).then((rsp) => {
         this.valueC = rsp[0];
+        // eslint-disable-next-line no-unused-vars
       }).catch((e) => {
         // console.log(254, e);
         jsonld.expand(`${url}.jsonld`).then((rsp) => {
           this.valueC = rsp[0];
+          // eslint-disable-next-line no-unused-vars
         }).catch((e2) => {
           // console.log(267, e2);
         });
@@ -296,11 +297,13 @@ export default {
         },
       }).then((resp) => {
         this.processActivityData(resp);
+        // eslint-disable-next-line no-unused-vars
       }).catch((e) => {
         // console.log(270, e);
         jsonld.expand(`${this.item['@id']}.jsonld`).then((resp) => {
           // console.log(272, 'success', resp);
           this.processActivityData(resp);
+          // eslint-disable-next-line no-unused-vars
         }).catch((e1) => {
           // console.log(this.item['@id'], e1);
         });
@@ -334,7 +337,6 @@ export default {
       this.sendNext();
     },
     setScore(key, scoreObj) {
-      console.log(291, 'score obj', scoreObj, this.index);
       this.$emit('setScores', scoreObj, this.index);
     },
     setMPResponse(index, value) {

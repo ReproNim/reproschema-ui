@@ -46,7 +46,6 @@
             :selected_language="selected_language"
             :clientIp="ipAddress"
             :showPassOptions="findPassOptions"
-            :score="score"
             :reprotermsUrl="reprotermsUrl"
           />
         </transition>
@@ -101,7 +100,7 @@ export default {
       listShow: [],
       parsedJSONLD: {},
       visibility: {},
-      score: 0,
+      scores: {},
       isSkip: false,
       isDontKnow: false,
       isVis: false,
@@ -133,29 +132,27 @@ export default {
         });
       });
     },
-    evaluateScoringLogic() {
-      const scoringLogic = (this.activity[`${this.reprotermsUrl}scoringLogic`][0][`${this.reprotermsUrl}jsExpression`][0]['@value']);
-      if (this.responses) {
-        let str = '';
-        _.forOwn(this.responses, (val, key) => {
-          const qId = (key.split(/\/items\//))[1]; // split url to get the scoring key
-          if (scoringLogic) {
-            if (isNaN(val)) {
-              str += `const ${qId}=0; `;
-            } else {
-              str += `const ${qId}=${val}; `;
-            }
+    getScoring(responses) {
+      // console.log(225, 'responses', responses);
+      const responseMapper = this.responseMapper(responses);
+      // console.log(227, 'response mapper', responseMapper);
+      if (!_.isEmpty(this.activity[`${this.reprotermsUrl}scoringLogic`])) {
+        const scoreMapper = {};
+        _.map(this.activity[`${this.reprotermsUrl}scoringLogic`], (a) => {
+          // console.log(231, 'logic a', a);
+          let scoreFormula = a[`${this.reprotermsUrl}jsExpression`][0]['@value'];
+          const scoreVariableName = a[`${this.reprotermsUrl}variableName`][0]['@value'];
+          if (_.isString(scoreFormula)) {
+            scoreFormula = this.evaluateString(scoreFormula, responseMapper);
+            // console.log(235, 'a.val', val);
+          }
+          if (responseMapper[scoreVariableName]) {
+            scoreMapper[responseMapper[scoreVariableName].ref] = scoreFormula;
           }
         });
-        try {
-          // eslint-disable-next-line
-          // eslint-disable-next-line no-eval
-          this.score = eval(`${str}  ${scoringLogic}`);
-          console.log('TOTAL SCORING LOGIC::::', this.score);
-        } catch (e) {
-          // Do nothing
-        }
+        return scoreMapper;
       }
+      return {};
     },
     nextQuestion(idx, skip, dontKnow) {
       if (idx === 8 && (this.context[idx]['@id']).split('items/')[1] === 'phq9_9') {
@@ -234,17 +231,24 @@ export default {
       } else {
         currResponses[this.context[index]['@id']] = val;
       }
-      console.log(239, currResponses);
       this.visibility = this.getVisibility(currResponses);
+      // if (!_.isEmpty(this.activity[`${this.reprotermsUrl}scoringLogic`])) {
+      //   // TODO: if you uncomment the scoring logic evaluation, things break w/ multipart.
+      //   this.evaluateScoringLogic();
+      // }
       if (!_.isEmpty(this.activity[`${this.reprotermsUrl}scoringLogic`])) {
-        // TODO: if you uncomment the scoring logic evaluation, things break w/ multipart.
-        console.log(243, this.activity[`${this.reprotermsUrl}scoringLogic`]);
-        this.evaluateScoringLogic();
+        _.map(this.getScoring(this.responses), (score, key) => {
+          if (!_.isNaN(score)) {
+            this.scores[key] = score;
+          }
+        });
+        if (!_.isEmpty(this.scores)) {
+          this.$emit('saveScores', this.srcUrl, this.scores);
+        }
       }
       this.updateProgress();
     },
     setScore(scoreObj, index) {
-      console.log(236, 'set score in survey', this.context[index]['@id'], scoreObj);
       this.$emit('saveScores', this.context[index]['@id'], scoreObj);
     },
     restart() {
@@ -266,7 +270,6 @@ export default {
           output = output.replace(k, 0);
         }
       });
-      console.log(267, output, safeEval(output));
       return safeEval(output);
     },
     responseMapper(responses) {

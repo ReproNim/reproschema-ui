@@ -48,7 +48,6 @@ export default {
     uploadZipData() {
       const Response = this.$store.state.responses;
       const totalScores = this.$store.state.scores;
-      console.log(61, this.$store.state.scores);
       const totalResponse = { response: Response, scores: totalScores };
       this.formatData(totalResponse);
     },
@@ -97,7 +96,6 @@ export default {
         f += 1;
       });
       // jsonData.score = JSONscores[0];
-      console.log(99, JSONscores);
       jszip.generateAsync({ type: 'blob' })
         .then((myzipfile) => {
           axios.post('http://localhost:8000/check', JSONscores[0], {
@@ -105,7 +103,6 @@ export default {
             ContentType: 'application/json',
           })
             .then((response) => {
-              console.log(104, response);
               const formData = new FormData();
               formData.append('file', myzipfile);
               formData.append('token', response.data.token);
@@ -119,12 +116,14 @@ export default {
                 // console.log('SUCCESS!!', res);
                 this.$emit('valueChanged', { status: res.status });
               })
+                // eslint-disable-next-line no-unused-vars
                 .catch((e) => {
-                  console.log('FAILURE!!', e);
+                  // console.log('FAILURE!!', e);
                 });
             })
+            // eslint-disable-next-line no-unused-vars
             .catch((error) => {
-              console.log(error);
+              // console.log(error);
             });
         });
     },
