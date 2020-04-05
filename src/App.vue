@@ -26,7 +26,7 @@
             <a @click="setActivity(index)"
                v-if="visibility[index]"
                :class="{'current': index===activityIndex}">
-              <circleProgress
+              <circleProgress v-if="isProtocolUrl"
                 :radius="20"
                 :progress="progress[index]"
                 :stroke="4"
@@ -200,6 +200,12 @@ export default {
       // TODO: this is a hack. the jsonld expander should give us this info.
       if (url) {
         if (!_.isEmpty(this.$store.state.schema)) {
+          if (this.getschemaType === 'Activity') {
+            // console.log(203, this.$store.state.schema[`${this.reprotermsUrl}variableMap`]);
+            const varMap = this.$store.state.schema[`${this.reprotermsUrl}variableMap`];
+            const itemVmap = _.filter(varMap, v => v[`${this.reprotermsUrl}isAbout`][0]['@id'] === url);
+            return itemVmap[0][`${this.reprotermsUrl}variableName`][0]['@value'];
+          }
           const dname = this.getDisplayName(url, this.$store.state.schema[`${this.reprotermsUrl}displayNameMap`]);
           return dname;
         }
@@ -356,6 +362,16 @@ export default {
     }
   },
   computed: {
+    getschemaType() {
+      return this.$store.getters.getschemaType;
+    },
+    isProtocolUrl() {
+      if (this.getschemaType === 'Activity') {
+        // eslint-disable-next-line no-console
+        console.log(368, 'false');
+        return false;
+      } return true;
+    },
     srcUrl() {
       return this.$store.getters.srcUrl;
     },
