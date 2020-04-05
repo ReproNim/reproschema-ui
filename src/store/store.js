@@ -38,7 +38,6 @@ const getters = {
   srcUrl(state) {
     if (!_.isEmpty(state.schema) && state.activityIndex) {
       state.schemaType = (state.schema['@type'][0]).split('schemas/')[1];
-      console.log(36, state.schemaType);
       if (state.schemaType === 'Activity') {
         return state.schema['@id']; // for rendering parameterized activities
       } return state.schema[`${state.termUrl}order`][0]['@list'][state.activityIndex]['@id'];
