@@ -155,7 +155,7 @@ export default {
       return dName[0]['@value'];
     },
     setActivity(index) {
-      if (!this.checkDisableBack) { // check if disableBack not enabled
+      if (!this.checkDisableBack && this.isProtocolUrl) { // check if disableBack not enabled
         if (this.$route.query.url) {
           this.$router.push(`/activities/${index}?url=${this.$route.query.url}`);
         } else {
