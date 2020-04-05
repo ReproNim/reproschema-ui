@@ -8,6 +8,9 @@ import axios from 'axios';
 
 window.jsonld = jsonld;
 
+const reproschemaUrlRl = 'https://schema.repronim.org/rl/schemas/';
+const reproschemaUrlgit = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/schemas/';
+
 Vue.use(Vuex);
 const state = {
   schema: {},
@@ -19,9 +22,14 @@ const state = {
   storeReady: false,
   activityReady: false,
   termUrl: 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/',
+  schemaType: '',
 };
 
 const getters = {
+  // eslint-disable-next-line
+  getschemaType(state) {
+    return state.schemaType;
+  },
   // eslint-disable-next-line
   getTermsUrl(state) {
     return state.termUrl;
@@ -29,7 +37,10 @@ const getters = {
   // eslint-disable-next-line
   srcUrl(state) {
     if (!_.isEmpty(state.schema) && state.activityIndex) {
-      return state.schema[`${state.termUrl}order`][0]['@list'][state.activityIndex]['@id'];
+      state.schemaType = (state.schema['@type'][0]).split('schemas/')[1];
+      if (state.schemaType === 'Activity') {
+        return state.schema['@id']; // for rendering parameterized activities
+      } return state.schema[`${state.termUrl}order`][0]['@list'][state.activityIndex]['@id'];
     }
     return null;
   },
@@ -51,12 +62,14 @@ const mutations = {
   },
   // eslint-disable-next-line
   setBaseSchema(state, data) {
+    console.log(54, data);
     state.schema = data[0];
     state.progress = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => 0);
     state.responses = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => ({}));
     state.scores = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => ({}));
     state.activities = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => ({}));
     state.storeReady = true;
+    console.log(61, state);
   },
   // eslint-disable-next-line
   setActivityIndex(state, idx) {

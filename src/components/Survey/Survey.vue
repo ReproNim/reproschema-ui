@@ -113,7 +113,6 @@ export default {
     getData() {
       jsonld.expand(this.srcUrl).then((resp) => {
         this.activity = resp[0];
-        // console.log(117, this.activity);
         this.listShow = [0];
         this.$nextTick(() => {
           // set listShow if there are responses for items in the context
