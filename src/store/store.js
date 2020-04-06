@@ -8,9 +8,6 @@ import axios from 'axios';
 
 window.jsonld = jsonld;
 
-const reproschemaUrlRl = 'https://schema.repronim.org/rl/schemas/';
-const reproschemaUrlgit = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/schemas/';
-
 Vue.use(Vuex);
 const state = {
   schema: {},
@@ -62,14 +59,12 @@ const mutations = {
   },
   // eslint-disable-next-line
   setBaseSchema(state, data) {
-    console.log(54, data);
     state.schema = data[0];
     state.progress = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => 0);
     state.responses = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => ({}));
     state.scores = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => ({}));
     state.activities = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => ({}));
     state.storeReady = true;
-    console.log(61, state);
   },
   // eslint-disable-next-line
   setActivityIndex(state, idx) {
