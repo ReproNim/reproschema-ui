@@ -367,8 +367,6 @@ export default {
     },
     isProtocolUrl() {
       if (this.getschemaType === 'Activity') {
-        // eslint-disable-next-line no-console
-        console.log(368, 'false');
         return false;
       } return true;
     },
