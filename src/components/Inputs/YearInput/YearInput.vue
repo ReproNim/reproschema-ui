@@ -1,8 +1,8 @@
 <template>
   <div class="DateInput">
-    <datepicker placeholder="Select Year" v-model="input" lang="en"
+    <datepicker placeholder="Select Date" v-model="input" lang=selected_language
                 :disabledDates="dateParam.disabledDates" :format="customFormatter"
-                :minimumView="'year'" :maximumView="'year'" :initialView="'year'"
+                :minimumView=inputType :maximumView="'year'" :initialView=inputType
                 ></datepicker>
   </div>
 </template>
@@ -13,7 +13,7 @@ import moment from 'moment';
 
 export default {
   name: 'DateInput',
-  props: ['constraints', 'init'],
+  props: ['constraints', 'init', 'inputType', 'selected_language'],
   components: {
     Datepicker,
   },
@@ -30,7 +30,11 @@ export default {
       this.$emit('valueChanged', val.getFullYear());
     },
     customFormatter(date) {
-      return moment(date).format('YYYY');
+      if (this.inputType === 'year') {
+        return moment(date).format('YYYY');
+      } else if (this.inputType === 'date') {
+        return moment(date).format('MMM DD YYYY');
+      } return date;
     },
   },
   data() {
