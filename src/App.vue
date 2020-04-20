@@ -1,9 +1,9 @@
 <template>
   <div id="app" class="">
     <nav class="navbar sticky-top navbar-custom">
-      <div class="navbar-brand">
-        This service is a demonstration for the ReproNim project.
-      </div>
+      <b-navbar-nav class="navbar-brand">
+        <b-nav-text>This service is a demonstration for the ReproNim project.</b-nav-text>
+      </b-navbar-nav>
     </nav>
     <div class="wrapper">
       <!-- Sidebar -->
@@ -32,7 +32,7 @@
                 :stroke="4"
                 strokeColor="#007bff" />
               <span class="align-middle activityItem">
-                     {{getName(ui)}}
+                     {{displayNames[ui]}}
                    </span>
             </a>
           </li>
@@ -89,6 +89,7 @@ import BootstrapVue from 'bootstrap-vue';
 import axios from 'axios';
 import _ from 'lodash';
 import JSZip from 'jszip';
+import jsonld from 'jsonld/dist/jsonld.min';
 import 'jszip/dist/jszip.min';
 import { saveAs } from 'file-saver';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -117,6 +118,7 @@ export default {
       sidebarActive: true,
       selected_language: '',
       visibility: {},
+      displayNames: {},
       cache: {},
       isAnswered: false,
       clientIp: '',
@@ -152,7 +154,7 @@ export default {
         // ⇒ do not attempt to process array
         return s[0]['http://schema.org/alternateName'][0]['@value'];
       }
-      return dName[0]['@value'];
+      this.displayNames[activityUrl] = dName[0]['@value'];
     },
     setActivity(index) {
       if (!this.checkDisableBack && this.isProtocolUrl) { // check if disableBack not enabled
@@ -197,11 +199,13 @@ export default {
       this.$forceUpdate();
     },
     getName(url) {
-      // TODO: this is a hack. the jsonld expander should give us this info.
       if (url) {
         if (!_.isEmpty(this.$store.state.schema)) {
-          if (this.getschemaType === 'Activity') {
+          // TODO: displayNameMap can be used to override prefLabel
+          if (this.getschemaType === 'Activity') { // get display name for items from prefLabel
             // console.log(203, this.$store.state.schema[`${this.reprotermsUrl}variableMap`]);
+            this.getPrefLabel(url);
+            // console.log(207, name);
             const varMap = this.$store.state.schema[`${this.reprotermsUrl}variableMap`];
             const itemVmap = _.filter(varMap, v => v[`${this.reprotermsUrl}isAbout`][0]['@id'] === url);
             return itemVmap[0][`${this.reprotermsUrl}variableName`][0]['@value'];
@@ -211,6 +215,35 @@ export default {
         }
       }
       return null;
+    },
+    getDName() {
+      if (!_.isEmpty(this.$store.state.schema)) {
+        if (this.$store.state.schema[`${this.reprotermsUrl}displayNameMap`]) {
+          // TODO: displayNameMap can be used to override prefLabel
+          if (this.schemaOrder) {
+            _.map(this.schemaOrder, (s) => {
+              this.getDisplayName(s, this.$store.state.schema[`${this.reprotermsUrl}displayNameMap`]);
+            });
+          }
+        } else { // get display name for items from prefLabel
+          // eslint-disable-next-line no-lonely-if
+          if (this.schemaOrder) {
+            _.map(this.schemaOrder, (s) => {
+              this.getPrefLabel(s);
+            });
+          }
+        }
+      }
+    },
+    getPrefLabel(activityUrl) {
+      // get schema order array.
+      // loop over array and do the following:
+      jsonld.expand(activityUrl).then((resp) => {
+        const label = (_.filter(resp[0]['http://www.w3.org/2004/02/skos/core#prefLabel'], pl =>
+          pl['@language'] === this.selected_language))[0]['@value'];
+        this.displayNames[activityUrl] = label;
+      });
+      // this.displayName[activityUrl] = label;
     },
     async computeVisibilityCondition(cond, index) {
       if (_.isObject(cond)) {
@@ -340,9 +373,11 @@ export default {
     // console.log('url is', url);
     if (url) {
       this.$store.dispatch('getReproTerm', url).then(() => {
-        this.$store.dispatch('getBaseSchema', url);
+        this.$store.dispatch('getBaseSchema', url).then(() => this.getDName());
       });
-    } else this.$store.dispatch('getBaseSchema', url);
+    } else {
+      this.$store.dispatch('getBaseSchema', url).then(() => this.getDName());
+    }
   },
   mounted() {
     // console.log(329, this.$route.query.uid, this.$route.query.consented);
