@@ -14,6 +14,7 @@ const state = {
   progress: [],
   responses: [],
   scores: {},
+  participantId: '',
   activities: [],
   activityIndex: null,
   storeReady: false,
@@ -83,6 +84,10 @@ const mutations = {
     //   console.log(58, val, scoreKey, state.scores);
     //   state.scores[key][scoreKey] = val;
     // });
+  },
+  // eslint-disable-next-line
+  saveParticipantId(state, uid) {
+    state.participantId = uid;
   },
   // eslint-disable-next-line
   updateProgress(state, progress) {

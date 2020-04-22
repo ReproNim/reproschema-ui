@@ -242,6 +242,8 @@ export default {
         const label = (_.filter(resp[0]['http://www.w3.org/2004/02/skos/core#prefLabel'], pl =>
           pl['@language'] === this.selected_language))[0]['@value'];
         this.displayNames[activityUrl] = label;
+      }).catch((e) => {
+        console.log(246, activityUrl, e);
       });
       // this.displayName[activityUrl] = label;
     },
@@ -298,7 +300,8 @@ export default {
     downloadZipData() {
       const Response = this.$store.state.responses;
       const totalScores = this.$store.state.scores;
-      const totalResponse = { response: Response, scores: totalScores };
+      const uId = this.$store.state.participantId;
+      const totalResponse = { response: Response, scores: totalScores, participantId: uId };
       this.formatData(totalResponse);
     },
     formatData(data) {
@@ -309,12 +312,14 @@ export default {
       // sort out blobs from JSONdata
       _.map(data.response, (val, key) => {
         if (val instanceof Blob) {
+          console.log(315, key, val);
           fileUploadData[key] = val;
         } else if (_.isObject(val)) {
           // make sure there aren't any Blobs here.
           // if there are, add them to fileUploadData
           _.map(val, (val2, key2) => {
             if (val2 instanceof Blob) {
+              console.log(322, val, key2, val2);
               fileUploadData[`${key2}`] = val2;
             } else {
               // refill the object.
@@ -333,17 +338,21 @@ export default {
           JSONscores[key] = val;
         }
       });
+      console.log(341, JSONdata);
       _.map(JSONdata, (val, key) => {
+        // console.log(342, (key));
         jszip.folder('data/responses').file(`activity_${key}.json`, JSON.stringify(val, null, 4));
       });
       _.map(JSONscores, (val, key) => {
         jszip.folder('data/scores').file(`activity_${key}_score.json`, JSON.stringify(val, null, 4));
       });
-      let f = 0;
-      _.map(fileUploadData, (val) => {
-        jszip.folder('data').file(`voice_item_${f + 1}.wav`, val);
-        f += 1;
+      _.map(fileUploadData, (val, key) => {
+        const keyStrings = (key.split('activities/')[1]).split('/items/');
+        jszip.folder(`data/responses/${keyStrings[0]}`).file(`${keyStrings[1]}.wav`, val);
       });
+      if (data.participantId) {
+        jszip.file('userDetails.json', data.participantId);
+      }
       jszip.generateAsync({ type: 'blob' })
         .then((myzipfile) => {
           saveAs(myzipfile, 'study-data.zip');
@@ -388,6 +397,10 @@ export default {
     if (this.$route.query.lang) {
       this.selected_language = this.$route.query.lang;
     } else this.selected_language = 'en';
+
+    if (this.$route.query.uid) {
+      this.$store.dispatch('saveParticipantId', this.$route.query.uid);
+    }
     // axios.get('https://api.muctool.de/whois').then((resp) => {
     //   // console.log(32, resp.data.ip);
     //   this.clientIp = resp.data.ip;
