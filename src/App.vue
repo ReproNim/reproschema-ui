@@ -14,10 +14,10 @@
         <div>
           <select v-model="selected_language">
             <option disabled value="">Select Language</option>
-            <!--<option v-for="item in getListofLanguages" :value="item"
-            :key="item">{{item}}</option>-->
-            <option value="en">English</option>
-            <option value="es">Spanish</option>
+            <option v-for="option in languageOptions" v-bind:value="option.value"
+            :key="option.text">
+              {{option.text}}
+            </option>
           </select>
         </div>
         <ul class="list-unstyled components">
@@ -119,6 +119,7 @@ export default {
       selected_language: '',
       visibility: {},
       displayNames: {},
+      langMap: {},
       cache: {},
       isAnswered: false,
       clientIp: '',
@@ -146,15 +147,19 @@ export default {
     },
     getDisplayName(activityUrl, displayNameMap) {
       // const dmap = displayNameMap;
+      // console.log(156, activityUrl, displayNameMap);
       const s = _.filter(displayNameMap, v1 => v1[`${this.reprotermsUrl}isAbout`][0]['@id'] === activityUrl);
+      // console.log(152, s);
       const dName = _.filter(s[0]['http://schema.org/alternateName'], d => d['@language'] === this.selected_language);
-
+      // console.log(154, dName);
       if (!Array.isArray(dName) || !dName.length) {
         // array does not exist, is not an array, or is empty
         // ⇒ do not attempt to process array
+        // console.log(156, s);
         return s[0]['http://schema.org/alternateName'][0]['@value'];
       }
-      this.displayNames[activityUrl] = dName[0]['@value'];
+      return dName[0]['@value'];
+      // this.displayNames[activityUrl] = dName[0]['@value'];
     },
     setActivity(index) {
       if (!this.checkDisableBack && this.isProtocolUrl) { // check if disableBack not enabled
@@ -204,13 +209,15 @@ export default {
           // TODO: displayNameMap can be used to override prefLabel
           if (this.getschemaType === 'Activity') { // get display name for items from prefLabel
             // console.log(203, this.$store.state.schema[`${this.reprotermsUrl}variableMap`]);
-            this.getPrefLabel(url);
-            // console.log(207, name);
+            const l = this.getLabel(url);
+            console.log(207, l);
             const varMap = this.$store.state.schema[`${this.reprotermsUrl}variableMap`];
             const itemVmap = _.filter(varMap, v => v[`${this.reprotermsUrl}isAbout`][0]['@id'] === url);
             return itemVmap[0][`${this.reprotermsUrl}variableName`][0]['@value'];
           }
           const dname = this.getDisplayName(url, this.$store.state.schema[`${this.reprotermsUrl}displayNameMap`]);
+          console.log(219, dname);
+          this.displayNames[url] = dname;
           return dname;
         }
       }
@@ -222,18 +229,26 @@ export default {
           // TODO: displayNameMap can be used to override prefLabel
           if (this.schemaOrder) {
             _.map(this.schemaOrder, (s) => {
-              this.getDisplayName(s, this.$store.state.schema[`${this.reprotermsUrl}displayNameMap`]);
+              const dname = this.getDisplayName(s, this.$store.state.schema[`${this.reprotermsUrl}displayNameMap`]);
+              this.displayNames[s] = dname;
             });
           }
         } else { // get display name for items from prefLabel
           // eslint-disable-next-line no-lonely-if
           if (this.schemaOrder) {
             _.map(this.schemaOrder, (s) => {
-              this.getPrefLabel(s);
+              this.getLabel(s);
             });
           }
         }
       }
+    },
+    async getLabel(activityUrl) {
+      const resp = await jsonld.expand(activityUrl);
+      const label = (_.filter(resp[0]['http://www.w3.org/2004/02/skos/core#prefLabel'], pl =>
+        pl['@language'] === this.selected_language))[0]['@value'];
+      console.log(250, label);
+      this.displayNames[activityUrl] = label;
     },
     getPrefLabel(activityUrl) {
       // get schema order array.
@@ -241,6 +256,7 @@ export default {
       jsonld.expand(activityUrl).then((resp) => {
         const label = (_.filter(resp[0]['http://www.w3.org/2004/02/skos/core#prefLabel'], pl =>
           pl['@language'] === this.selected_language))[0]['@value'];
+        console.log(250, label);
         this.displayNames[activityUrl] = label;
       }).catch((e) => {
         console.log(246, activityUrl, e);
@@ -408,6 +424,9 @@ export default {
     if (this.$route.params.id) {
       this.$store.dispatch('setActivityIndex', this.$route.params.id);
     }
+    axios.get('https://raw.githubusercontent.com/ReproNim/reproschema/master/resources/languages.json').then((resp) => {
+      this.langMap = resp.data;
+    });
   },
   computed: {
     getschemaType() {
@@ -453,8 +472,12 @@ export default {
       }
       return [];
     },
-    getListofLanguages() {
-      return ['en', 'es'];
+    languageOptions() {
+      if (!_.isEmpty(this.$store.state.schema)) {
+        const langCodeList = _.map(this.$store.state.schema['http://www.w3.org/2004/02/skos/core#prefLabel'], l => l['@language']);
+        const langList = _.map(langCodeList, c => ({ value: c, text: this.langMap[c] }));
+        return langList;
+      } return [];
     },
     allowExport() {
       if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema[`${this.reprotermsUrl}allow`]) {
