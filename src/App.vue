@@ -32,7 +32,7 @@
                 :stroke="4"
                 strokeColor="#007bff" />
               <span class="align-middle activityItem">
-                     {{displayNames[ui]}}
+                     {{getDisplayName(ui)}}
                    </span>
             </a>
           </li>
@@ -119,6 +119,7 @@ export default {
       selected_language: '',
       visibility: {},
       displayNames: {},
+      labelMap: {},
       langMap: {},
       cache: {},
       isAnswered: false,
@@ -144,22 +145,6 @@ export default {
         mapper[uri] = variable;
       });
       return mapper[s];
-    },
-    getDisplayName(activityUrl, displayNameMap) {
-      // const dmap = displayNameMap;
-      // console.log(156, activityUrl, displayNameMap);
-      const s = _.filter(displayNameMap, v1 => v1[`${this.reprotermsUrl}isAbout`][0]['@id'] === activityUrl);
-      // console.log(152, s);
-      const dName = _.filter(s[0]['http://schema.org/alternateName'], d => d['@language'] === this.selected_language);
-      // console.log(154, dName);
-      if (!Array.isArray(dName) || !dName.length) {
-        // array does not exist, is not an array, or is empty
-        // ⇒ do not attempt to process array
-        // console.log(156, s);
-        return s[0]['http://schema.org/alternateName'][0]['@value'];
-      }
-      return dName[0]['@value'];
-      // this.displayNames[activityUrl] = dName[0]['@value'];
     },
     setActivity(index) {
       if (!this.checkDisableBack && this.isProtocolUrl) { // check if disableBack not enabled
@@ -243,24 +228,61 @@ export default {
         }
       }
     },
+    getDisplayName(activityUrl) {
+      console.log(231, activityUrl);
+      if (!_.isEmpty(this.$store.state.schema)) {
+        console.log(232, this.$store.state.schema);
+        console.log(233, this.schemaOrder);
+        if (this.$store.state.schema[`${this.reprotermsUrl}displayNameMap`]) {
+          // TODO: displayNameMap can be used to override prefLabel
+          const displayNameMap = this.$store.state.schema[`${this.reprotermsUrl}displayNameMap`];
+          console.log(472, activityUrl, displayNameMap);
+          const s = _.filter(displayNameMap, v1 => v1[`${this.reprotermsUrl}isAbout`][0]['@id'] === activityUrl);
+          // console.log(152, s);
+          const dName = _.filter(s[0]['http://schema.org/alternateName'], d => d['@language'] === this.selected_language);
+          // console.log(154, dName);
+          if (!Array.isArray(dName) || !dName.length) {
+            // array does not exist, is not an array, or is empty
+            // return display name corresponding to default language
+            return s[0]['http://schema.org/alternateName'][0]['@value'];
+          }
+          return dName[0]['@value'];
+        } // get display name from prefLabel
+        console.log(251, this.labelMap[activityUrl]);
+        return this.labelMap[activityUrl];
+      } return '';
+      // this.displayNames[activityUrl] = dName[0]['@value'];
+    },
     async getLabel(activityUrl) {
       const resp = await jsonld.expand(activityUrl);
       const label = (_.filter(resp[0]['http://www.w3.org/2004/02/skos/core#prefLabel'], pl =>
         pl['@language'] === this.selected_language))[0]['@value'];
       console.log(250, label);
-      this.displayNames[activityUrl] = label;
+      // this.displayNames[activityUrl] = label;
+      return label;
     },
-    getPrefLabel(activityUrl) {
+    async getPrefLabel() {
+      console.log(265, this.schemaOrder);
       // get schema order array.
       // loop over array and do the following:
-      jsonld.expand(activityUrl).then((resp) => {
-        const label = (_.filter(resp[0]['http://www.w3.org/2004/02/skos/core#prefLabel'], pl =>
-          pl['@language'] === this.selected_language))[0]['@value'];
-        console.log(250, label);
-        this.displayNames[activityUrl] = label;
-      }).catch((e) => {
-        console.log(246, activityUrl, e);
-      });
+      if (this.schemaOrder) {
+        await _.map(this.schemaOrder, (s) => {
+          console.log(270, s);
+          jsonld.expand(s).then((resp) => {
+            console.log(271, resp.data);
+          }).catch((e) => {
+            console.log(273, s, e);
+          });
+        });
+      }
+      // jsonld.expand(activityUrl).then((resp) => {
+      //   const label = (_.filter(resp[0]['http://www.w3.org/2004/02/skos/core#prefLabel'], pl =>
+      //     pl['@language'] === this.selected_language))[0]['@value'];
+      //   console.log(250, label);
+      //   this.displayNames[activityUrl] = label;
+      // }).catch((e) => {
+      //   console.log(246, activityUrl, e);
+      // });
       // this.displayName[activityUrl] = label;
     },
     async computeVisibilityCondition(cond, index) {
@@ -398,11 +420,12 @@ export default {
     // console.log('url is', url);
     if (url) {
       this.$store.dispatch('getReproTerm', url).then(() => {
-        this.$store.dispatch('getBaseSchema', url).then(() => this.getDName());
+        this.$store.dispatch('getBaseSchema', url).then(() => this.getPrefLabel());
       });
     } else {
-      this.$store.dispatch('getBaseSchema', url).then(() => this.getDName());
+      this.$store.dispatch('getBaseSchema', url).then(() => this.getPrefLabel());
     }
+    // processFurther() {
   },
   mounted() {
     // console.log(329, this.$route.query.uid, this.$route.query.consented);
@@ -427,6 +450,12 @@ export default {
     axios.get('https://raw.githubusercontent.com/ReproNim/reproschema/master/resources/languages.json').then((resp) => {
       this.langMap = resp.data;
     });
+    console.log(441, 'mounted', this.$store.state.schema);
+    if (this.schemaOrder) {
+      _.map(this.schemaOrder, (s) => {
+        this.labelMap[s] = this.getLabel(s);
+      });
+    }
   },
   computed: {
     getschemaType() {
