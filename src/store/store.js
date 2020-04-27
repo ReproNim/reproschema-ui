@@ -13,6 +13,7 @@ const state = {
   schema: {},
   progress: [],
   responses: [],
+  exportResponses: [],
   scores: {},
   participantId: '',
   activities: [],
@@ -21,6 +22,7 @@ const state = {
   activityReady: false,
   termUrl: 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/',
   schemaType: '',
+  answeredLanguage: '',
 };
 
 const getters = {
@@ -46,6 +48,10 @@ const getters = {
   readyForActivity(state) {
     return state.storeReady && state.activityReady;
   },
+  // eslint-disable-next-line
+  getAnsweredLanguage(state) {
+    return state.answeredLanguage;
+  },
 };
 
 const mutations = {
@@ -63,6 +69,7 @@ const mutations = {
     state.schema = data[0];
     state.progress = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => 0);
     state.responses = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => ({}));
+    state.exportResponses = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => ([]));
     state.scores = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => ({}));
     state.activities = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => ({}));
     state.storeReady = true;
@@ -74,8 +81,12 @@ const mutations = {
   },
   // eslint-disable-next-line
   saveResponse(state, { key, value }) {
-    // console.log(50, state.activityIndex, key, value, state.responses);
-    state.responses[state.activityIndex][key] = value;
+    console.log(50, state.activityIndex, key, value);
+    const val = value[0]; // response value
+    const exportData = value[1]; // response object for exporting data
+    state.responses[state.activityIndex][key] = val;
+    state.exportResponses[state.activityIndex].push(exportData);
+    console.log(87, state.exportResponses);
   },
   // eslint-disable-next-line
   saveScores(state, { key, scoreObj }) {
@@ -107,6 +118,10 @@ const mutations = {
     state.selected_language = lang;
   },
   // eslint-disable-next-line
+  // setAnsweredLanguage(state, lang) {
+  //   state.answeredLanguage = lang;
+  // },
+  // eslint-disable-next-line
   setActivityList(state, actList) {
     if (state.activities[state.activityIndex]) {
       state.activities[state.activityIndex].activityList = actList;
@@ -130,6 +145,7 @@ const actions = {
     commit('setActivityIndex', idx);
   },
   saveResponse({ commit }, { key, value }) {
+    console.log(148, key, value);
     commit('saveResponse', { key, value });
   },
   saveScores({ commit }, { key, scoreObj }) {
