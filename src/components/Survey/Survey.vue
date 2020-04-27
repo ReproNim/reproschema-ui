@@ -218,11 +218,15 @@ export default {
       });
     },
     setResponse(val, index) {
+      const itemUrl = this.context[index]['@id'];
       const t1 = performance.now();
-      const respData = { startedAt: this.t0 / 1000,
-        recordedAt: t1 / 1000,
-        value: val };
-      this.$emit('saveResponse', this.context[index]['@id'], val);
+      const respData = {
+        lang: this.selected_language,
+        time_start: this.t0 / 1000,
+        time_response: t1 / 1000 };
+      respData[itemUrl] = val;
+      const valueAndDataExport = [val, respData];
+      this.$emit('saveResponse', this.context[index]['@id'], valueAndDataExport);
       this.t0 = t1;
       const currResponses = { ...this.responses };
       if (val instanceof Object) {

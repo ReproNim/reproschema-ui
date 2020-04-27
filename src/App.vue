@@ -171,10 +171,11 @@ export default {
     },
     saveResponse(key, value) {
       let needsVizUpdate = false;
-      if (this.currentResponse[key] !== value && this.progress[this.activityIndex] === 100) {
+      if (this.currentResponse[key] !== value[0] && this.progress[this.activityIndex] === 100) {
         // there has been a change in an already completed activity
         needsVizUpdate = true;
       }
+      console.log(178, 'save app', key, value);
       this.$store.dispatch('saveResponse', { key, value });
       if (needsVizUpdate) {
         this.setVisbility();
@@ -267,7 +268,7 @@ export default {
       this.visibilityChain(values);
     },
     downloadZipData() {
-      const Response = this.$store.state.responses;
+      const Response = this.$store.state.exportResponses;
       const totalScores = this.$store.state.scores;
       const uId = this.$store.state.participantId;
       const totalResponse = { response: Response, scores: totalScores, participantId: uId };
@@ -275,49 +276,55 @@ export default {
     },
     formatData(data) {
       const jszip = new JSZip();
-      const fileUploadData = {};
-      const JSONdata = {};
-      const JSONscores = {};
+      // const fileUploadData = {};
+      // const JSONdata = {};
+      // const JSONscores = {};
       // sort out blobs from JSONdata
-      _.map(data.response, (val, key) => {
-        if (val instanceof Blob) {
-          // console.log(315, key, val);
-          fileUploadData[key] = val;
-        } else if (_.isObject(val)) {
-          // make sure there aren't any Blobs here.
-          // if there are, add them to fileUploadData
-          _.map(val, (val2, key2) => {
-            if (val2 instanceof Blob) {
-              // console.log(322, val, key2, val2);
-              fileUploadData[`${key2}`] = val2;
-            } else {
-              // refill the object.
-              if (!JSONdata[key]) {
-                JSONdata[key] = {};
-              }
-              JSONdata[key][key2] = val2;
-            }
-          });
-        } else {
-          JSONdata[key] = val;
-        }
+      let key = 0;
+      _.map(data.response, (activityList) => {
+        jszip.folder('responses').file(`activity_${key}.json`, JSON.stringify(activityList, null, 4));
+        key += 1;
+        // _.map(activityList, itemObj => {
+        //   // if (val instanceof Blob) {
+        //   //   // console.log(315, key, val);
+        //   //   fileUploadData[key] = val;
+        //   // } else if (_.isObject(val)) {
+        //   //   // make sure there aren't any Blobs here.
+        //   //   // if there are, add them to fileUploadData
+        //   //   _.map(val, (val2, key2) => {
+        //   //     if (val2 instanceof Blob) {
+        //   //       // console.log(322, val, key2, val2);
+        //   //       fileUploadData[`${key2}`] = val2;
+        //   //     } else {
+        //   //       // refill the object.
+        //   //       if (!JSONdata[key]) {
+        //   //         JSONdata[key] = {};
+        //   //       }
+        //   //       JSONdata[key][key2] = val2;
+        //   //     }
+        //   //   });
+        //   // } else {
+        //   //   JSONdata[key] = val;
+        //   // }
+        // });
       });
-      _.map(data.scores, (val, key) => { // todo: check if score object not null?
-        if (!_.isEmpty(val)) {
-          JSONscores[key] = val;
-        }
-      });
-      _.map(JSONdata, (val, key) => {
-        // console.log(342, (key));
-        jszip.folder('data/responses').file(`activity_${key}.json`, JSON.stringify(val, null, 4));
-      });
-      _.map(JSONscores, (val, key) => {
-        jszip.folder('data/scores').file(`activity_${key}_score.json`, JSON.stringify(val, null, 4));
-      });
-      _.map(fileUploadData, (val, key) => {
-        const keyStrings = (key.split('activities/')[1]).split('/items/');
-        jszip.folder(`data/responses/${keyStrings[0]}`).file(`${keyStrings[1]}.wav`, val);
-      });
+
+      // _.map(data.scores, (val, key) => { // todo: check if score object not null?
+      //   if (!_.isEmpty(val)) {
+      //     JSONscores[key] = val;
+      //   }
+      // });
+      // _.map(JSONdata, (val, key) => {
+      //   // console.log(342, (key));
+      //   jszip.folder('data/responses').file(`activity_${key}.json`, JSON.stringify(val, null, 4));
+      // });
+      // _.map(JSONscores, (val, key) => {
+      //   jszip.folder('data/scores').file(`activity_${key}_score.json`, JSON.stringify(val, null, 4));
+      // });
+      // _.map(fileUploadData, (val, key) => {
+      //   const keyStrings = (key.split('activities/')[1]).split('/items/');
+      //   jszip.folder(`data/responses/${keyStrings[0]}`).file(`${keyStrings[1]}.wav`, val);
+      // });
       if (data.participantId) {
         jszip.file('userDetails.json', data.participantId);
       }
