@@ -114,9 +114,9 @@ const mutations = {
     state.activities[state.activityIndex].listShow = arr;
   },
   // eslint-disable-next-line
-  setLanguage(state, lang) {
-    state.selected_language = lang;
-  },
+  // setLanguage(state, lang) {
+  //   state.selected_language = lang;
+  // },
   // eslint-disable-next-line
   setAnsweredLanguage(state, lang) {
     state.answeredLanguage = lang;

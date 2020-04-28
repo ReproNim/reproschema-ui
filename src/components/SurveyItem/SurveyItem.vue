@@ -192,10 +192,13 @@ export default {
         // console.log(186, this.selected_language, this.data['http://schema.org/question']);
         const activeQuestion = _.filter(this.data['http://schema.org/question'], q => q['@language'] === this.selected_language);
         if (!Array.isArray(activeQuestion) || !activeQuestion.length) {
-          // array does not exist, is not an array, or is empty
+          // array does not exist, is not an array, or empty - when selected_language string absent
           // ⇒ return value in default language
+          const answeredLanguage = this.data['http://schema.org/question'][0]['@language'];
+          this.$store.dispatch('setAnsweredLanguage', answeredLanguage); // set default language present
           return this.data['http://schema.org/question'][0]['@value'];
         }
+        this.$store.dispatch('setAnsweredLanguage', activeQuestion[0]['@language']); // set selected_language
         return activeQuestion[0]['@value'];
       }
       return null;
