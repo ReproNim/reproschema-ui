@@ -1,9 +1,18 @@
 <template>
   <div class="radioInput container ml-3 pl-3">
     <div v-if="constraints.multipleChoice">
-      <b-alert show variant="warning">
-        Multiple Choice radio buttons are not implemented yet!
-      </b-alert>
+      <b-form @submit="onSubmit">
+        <b-form-group label="">
+          <b-form-checkbox-group
+            v-model="checkboxSelected"
+            :options="options"
+            stacked
+            class="text-left"
+            ref="checkboxbutton"
+          ></b-form-checkbox-group>
+        </b-form-group>
+        <b-btn type="submit">Submit</b-btn>
+      </b-form>
     </div>
     <div v-else>
       <b-form-group label="" v-if="!isImageSelect">
@@ -45,15 +54,14 @@
 import _ from 'lodash';
 import VueSelectImage from '../Utils/SelectImage';
 
-// add stylesheet
-// import { bus } from '../../main';
-
 export default {
   name: 'radioInput',
   props: ['constraints', 'init', 'selected_language'],
   data() {
     return {
       selected: null,
+      checkboxSelected: [],
+      answerLanguage: this.selected_language,
     };
   },
   components: {
@@ -107,7 +115,11 @@ export default {
   },
   mounted() {
     if (this.init !== undefined) {
-      this.selected = this.init;
+      if (this.init instanceof Array) { // checkbox
+        this.checkboxSelected = this.init;
+      } else { // radio
+        this.selected = this.init;
+      }
       if (this.$refs.imageSelect) {
         this.$nextTick(() => {
           if (this.selectedImages[0]) {
@@ -118,6 +130,10 @@ export default {
     }
   },
   methods: {
+    onSubmit(e) {
+      e.preventDefault();
+      this.$emit('valueChanged', this.checkboxSelected);
+    },
     sendData(val) {
       this.$emit('valueChanged', val);
     },
