@@ -66,10 +66,15 @@ export default {
       return _.map(this.constraints['http://schema.org/itemListElement'][0]['@list'], (v) => {
         const activeValueChoices = _.filter(v['http://schema.org/name'], ac => ac['@language'] === this.selected_language);
         if (!Array.isArray(activeValueChoices) || !activeValueChoices.length) {
-          // array does not exist, is not an array, or is empty
+          // array does not exist, is not an array, or empty - when selected_language string absent
           // ⇒ select value in default language
           text = v['http://schema.org/name'][0]['@value'];
-        } else text = activeValueChoices[0]['@value'];
+          const answeredLanguage = v['http://schema.org/name'][0]['@language'];
+          this.$store.dispatch('setAnsweredLanguage', answeredLanguage); // set default language present
+        } else {
+          text = activeValueChoices[0]['@value'];
+          this.$store.dispatch('setAnsweredLanguage', activeValueChoices[0]['@language']); // set selected_language
+        }
         return {
           text, // ESLint object-shorthand
           value: v['http://schema.org/value'][0]['@value'],
@@ -105,7 +110,7 @@ export default {
     // },
   },
   mounted() {
-    if (this.init !== undefined || this.init != null) {
+    if (this.init !== undefined) {
       this.selected = this.init;
       if (this.$refs.imageSelect) {
         this.$nextTick(() => {

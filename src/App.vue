@@ -175,7 +175,6 @@ export default {
         // there has been a change in an already completed activity
         needsVizUpdate = true;
       }
-      console.log(178, 'save app', key, value);
       this.$store.dispatch('saveResponse', { key, value });
       if (needsVizUpdate) {
         this.setVisbility();

@@ -221,7 +221,7 @@ export default {
       const itemUrl = this.context[index]['@id'];
       const t1 = performance.now();
       const respData = {
-        lang: this.selected_language,
+        lang: this.getAnsweredLanguage,
         time_start: this.t0 / 1000,
         time_response: t1 / 1000 };
       respData[itemUrl] = val;
@@ -398,6 +398,9 @@ export default {
   computed: {
     complete() {
       return this.progress === 100;
+    },
+    getAnsweredLanguage() {
+      return this.$store.getters.getAnsweredLanguage;
     },
     storeContext() {
       if (this.$store) {
