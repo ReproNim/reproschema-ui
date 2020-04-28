@@ -220,12 +220,30 @@ export default {
     setResponse(val, index) {
       const itemUrl = this.context[index]['@id'];
       const t1 = performance.now();
-      const respData = {
+      const responseActivity = {
+        '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/master/contexts/generic',
+        '@type': 'reproterms:ResponseActivity',
+        '@id': 'uuid:activity_uuid',
+        'prov:used': [`${itemUrl}`,
+          `${this.srcUrl}`,
+        ],
         lang: this.getAnsweredLanguage,
-        time_start: this.t0 / 1000,
-        time_response: t1 / 1000 };
+        'prov:startedAtTime': this.t0 / 1000,
+        'prov:endedAtTime': t1 / 1000,
+        'prov:wasAssociatedWith': 'url of the schema_ui',
+        generated: 'response_uuid',
+      };
+      const respData = {
+        '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/master/contexts/generic',
+        '@type': 'reproterms:Response',
+        '@id': 'uuid:response_uuid',
+        'prov:wasAttributedTo': {
+          '@id': 'participant_uuid',
+          'nidm:subject_id': this.participantId,
+        },
+      };
       respData[itemUrl] = val;
-      const valueAndDataExport = [val, respData];
+      const valueAndDataExport = [val, responseActivity, respData];
       this.$emit('saveResponse', this.context[index]['@id'], valueAndDataExport);
       this.t0 = t1;
       const currResponses = { ...this.responses };
@@ -490,7 +508,10 @@ export default {
       },
     currentActivityIndex() {
         return parseInt(this.$store.state.activityIndex);
-      },
+    },
+    participantId() {
+      return this.$store.state.participantId;
+    }
   },
   mounted() {
       if (this.srcUrl) {

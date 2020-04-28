@@ -95,6 +95,7 @@ import { saveAs } from 'file-saver';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import circleProgress from './components/Circle/';
+import config from "./config";
 
 Vue.use(BootstrapVue);
 Vue.filter('reverse', value => value.slice().reverse());
@@ -125,6 +126,7 @@ export default {
       isAnswered: false,
       clientIp: '',
       reproterms2: '',
+      protocolUrl: config.githubSrc,
       // responses: [],
     };
   },
@@ -175,6 +177,8 @@ export default {
         // there has been a change in an already completed activity
         needsVizUpdate = true;
       }
+      // add protocol url to prov:used key in responseActivity
+      value[1]['prov:used'].push(this.protocolUrl);
       this.$store.dispatch('saveResponse', { key, value });
       if (needsVizUpdate) {
         this.setVisbility();
@@ -280,8 +284,8 @@ export default {
       // const JSONscores = {};
       // sort out blobs from JSONdata
       let key = 0;
-      _.map(data.response, (activityList) => {
-        jszip.folder('responses').file(`activity_${key}.json`, JSON.stringify(activityList, null, 4));
+      _.map(data.response, (eachActivityList) => {
+        jszip.folder('responses').file(`activity_${key}.json`, JSON.stringify(eachActivityList, null, 4));
         key += 1;
         // _.map(activityList, itemObj => {
         //   // if (val instanceof Blob) {
@@ -358,6 +362,7 @@ export default {
       this.$store.dispatch('getReproTerm', url).then(() => {
         this.$store.dispatch('getBaseSchema', url).then(() => this.getPrefLabel());
       });
+      this.protocolUrl = url;
     } else {
       this.$store.dispatch('getBaseSchema', url).then(() => this.getPrefLabel());
     }

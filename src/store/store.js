@@ -83,10 +83,11 @@ const mutations = {
   saveResponse(state, { key, value }) {
     // console.log(50, state.activityIndex, key, value);
     const val = value[0]; // response value
-    const exportData = value[1]; // response object for exporting data
+    const exportResponseActivity = value[1]; // response activity object for exporting data
+    const exportResponse = value[2]; // response object for export data
     state.responses[state.activityIndex][key] = val;
-    state.exportResponses[state.activityIndex].push(exportData);
-    // console.log(87, state.exportResponses);
+    state.exportResponses[state.activityIndex].push(exportResponseActivity, exportResponse);
+    console.log(87, state.exportResponses);
   },
   // eslint-disable-next-line
   saveScores(state, { key, scoreObj }) {
