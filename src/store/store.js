@@ -81,11 +81,12 @@ const mutations = {
   },
   // eslint-disable-next-line
   saveResponse(state, { key, value }) {
-    console.log(50, state.activityIndex, key, value);
+    // console.log(50, state.activityIndex, key, value);
     const val = value[0]; // response value
-    const exportData = value[1]; // response object for exporting data
+    const exportResponseActivity = value[1]; // response activity object for exporting data
+    const exportResponse = value[2]; // response object for export data
     state.responses[state.activityIndex][key] = val;
-    state.exportResponses[state.activityIndex].push(exportData);
+    state.exportResponses[state.activityIndex].push(exportResponseActivity, exportResponse);
     console.log(87, state.exportResponses);
   },
   // eslint-disable-next-line
@@ -114,13 +115,13 @@ const mutations = {
     state.activities[state.activityIndex].listShow = arr;
   },
   // eslint-disable-next-line
-  setLanguage(state, lang) {
-    state.selected_language = lang;
-  },
-  // eslint-disable-next-line
-  // setAnsweredLanguage(state, lang) {
-  //   state.answeredLanguage = lang;
+  // setLanguage(state, lang) {
+  //   state.selected_language = lang;
   // },
+  // eslint-disable-next-line
+  setAnsweredLanguage(state, lang) {
+    state.answeredLanguage = lang;
+  },
   // eslint-disable-next-line
   setActivityList(state, actList) {
     if (state.activities[state.activityIndex]) {
@@ -145,7 +146,6 @@ const actions = {
     commit('setActivityIndex', idx);
   },
   saveResponse({ commit }, { key, value }) {
-    console.log(148, key, value);
     commit('saveResponse', { key, value });
   },
   saveScores({ commit }, { key, scoreObj }) {
@@ -161,8 +161,8 @@ const actions = {
   updateListShow({ commit }, arr) {
     commit('setListShow', arr);
   },
-  setLanguage({ commit }, lang) {
-    commit('setLanguage', lang);
+  setAnsweredLanguage({ commit }, lang) {
+    commit('setAnsweredLanguage', lang);
   },
   setActivityList({ commit }, actList) {
     commit('setActivityList', actList);

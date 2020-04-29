@@ -80,6 +80,7 @@
 <script>
 import Vue from 'vue';
 import jsonld from 'jsonld/dist/jsonld.min';
+import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash';
 import SurveyItem from '../SurveyItem/';
 import Loader from '../Loader/';
@@ -220,12 +221,36 @@ export default {
     setResponse(val, index) {
       const itemUrl = this.context[index]['@id'];
       const t1 = performance.now();
+      let uiUrl = `${window.location.host}`;
+      if (window.location.pathname) {
+        uiUrl = `${uiUrl}${window.location.pathname}`;
+      }
+      const respActivityUuid = uuidv4();
+      const responseUuid = uuidv4();
+      const responseActivity = {
+        '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/master/contexts/generic',
+        '@type': 'reproterms:ResponseActivity',
+        '@id': `uuid:${respActivityUuid}`,
+        'prov:used': [`${itemUrl}`,
+          `${this.srcUrl}`,
+        ],
+        lang: this.getAnsweredLanguage,
+        'prov:startedAtTime': this.t0 / 1000,
+        'prov:endedAtTime': t1 / 1000,
+        'prov:wasAssociatedWith': uiUrl,
+        generated: responseUuid,
+      };
       const respData = {
-        lang: this.selected_language,
-        time_start: this.t0 / 1000,
-        time_response: t1 / 1000 };
+        '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/master/contexts/generic',
+        '@type': 'reproterms:Response',
+        '@id': `uuid:${responseUuid}`,
+        'prov:wasAttributedTo': {
+          '@id': 'participant_uuid',
+          'nidm:subject_id': this.participantId,
+        },
+      };
       respData[itemUrl] = val;
-      const valueAndDataExport = [val, respData];
+      const valueAndDataExport = [val, responseActivity, respData];
       this.$emit('saveResponse', this.context[index]['@id'], valueAndDataExport);
       this.t0 = t1;
       const currResponses = { ...this.responses };
@@ -399,6 +424,9 @@ export default {
     complete() {
       return this.progress === 100;
     },
+    getAnsweredLanguage() {
+      return this.$store.getters.getAnsweredLanguage;
+    },
     storeContext() {
       if (this.$store) {
         const state = this.$store.state;
@@ -487,7 +515,10 @@ export default {
       },
     currentActivityIndex() {
         return parseInt(this.$store.state.activityIndex);
-      },
+    },
+    participantId() {
+      return this.$store.state.participantId;
+    }
   },
   mounted() {
       if (this.srcUrl) {

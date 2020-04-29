@@ -74,13 +74,10 @@ export default {
       return _.map(this.constraints['http://schema.org/itemListElement'][0]['@list'], (v) => {
         const activeValueChoices = _.filter(v['http://schema.org/name'], ac => ac['@language'] === this.selected_language);
         if (!Array.isArray(activeValueChoices) || !activeValueChoices.length) {
-          // value not present for the selected_language hence
-          // select value in default language
+          // array does not exist, is not an array, or empty - when selected_language string absent
           text = v['http://schema.org/name'][0]['@value'];
-          // this.$store.dispatch('setAnsweredLanguage', v['http://schema.org/name'][0]['@language']);
         } else {
           text = activeValueChoices[0]['@value'];
-          // this.$store.dispatch('setAnsweredLanguage', this.selected_language);
         }
         return {
           text, // ESLint object-shorthand
