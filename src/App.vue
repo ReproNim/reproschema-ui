@@ -295,10 +295,10 @@ export default {
                 console.log(315, key1, value);
                 // fileUploadData[key1] = value;
                 const keyStrings = (key1.split('/items/')[1]);
-                console.log(297, 'str split', keyStrings);
-                jszip.folder('responses').file(`${keyStrings}.wav`, value);
+                const rId = itemObj['@id'].split('uuid:')[1];
+                jszip.folder('responses').file(`${keyStrings}-${rId}.wav`, value);
                 // eslint-disable-next-line no-param-reassign
-                voiceMap[key1] = `responses/${keyStrings}.wav`;
+                voiceMap[key1] = `responses/${keyStrings}-${rId}.wav`;
               }
               // todo: check if sections are present, they are no longer object but lists
               // else if (_.isObject(value)) {
