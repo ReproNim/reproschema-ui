@@ -80,6 +80,7 @@
 <script>
 import Vue from 'vue';
 import jsonld from 'jsonld/dist/jsonld.min';
+import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash';
 import SurveyItem from '../SurveyItem/';
 import Loader from '../Loader/';
@@ -224,10 +225,12 @@ export default {
       if (window.location.pathname) {
         uiUrl = `${uiUrl}${window.location.pathname}`;
       }
+      const respActivityUuid = uuidv4();
+      const responseUuid = uuidv4();
       const responseActivity = {
         '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/master/contexts/generic',
         '@type': 'reproterms:ResponseActivity',
-        '@id': 'uuid:activity_uuid',
+        '@id': `uuid:${respActivityUuid}`,
         'prov:used': [`${itemUrl}`,
           `${this.srcUrl}`,
         ],
@@ -235,12 +238,12 @@ export default {
         'prov:startedAtTime': this.t0 / 1000,
         'prov:endedAtTime': t1 / 1000,
         'prov:wasAssociatedWith': uiUrl,
-        generated: 'response_uuid',
+        generated: responseUuid,
       };
       const respData = {
         '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/master/contexts/generic',
         '@type': 'reproterms:Response',
-        '@id': 'uuid:response_uuid',
+        '@id': `uuid:${responseUuid}`,
         'prov:wasAttributedTo': {
           '@id': 'participant_uuid',
           'nidm:subject_id': this.participantId,
