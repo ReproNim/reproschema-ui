@@ -280,37 +280,62 @@ export default {
     },
     formatData(data) {
       const jszip = new JSZip();
-      // const fileUploadData = {};
+      const fileUploadData = {};
       // const JSONdata = {};
       // const JSONscores = {};
       // sort out blobs from JSONdata
       let key = 0;
       _.map(data.response, (eachActivityList) => {
-        jszip.folder('responses').file(`activity_${key}.json`, JSON.stringify(eachActivityList, null, 4));
-        key += 1;
-        // _.map(activityList, itemObj => {
-        //   // if (val instanceof Blob) {
-        //   //   // console.log(315, key, val);
-        //   //   fileUploadData[key] = val;
-        //   // } else if (_.isObject(val)) {
-        //   //   // make sure there aren't any Blobs here.
-        //   //   // if there are, add them to fileUploadData
-        //   //   _.map(val, (val2, key2) => {
-        //   //     if (val2 instanceof Blob) {
-        //   //       // console.log(322, val, key2, val2);
-        //   //       fileUploadData[`${key2}`] = val2;
-        //   //     } else {
-        //   //       // refill the object.
-        //   //       if (!JSONdata[key]) {
-        //   //         JSONdata[key] = {};
-        //   //       }
-        //   //       JSONdata[key][key2] = val2;
-        //   //     }
-        //   //   });
-        //   // } else {
-        //   //   JSONdata[key] = val;
-        //   // }
-        // });
+        _.map(eachActivityList, (itemObj) => {
+          if (itemObj['@type'] === 'reproterms:Response') {
+            const voiceMap = {};
+            _.map(itemObj, (value, key1) => {
+              // console.log(294, value, key1);
+              if (value instanceof Blob) {
+                console.log(315, key1, value);
+                // fileUploadData[key1] = value;
+                const keyStrings = (key1.split('/items/')[1]);
+                console.log(297, 'str split', keyStrings);
+                jszip.folder('responses').file(`${keyStrings}.wav`, value);
+                // eslint-disable-next-line no-param-reassign
+                voiceMap[key1] = `responses/${keyStrings}.wav`;
+              }
+              // todo: check if sections are present, they are no longer object but lists
+              // else if (_.isObject(value)) {
+              //   // make sure there aren't any Blobs here.
+              //   // if there are, add them to fileUploadData
+              //   _.map(value, (val2, key2) => {
+              //     if (val2 instanceof Blob) {
+              //       // console.log(322, val, key2, val2);
+              //       fileUploadData[`${key2}`] = val2;
+              //     }
+              //     else {
+              //       // refill the object.
+              //       if (!JSONdata[key]) {
+              //         JSONdata[key] = {};
+              //       }
+              //       JSONdata[key][key2] = val2;
+              //     }
+              //   });
+              // }
+              // else {
+              //   JSONdata[key] = val;
+              // }
+            });
+            _.map(voiceMap, (v, ky) => {
+              if (ky in itemObj) {
+                const newObj = itemObj;
+                // console.log(327, itemObj);
+                newObj[ky] = v;
+              }
+            });
+          }
+        });
+        // write out the activity files
+        if (eachActivityList.length) { // if activity is answered then write to file
+          jszip.folder('responses').file(`activity_${key}.jsonld`, JSON.stringify(eachActivityList, null, 4));
+          key += 1;
+        }
       });
 
       // _.map(data.scores, (val, key) => { // todo: check if score object not null?
@@ -320,15 +345,15 @@ export default {
       // });
       // _.map(JSONdata, (val, key) => {
       //   // console.log(342, (key));
-      //   jszip.folder('data/responses').file(`activity_${key}.json`, JSON.stringify(val, null, 4));
+      // jszip.folder('responses').file(`activity_${key}.json`, JSON.stringify(val, null, 4));
       // });
       // _.map(JSONscores, (val, key) => {
-      //   jszip.folder('data/scores').file(`activity_${key}_score.json`, JSON.stringify(val, null, 4));
+      // jszip.folder('scores').file(`activity_${key}_score.json`, JSON.stringify(val, null, 4));
       // });
-      // _.map(fileUploadData, (val, key) => {
-      //   const keyStrings = (key.split('activities/')[1]).split('/items/');
-      //   jszip.folder(`data/responses/${keyStrings[0]}`).file(`${keyStrings[1]}.wav`, val);
-      // });
+      _.map(fileUploadData, (val, k) => {
+        const keyStrings = (k.split('activities/')[1]).split('/items/');
+        jszip.folder(`responses/${keyStrings[0]}`).file(`${keyStrings[1]}.wav`, val);
+      });
       if (data.participantId) {
         jszip.file('userDetails.json', data.participantId);
       }
