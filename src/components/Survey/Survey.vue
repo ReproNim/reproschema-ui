@@ -220,6 +220,10 @@ export default {
     setResponse(val, index) {
       const itemUrl = this.context[index]['@id'];
       const t1 = performance.now();
+      let uiUrl = `${window.location.host}`;
+      if (window.location.pathname) {
+        uiUrl = `${uiUrl}${window.location.pathname}`;
+      }
       const responseActivity = {
         '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/master/contexts/generic',
         '@type': 'reproterms:ResponseActivity',
@@ -230,7 +234,7 @@ export default {
         lang: this.getAnsweredLanguage,
         'prov:startedAtTime': this.t0 / 1000,
         'prov:endedAtTime': t1 / 1000,
-        'prov:wasAssociatedWith': 'url of the schema_ui',
+        'prov:wasAssociatedWith': uiUrl,
         generated: 'response_uuid',
       };
       const respData = {
