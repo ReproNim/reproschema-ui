@@ -221,7 +221,7 @@ export default {
     setResponse(val, index) {
       const itemUrl = this.context[index]['@id'];
       const t1 = performance.now();
-      let uiUrl = `${window.location.host}`;
+      let uiUrl = `${window.location.origin}`;
       if (window.location.pathname) {
         uiUrl = `${uiUrl}${window.location.pathname}`;
       }
@@ -238,7 +238,7 @@ export default {
         'prov:startedAtTime': this.t0 / 1000,
         'prov:endedAtTime': t1 / 1000,
         'prov:wasAssociatedWith': uiUrl,
-        generated: responseUuid,
+        'prov:generated': `uuid:${responseUuid}`,
       };
       const respData = {
         '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/master/contexts/generic',
