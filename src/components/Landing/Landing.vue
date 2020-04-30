@@ -44,6 +44,11 @@ export default {
       content: null,
     };
   },
+  computed: {
+    reprotermsUrl() {
+      return this.$store.getters.getTermsUrl;
+    },
+  },
   methods: {
     doBack() {
       if (this.step > 1) {
@@ -53,27 +58,38 @@ export default {
     doNext() {
       this.$router.push('/activities/0');
     },
-  },
-  mounted() {
-    // eslint-disable-next-line no-underscore-dangle
-    // console.log(this.$options._scopeId);
-    axios.get(this.contentSrc).then((resp) => {
-      this.content = resp.data;
-      // eslint-disable-next-line no-unused-vars
-    }).then((resp1) => {
-      // HTML injected into a component cannot be styled in the component?
-      // https://forum.vuejs.org/t/html-injected-into-a-component-from-a-vuex-store-cannot-be-styled-in-the-component/13691/24
-      const rootnode = document.getElementById('smooth-scroller');
-      const treeWalker = document.createTreeWalker(rootnode, NodeFilter.SHOW_ELEMENT, null);
-      let currentNode = treeWalker.currentNode;
-      while (currentNode) {
-        currentNode = treeWalker.nextNode();
-        if (currentNode) {
-          // eslint-disable-next-line no-underscore-dangle
-          currentNode.setAttribute(this.$options._scopeId, '');
-        }
+    getContent() {
+      let landingUrl = this.contentSrc; // default to this for now.
+      if (this.$store.state.schema[`${this.reprotermsUrl}landingPage`]) {
+        landingUrl = this.$store.state.schema[`${this.reprotermsUrl}landingPage`][0]['@value'];
       }
-    });
+      axios.get(landingUrl).then((resp) => {
+        this.content = resp.data;
+      }).then(() => {
+        // HTML injected into a component cannot be styled in the component?
+        // https://forum.vuejs.org/t/html-injected-into-a-component-from-a-vuex-store-cannot-be-styled-in-the-component/13691/24
+        const rootnode = document.getElementById('smooth-scroller');
+        const treeWalker = document.createTreeWalker(rootnode, NodeFilter.SHOW_ELEMENT, null);
+        let currentNode = treeWalker.currentNode;
+        while (currentNode) {
+          currentNode = treeWalker.nextNode();
+          if (currentNode) {
+            // eslint-disable-next-line no-underscore-dangle
+            currentNode.setAttribute(this.$options._scopeId, '');
+          }
+        }
+      });
+    },
+  },
+  created() {
+    const url = this.$route.query.url;
+    if (url) {
+      this.$store.dispatch('getReproTerm', url).then(() => {
+        this.$store.dispatch('getBaseSchema', url).then(() => this.getContent());
+      });
+    } else {
+      this.$store.dispatch('getBaseSchema', url).then(() => this.getContent());
+    }
   },
 };
 </script>
