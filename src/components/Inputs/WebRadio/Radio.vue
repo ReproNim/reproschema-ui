@@ -1,6 +1,6 @@
 <template>
   <div class="radioInput container ml-3 pl-3">
-    <div v-if="constraints.multipleChoice">
+    <div v-if="isMultipleChoice">
       <b-form @submit="onSubmit">
         <b-form-group label="">
           <b-form-checkbox-group
@@ -56,7 +56,7 @@ import VueSelectImage from '../Utils/SelectImage';
 
 export default {
   name: 'radioInput',
-  props: ['constraints', 'init', 'selected_language'],
+  props: ['constraints', 'init', 'selected_language', 'reprotermsUrl'],
   data() {
     return {
       selected: null,
@@ -86,6 +86,11 @@ export default {
         };
       });
     },
+    isMultipleChoice() {
+      if (this.constraints[`${this.reprotermsUrl}multipleChoice`]) { // checkbox field
+        return this.constraints[`${this.reprotermsUrl}multipleChoice`][0]['@value'];
+      } return false; // default to radio
+    },
     isImageSelect() {
       return _.filter(this.options, o => o.image).length === this.options.length;
     },
@@ -114,6 +119,7 @@ export default {
     // },
   },
   mounted() {
+    console.log(117, this.constraints);
     if (this.init !== undefined) {
       if (this.init instanceof Array) { // checkbox
         this.checkboxSelected = this.init;
