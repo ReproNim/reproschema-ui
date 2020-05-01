@@ -7,13 +7,7 @@
     <div v-else>
       <div v-if="complete && autoAdvance">
         <div v-if="isVis">
-          <p v-if="currentActivityIndex === 0">
-            Great, you are eligible for the voice study! Hit "Next" to learn about the study, risks,
-            and benefits of joining.</p>
-          <p v-else-if="currentActivityIndex === 1">
-            Thanks for walking through the consent. You have agreed to the study, let’s get started.
-          </p>
-          <p v-else-if="currentActivityIndex !== 9">
+          <p v-if="currentActivityIndex < listShow.length">
             Please review your responses, then click "Next" below:</p>
           <!--<div class="mt-3 mb-3">Please review your responses, then click "Next" below:</div>-->
           <b-button v-if="nextActivity[activityUrl]" @click="nextActivity1">Next</b-button>
