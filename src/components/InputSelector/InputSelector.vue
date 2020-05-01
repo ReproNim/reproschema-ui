@@ -78,6 +78,14 @@
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
+    <!-- If type is email -->
+    <div v-else-if="inputType === 'email'">
+      <EmailInput
+        :constraints="valueConstraints"
+        :selected_language="selected_language"
+        :init="init" v-on:valueChanged="sendData"/>
+    </div>
+
     <!-- If type is time rnage -->
     <div v-else-if="inputType==='timeRange'">
       <TimeRange
@@ -215,6 +223,7 @@ import StaticReadOnly from '../Inputs/StaticReadOnly';
 import SaveData from '../Inputs/SaveData/SaveData';
 import StudySign from '../StudySign/StudySign';
 import Static from '../Inputs/Static';
+import EmailInput from '../Inputs/EmailInput';
 
 
 export default {
@@ -257,6 +266,7 @@ export default {
     Radio,
     AudioRecord,
     TextInput,
+    EmailInput,
     IntegerInput,
     FloatInput,
     DateInput,
