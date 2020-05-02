@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import _ from 'lodash';
+import { v4 as uuidv4 } from 'uuid';
 import jsonld from 'jsonld/dist/jsonld.min';
 import config from '../config';
 // eslint-disable-next-line import/first
@@ -73,6 +74,7 @@ const mutations = {
     state.scores = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => ({}));
     state.activities = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => ({}));
     state.storeReady = true;
+    state.participantUuid = uuidv4();
   },
   // eslint-disable-next-line
   setActivityIndex(state, idx) {
@@ -87,7 +89,7 @@ const mutations = {
     const exportResponse = value[2]; // response object for export data
     state.responses[state.activityIndex][key] = val;
     state.exportResponses[state.activityIndex].push(exportResponseActivity, exportResponse);
-    console.log(87, state.exportResponses);
+    // console.log(87, state.exportResponses);
   },
   // eslint-disable-next-line
   saveScores(state, { key, scoreObj }) {

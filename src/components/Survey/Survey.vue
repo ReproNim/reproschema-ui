@@ -241,7 +241,7 @@ export default {
         '@type': 'reproterms:Response',
         '@id': `uuid:${responseUuid}`,
         'prov:wasAttributedTo': {
-          '@id': 'participant_uuid',
+          '@id': this.$store.state.participantUuid,
           'nidm:subject_id': this.participantId,
         },
       };

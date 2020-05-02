@@ -179,7 +179,6 @@ export default {
       }
       // add protocol url to prov:used key in responseActivity
       value[1]['prov:used'].push(this.protocolUrl);
-      console.log(182, window.location.host);
       this.$store.dispatch('saveResponse', { key, value });
       if (needsVizUpdate) {
         this.setVisbility();
