@@ -280,7 +280,7 @@ export default {
     },
     formatData(data) {
       const jszip = new JSZip();
-      const fileUploadData = {};
+      // const fileUploadData = {};
       // const JSONdata = {};
       // const JSONscores = {};
       // sort out blobs from JSONdata
@@ -292,13 +292,12 @@ export default {
             _.map(itemObj, (value, key1) => {
               // console.log(294, value, key1);
               if (value instanceof Blob) {
-                console.log(315, key1, value);
                 // fileUploadData[key1] = value;
                 const keyStrings = (key1.split('/items/')[1]);
                 const rId = itemObj['@id'].split('uuid:')[1];
                 jszip.folder('responses').file(`${keyStrings}-${rId}.wav`, value);
                 // eslint-disable-next-line no-param-reassign
-                voiceMap[key1] = `responses/${keyStrings}-${rId}.wav`;
+                voiceMap[key1] = `${keyStrings}-${rId}.wav`;
               }
               // todo: check if sections are present, they are no longer object but lists
               // else if (_.isObject(value)) {
@@ -350,13 +349,6 @@ export default {
       // _.map(JSONscores, (val, key) => {
       // jszip.folder('scores').file(`activity_${key}_score.json`, JSON.stringify(val, null, 4));
       // });
-      _.map(fileUploadData, (val, k) => {
-        const keyStrings = (k.split('activities/')[1]).split('/items/');
-        jszip.folder(`responses/${keyStrings[0]}`).file(`${keyStrings[1]}.wav`, val);
-      });
-      if (data.participantId) {
-        jszip.file('userDetails.json', data.participantId);
-      }
       jszip.generateAsync({ type: 'blob' })
         .then((myzipfile) => {
           saveAs(myzipfile, 'study-data.zip');
