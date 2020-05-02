@@ -214,7 +214,9 @@ export default {
     },
     setResponse(val, index) {
       const itemUrl = this.context[index]['@id'];
-      const t1 = performance.now();
+      const d2 = new Date();
+      const t1 = d2.toISOString();
+      // const t1 = performance.now();
       let uiUrl = `${window.location.origin}`;
       if (window.location.pathname) {
         uiUrl = `${uiUrl}${window.location.pathname}`;
@@ -229,8 +231,8 @@ export default {
           `${this.srcUrl}`,
         ],
         lang: this.getAnsweredLanguage,
-        'prov:startedAtTime': this.t0 / 1000,
-        'prov:endedAtTime': t1 / 1000,
+        'prov:startedAtTime': this.t0,
+        'prov:endedAtTime': t1,
         'prov:wasAssociatedWith': uiUrl,
         'prov:generated': `uuid:${responseUuid}`,
       };
@@ -370,7 +372,12 @@ export default {
       const currentIndex = parseInt(this.$store.state.activityIndex);
       const nextIndex = currentIndex + 1;
       if (this.actVisibility[nextIndex]) {
-        this.$router.push(`/activities/${nextIndex}`);
+        if (this.$route.query.url) {
+          this.$router.push(`/activities/${nextIndex}?url=${this.$route.query.url}`);
+        } else {
+          this.$router.push(`/activities/${nextIndex}`);
+        }
+        // this.$router.push(`/activities/${nextIndex}`);
       }
     },
   },
@@ -520,7 +527,9 @@ export default {
         // console.log(46, this.srcUrl);
         this.getData();
       }
-      this.t0 = performance.now();
+      const d = new Date();
+      this.t0 = d.toISOString();
+      // this.t0 = performance.now();
     },
   };
 </script>
