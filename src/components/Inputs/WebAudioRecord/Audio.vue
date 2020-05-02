@@ -11,7 +11,7 @@
       <b-button v-if="!isRecording && !hasRecording" @click="record" variant="danger">
         record
       </b-button>
-      <b-button v-if="isRecording" @click="stop">stop</b-button>
+      <b-button v-if="isRecording" @click="finish">stop</b-button>
       <div v-if="isRecording">
         <small>{{timeRemaining}} seconds left</small>
       </div>
@@ -100,13 +100,11 @@ export default {
     endPlay() {
       this.isPlaying = false;
     },
-    stop() {
+    finish() {
       this.mediaRecorder.stop();
       this.hasRecording = true;
       this.isRecording = false;
       clearInterval(this.interval);
-      this.timeRemaining = this.recordingTime / 1000;
-      this.$emit('valueChanged', this.recording.blob);
     },
     reset(e) {
       e.preventDefault();
@@ -123,7 +121,8 @@ export default {
         const blobURL = URL.createObjectURL(e);
         self.recording.src = blobURL;
         self.recording.blob = e;
-        self.stop();
+        this.$emit('valueChanged', this.recording.blob);
+        self.finish();
       };
     },
     error() {
