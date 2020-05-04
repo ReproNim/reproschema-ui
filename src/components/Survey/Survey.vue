@@ -289,9 +289,9 @@ export default {
           if (_.isString(val)) {
             val = `'${val}'`; // put the string in quotes
           }
-          output = output.replace(k, val);
+          output = output.replace(new RegExp(`\\b${k}\\b`), val);
         } else {
-          output = output.replace(k, 0);
+          output = output.replace(new RegExp(`\\b${k}\\b`), 0);
         }
       });
       return safeEval(output);
