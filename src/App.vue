@@ -38,7 +38,7 @@
           </li>
         </ul>
         <div>
-          <b-button class="align-middle" @click="downloadZipData"
+          <b-button v-if="allowExport" class="align-middle" @click="downloadZipData"
                     :disabled="!isAnswered">Export</b-button>
         </div>
       </nav>
@@ -95,7 +95,7 @@ import { saveAs } from 'file-saver';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import circleProgress from './components/Circle/';
-import config from "./config";
+import config from './config';
 
 Vue.use(BootstrapVue);
 Vue.filter('reverse', value => value.slice().reverse());
