@@ -194,17 +194,17 @@ export default {
     },
     getDisplayName(activityUrl) {
       if (!_.isEmpty(this.$store.state.schema)) {
-        if (this.$store.state.schema[`${this.reprotermsUrl}displayNameMap`]) {
-          // TODO: displayNameMap can be used to override prefLabel
-          const displayNameMap = this.$store.state.schema[`${this.reprotermsUrl}displayNameMap`];
-          const s = _.filter(displayNameMap, v1 => v1[`${this.reprotermsUrl}isAbout`][0]['@id'] === activityUrl);
+        // console.log(197, this.$store.state.schema[`${this.reprotermsUrl}addProperties`]);
+        if (this.$store.state.schema[`${this.reprotermsUrl}addProperties`][0]['http://www.w3.org/2004/02/skos/core#prefLabel']) {
+          const addProperties = this.$store.state.schema[`${this.reprotermsUrl}addProperties`];
+          const s = _.filter(addProperties, v1 => v1[`${this.reprotermsUrl}isAbout`][0]['@id'] === activityUrl);
           // console.log(152, s);
-          const dName = _.filter(s[0]['http://schema.org/alternateName'], d => d['@language'] === this.selected_language);
+          const dName = _.filter(s[0]['http://www.w3.org/2004/02/skos/core#prefLabel'], d => d['@language'] === this.selected_language);
           // console.log(154, dName);
           if (!Array.isArray(dName) || !dName.length) {
             // array does not exist, is not an array, or is empty
             // return display name corresponding to default language
-            return s[0]['http://schema.org/alternateName'][0]['@value'];
+            return s[0]['http://www.w3.org/2004/02/skos/core#prefLabel'][0]['@value'];
           }
           return dName[0]['@value'];
         }
@@ -446,6 +446,7 @@ export default {
     },
     schemaOrder() {
       if (!_.isEmpty(this.$store.state.schema)) {
+        console.log(449, this.$store.state.schema);
         const order = _.map(this.$store.state.schema[`${this.reprotermsUrl}order`][0]['@list'],
           u => u['@id']);
         return order;
@@ -485,32 +486,42 @@ export default {
       return output;
     },
     visibilityConditions() {
-      if (this.schema[`${this.reprotermsUrl}visibility`]) {
+      console.log(489, this.schema);
+      if (this.schema[`${this.reprotermsUrl}addProperties`]) {
         return _.map(this.schemaOrder, (s) => {
           let keyName = '';
-          if (this.schema[`${this.reprotermsUrl}variableMap`]) {
-            keyName = this.getVariableName(s, this.schema[`${this.reprotermsUrl}variableMap`]);
-          } else {
-            // TODO: remove this backwards compatibility else
-            keyName = getFilename(s);
+          const addProperties = this.schema[`${this.reprotermsUrl}addProperties`];
+          const currentActivityObj = _.filter(addProperties, v1 => v1[`${this.reprotermsUrl}isAbout`][0]['@id'] === s);
+          let varName = _.filter(currentActivityObj[0][`${this.reprotermsUrl}variableName`], v => v['@language'] === this.selected_language);
+          if (!varName.length) {
+            // if selected lang is not in schema, return corresponding to default lang
+            varName = currentActivityObj[0][`${this.reprotermsUrl}variableName`];
           }
-          // look through the "https://schema.repronim.org/visibility" field
-          // and reformat nicely
-
-          let condition = _.filter(this.schema[`${this.reprotermsUrl}visibility`], c => c['@index'] === keyName);
-          const condition1 = _.filter(this.schema[`${this.reprotermsUrl}vis`], c => c[`${this.reprotermsUrl}variableName`][0]['@value'] === keyName);
-          if (condition.length === 1) {
-            condition = condition[0];
-            if ('@value' in condition1[0][`${this.reprotermsUrl}isVis`][0]) {
-              return condition1[0][`${this.reprotermsUrl}isVis`][0]['@value'];
+          keyName = varName[0]['@value'];
+          console.log(495, keyName);
+          // if (this.schema[`${this.reprotermsUrl}variableMap`]) {
+          //   keyName = this.getVariableName(s, this.schema[`${this.reprotermsUrl}variableMap`]);
+          // } else {
+          //   // TODO: remove this backwards compatibility else
+          //   keyName = getFilename(s);
+          // }
+          console.log(508, currentActivityObj[0][`${this.reprotermsUrl}isVis`][0]['@value']);
+          // let condition = _.filter(this.schema[`${this.reprotermsUrl}visibility`], c => c['@index'] === keyName);
+          const condition1 = currentActivityObj[0][`${this.reprotermsUrl}isVis`][0];
+          // const condition1 = _.filter(this.schema[`${this.reprotermsUrl}vis`],
+          // c => c[`${this.reprotermsUrl}variableName`][0]['@value'] === keyName);
+          if (condition1) {
+            if ('@value' in condition1) {
+              console.log(516, condition1['@value']);
+              return condition1['@value'];
             }
-            if (('http://schema.org/httpMethod' in condition1[0][`${this.reprotermsUrl}isVis`][0]) &&
-                ('http://schema.org/url' in condition1[0][`${this.reprotermsUrl}isVis`][0]) &&
-                (`${this.reprotermsUrl}payload` in condition1[0][`${this.reprotermsUrl}isVis`][0])) {
+            if (('http://schema.org/httpMethod' in condition1) &&
+                ('http://schema.org/url' in condition1) &&
+                (`${this.reprotermsUrl}payload` in condition1)) {
               // lets fill the payload here.
               const payload = {};
               // const payloadList = condition[`${this.reprotermsUrl}payload`];
-              const payloadList = condition1[0][`${this.reprotermsUrl}isVis`][0][`${this.reprotermsUrl}payload`];
+              const payloadList = condition1[`${this.reprotermsUrl}payload`]; // todo: check when its payload
               _.map(payloadList, (p) => {
                 const item = p['@value'];
                 const index = this.schemaOrder.indexOf(this.schemaNameMapper[item]);

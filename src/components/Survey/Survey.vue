@@ -333,9 +333,9 @@ export default {
     },
     getVisibility(responses) {
       const responseMapper = this.responseMapper(responses);
-      if (!_.isEmpty(this.activity[`${this.reprotermsUrl}visibility`])) {
+      if (!_.isEmpty(this.activity[`${this.reprotermsUrl}addProperties`])) {
         const visibilityMapper = {};
-        _.map(this.activity[`${this.reprotermsUrl}visibility`], (a) => {
+        _.map(this.activity[`${this.reprotermsUrl}addProperties`], (a) => {
           let val = a[`${this.reprotermsUrl}isVis`][0]['@value'];
           if (_.isString(val)) {
             val = this.evaluateString(val, responseMapper);
@@ -343,7 +343,6 @@ export default {
           if (responseMapper[a[`${this.reprotermsUrl}variableName`][0]['@value']]) {
             visibilityMapper[responseMapper[a[`${this.reprotermsUrl}variableName`][0]['@value']].ref] = val;
           }
-          // visibilityMapper[responseMapper[a['@index']].ref] = val;
         });
         return visibilityMapper;
       }
