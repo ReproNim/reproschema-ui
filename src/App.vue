@@ -446,7 +446,6 @@ export default {
     },
     schemaOrder() {
       if (!_.isEmpty(this.$store.state.schema)) {
-        console.log(449, this.$store.state.schema);
         const order = _.map(this.$store.state.schema[`${this.reprotermsUrl}order`][0]['@list'],
           u => u['@id']);
         return order;
@@ -486,10 +485,9 @@ export default {
       return output;
     },
     visibilityConditions() {
-      console.log(489, this.schema);
       if (this.schema[`${this.reprotermsUrl}addProperties`]) {
         return _.map(this.schemaOrder, (s) => {
-          let keyName = '';
+          // let keyName = '';
           const addProperties = this.schema[`${this.reprotermsUrl}addProperties`];
           const currentActivityObj = _.filter(addProperties, v1 => v1[`${this.reprotermsUrl}isAbout`][0]['@id'] === s);
           let varName = _.filter(currentActivityObj[0][`${this.reprotermsUrl}variableName`], v => v['@language'] === this.selected_language);
@@ -497,22 +495,10 @@ export default {
             // if selected lang is not in schema, return corresponding to default lang
             varName = currentActivityObj[0][`${this.reprotermsUrl}variableName`];
           }
-          keyName = varName[0]['@value'];
-          console.log(495, keyName);
-          // if (this.schema[`${this.reprotermsUrl}variableMap`]) {
-          //   keyName = this.getVariableName(s, this.schema[`${this.reprotermsUrl}variableMap`]);
-          // } else {
-          //   // TODO: remove this backwards compatibility else
-          //   keyName = getFilename(s);
-          // }
-          console.log(508, currentActivityObj[0][`${this.reprotermsUrl}isVis`][0]['@value']);
-          // let condition = _.filter(this.schema[`${this.reprotermsUrl}visibility`], c => c['@index'] === keyName);
+          // keyName = varName[0]['@value'];
           const condition1 = currentActivityObj[0][`${this.reprotermsUrl}isVis`][0];
-          // const condition1 = _.filter(this.schema[`${this.reprotermsUrl}vis`],
-          // c => c[`${this.reprotermsUrl}variableName`][0]['@value'] === keyName);
           if (condition1) {
             if ('@value' in condition1) {
-              console.log(516, condition1['@value']);
               return condition1['@value'];
             }
             if (('http://schema.org/httpMethod' in condition1) &&
@@ -528,8 +514,8 @@ export default {
                 payload[this.schemaNameMapper[item]] = this.scores[index];
               });
               return {
-                url: condition['http://schema.org/url'][0]['@value'],
-                method: condition['http://schema.org/httpMethod'][0]['@value'],
+                url: condition1['http://schema.org/url'][0]['@value'],
+                method: condition1['http://schema.org/httpMethod'][0]['@value'],
                 payload,
               };
             }

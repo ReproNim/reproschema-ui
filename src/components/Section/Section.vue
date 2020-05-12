@@ -142,12 +142,11 @@ export default {
     },
     responseMapper(responses) {
       // a variable map is defined! great
-      const vmap = this.activity[`${this.reprotermsUrl}variableMap`];
+      const vmap = this.activity[`${this.reprotermsUrl}addProperties`];
       const keyArr = _.map(vmap, (v) => {
         const key = v[`${this.reprotermsUrl}isAbout`][0]['@id'];
         const qId = v[`${this.reprotermsUrl}variableName`][0]['@value'];
         const val = responses[key];
-        // console.log(145, 'sec resp key in mapper', val.value);
         return { key, val, qId };
       });
       const outMapper = {};
@@ -166,12 +165,11 @@ export default {
           if (_.isString(val)) {
             val = `'${val}'`; // put the string in quotes
           }
-          output = output.replace(k, val);
+          output = output.replace(new RegExp(`\\b${k}\\b`), val);
         } else {
-          output = output.replace(k, 0);
+          output = output.replace(new RegExp(`\\b${k}\\b`), 0);
         }
       });
-      // console.log(170, 'output', output);
       return safeEval(output);
     },
     restart() {
