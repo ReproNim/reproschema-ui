@@ -496,8 +496,8 @@ export default {
             varName = currentActivityObj[0][`${this.reprotermsUrl}variableName`];
           }
           // keyName = varName[0]['@value'];
-          const condition1 = currentActivityObj[0][`${this.reprotermsUrl}isVis`][0];
-          if (condition1) {
+          if (currentActivityObj[0][`${this.reprotermsUrl}isVis`]) {
+            const condition1 = currentActivityObj[0][`${this.reprotermsUrl}isVis`][0];
             if ('@value' in condition1) {
               return condition1['@value'];
             }

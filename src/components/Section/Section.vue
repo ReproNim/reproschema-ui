@@ -128,7 +128,10 @@ export default {
       if (!_.isEmpty(this.activity[`${this.reprotermsUrl}addProperties`])) {
         const visibilityMapper = {};
         _.map(this.activity[`${this.reprotermsUrl}addProperties`], (a) => {
-          let val = a[`${this.reprotermsUrl}isVis`][0]['@value'];
+          let val = true; // true by default if not mentioned
+          if (a[`${this.reprotermsUrl}isVis`]) {
+            val = a[`${this.reprotermsUrl}isVis`][0]['@value'];
+          }
           if (_.isString(val)) {
             val = this.evaluateString(val, responseMapper);
           }
