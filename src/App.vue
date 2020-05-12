@@ -9,7 +9,7 @@
       <!-- Sidebar -->
       <nav id="sidebar" v-bind:class="{'active':checkDisableBack}" ref="sidebar">
         <div class="sidebar-header">
-          <h3>Activities</h3>
+          <h4>{{ sidebarHeader }}</h4>
         </div>
         <div>
           <select v-model="selected_language">
@@ -118,6 +118,7 @@ export default {
     return {
       sidebarActive: true,
       selected_language: '',
+      sidebarHeader: '',
       visibility: {},
       displayNames: {},
       labelMap: {},
@@ -212,6 +213,12 @@ export default {
       } return '';
     },
     getPrefLabel() {
+      const baseSchema = this.$store.state.schema;
+      let sidebarHeader = _.filter(baseSchema['http://www.w3.org/2004/02/skos/core#prefLabel'], n => n['@language'] === this.selected_language);
+      if (!sidebarHeader.length) { // selected_language absent, return label in default language
+        sidebarHeader = baseSchema['http://www.w3.org/2004/02/skos/core#prefLabel'];
+      }
+      this.sidebarHeader = sidebarHeader[0]['@value']; // set sidebar header
       if (this.schemaOrder) {
         _.map(this.schemaOrder, (s) => {
           jsonld.expand(s).then((resp) => {
@@ -353,6 +360,9 @@ export default {
           saveAs(myzipfile, 'study-data.zip');
         });
     },
+    processSchema(url) {
+      this.$store.dispatch('getBaseSchema', url).then(() => this.getPrefLabel());
+    },
   },
   watch: {
     $route() {
@@ -377,19 +387,14 @@ export default {
     // console.log('url is', url);
     if (url) {
       this.$store.dispatch('getReproTerm', url).then(() => {
-        this.$store.dispatch('getBaseSchema', url).then(() => this.getPrefLabel());
+        this.processSchema(url);
       });
       this.protocolUrl = url;
     } else {
-      this.$store.dispatch('getBaseSchema', url).then(() => this.getPrefLabel());
+      this.processSchema(url);
     }
   },
   mounted() {
-    // console.log(329, this.$route.query.uid, this.$route.query.consented);
-    // if (this.$route.query.uid && this.$route.query.consented === 'True') {
-    //   this.$router.push('/activities/0');
-    // }
-    // `http://api.ipstack.com/check?access_key=${accessKey}&hostname=1`
     if (this.$route.query.lang) {
       this.selected_language = this.$route.query.lang;
     } else this.selected_language = 'en';
@@ -397,10 +402,6 @@ export default {
     if (this.$route.query.uid) {
       this.$store.dispatch('saveParticipantId', this.$route.query.uid);
     }
-    // axios.get('https://api.muctool.de/whois').then((resp) => {
-    //   // console.log(32, resp.data.ip);
-    //   this.clientIp = resp.data.ip;
-    // });
     if (this.$route.params.id) {
       this.$store.dispatch('setActivityIndex', this.$route.params.id);
     }
@@ -496,8 +497,8 @@ export default {
             varName = currentActivityObj[0][`${this.reprotermsUrl}variableName`];
           }
           // keyName = varName[0]['@value'];
-          const condition1 = currentActivityObj[0][`${this.reprotermsUrl}isVis`][0];
-          if (condition1) {
+          if (currentActivityObj[0][`${this.reprotermsUrl}isVis`]) {
+            const condition1 = currentActivityObj[0][`${this.reprotermsUrl}isVis`][0];
             if ('@value' in condition1) {
               return condition1['@value'];
             }
