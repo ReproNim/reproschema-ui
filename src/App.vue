@@ -528,8 +528,8 @@ export default {
                 payload[this.schemaNameMapper[item]] = this.scores[index];
               });
               return {
-                url: condition['http://schema.org/url'][0]['@value'],
-                method: condition['http://schema.org/httpMethod'][0]['@value'],
+                url: condition1['http://schema.org/url'][0]['@value'],
+                method: condition1['http://schema.org/httpMethod'][0]['@value'],
                 payload,
               };
             }

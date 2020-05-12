@@ -142,7 +142,8 @@ export default {
     },
     responseMapper(responses) {
       // a variable map is defined! great
-      const vmap = this.activity[`${this.reprotermsUrl}variableMap`];
+      console.log(145, this.activity);
+      const vmap = this.activity[`${this.reprotermsUrl}addProperties`];
       const keyArr = _.map(vmap, (v) => {
         const key = v[`${this.reprotermsUrl}isAbout`][0]['@id'];
         const qId = v[`${this.reprotermsUrl}variableName`][0]['@value'];
@@ -154,24 +155,28 @@ export default {
       _.map(keyArr, (a) => {
         outMapper[a.qId] = { val: a.val, ref: a.key };
       });
+      console.log(157, outMapper);
       return outMapper;
     },
     evaluateString(string, responseMapper) {
+      console.log(160, string, responseMapper);
       const keys = Object.keys(responseMapper);
       let output = string;
       _.map(keys, (k) => {
         // grab the value of the key from responseMapper
         let val = responseMapper[k].val;
+        console.log(165, responseMapper[k]);
         if (val !== 'skipped' && val !== 'dontknow') {
           if (_.isString(val)) {
             val = `'${val}'`; // put the string in quotes
           }
-          output = output.replace(k, val);
+          output = output.replace(new RegExp(`\\b${k}\\b`), val);
+          console.log(170, output);
         } else {
-          output = output.replace(k, 0);
+          output = output.replace(new RegExp(`\\b${k}\\b`), 0);
         }
       });
-      // console.log(170, 'output', output);
+      console.log(174, 'output', output);
       return safeEval(output);
     },
     restart() {
