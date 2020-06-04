@@ -70,8 +70,8 @@ export default {
   computed: {
     options() {
       let text = '';
-      // console.log(64, this.constraints['http://schema.org/itemListElement'][0]['@list']);
-      return _.map(this.constraints['http://schema.org/itemListElement'][0]['@list'], (v) => {
+      console.log(64, this.constraints['http://schema.org/itemListElement']);
+      return _.map(this.constraints['http://schema.org/itemListElement'], (v) => {
         const activeValueChoices = _.filter(v['http://schema.org/name'], ac => ac['@language'] === this.selected_language);
         if (!Array.isArray(activeValueChoices) || !activeValueChoices.length) {
           // array does not exist, is not an array, or empty - when selected_language string absent
