@@ -15,6 +15,7 @@ export default new Router({
       component: Landing,
       props: {
         contentSrc: config.contentSrc,
+        startButton: config.startButton,
       },
     },
     {

@@ -17,7 +17,7 @@
       <Loader v-else/>
     </section>
     <p style="margin-top: 2rem">
-      <button class="join-button" @click="doNext">Join</button>
+      <button class="join-button" @click="doNext">{{ startButton }}</button>
     </p>
   </div>
 </template>
@@ -32,6 +32,9 @@ export default {
   name: 'Landing',
   props: {
     contentSrc: {
+      type: String,
+    },
+    startButton: {
       type: String,
     },
   },
