@@ -2,9 +2,8 @@
 // Template version: 1.3.1
 // see http://vuejs-templates.github.io/webpack for documentation.
 
-import config from "../src/config";
-
-const path = require('path')
+const config = require('../src/config');
+const path = require('path');
 
 module.exports = {
   dev: {
