@@ -396,7 +396,7 @@ export default {
     }
   },
   mounted() {
-    axios.get('https://sig.mit.edu/vb/').then((response) => {
+    axios.get(config.backendServer).then((response) => {
       console.log(399, response);
     });
     if (this.$route.query.lang) {

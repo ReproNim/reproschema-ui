@@ -4,5 +4,6 @@ module.exports = {
   contentSrc: 'https://raw.githubusercontent.com/ReproNim/reproschema/master/protocols/VoicePilot/README.md',
   banner: 'This service is a demonstration for the ReproNim project.',
   startButton: 'Join',
-  assetsPublicPath: '/reproschema-ui/'
+  assetsPublicPath: '/reproschema-ui/',
+  backendServer: 'https://sig.mit.edu/vb/'
 };
