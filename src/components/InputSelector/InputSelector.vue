@@ -14,7 +14,7 @@
     </b-alert>
 
     <!-- If type is radio -->
-    <div v-if="inputType==='radio'">
+    <div v-if="inputType === 'radio'">
       <Radio
         :constraints="valueConstraints"
         :selected_language="selected_language"
@@ -23,14 +23,14 @@
     </div>
 
     <!-- If type is audioAutoRecord -->
-    <div v-else-if="inputType==='audioAutoRecord'">
+    <div v-else-if="inputType === 'audioAutoRecord'">
       <AudioCheckRecord
         :constraints="valueConstraints"
         :selected_language="selected_language"
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
-    <div v-else-if="inputType==='audioCheck'">
+    <div v-else-if="inputType === 'audioCheck'">
       <AudioCheck
         :constraints="valueConstraints"
         :selected_language="selected_language"
@@ -38,14 +38,14 @@
     </div>
 
     <!-- If type is audioRecord -->
-    <div v-else-if="inputType==='audioRecord'">
+    <div v-else-if="inputType === 'audioRecord'">
       <AudioRecord
         :constraints="valueConstraints"
         :selected_language="selected_language"
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
-    <div v-else-if="inputType==='audioPassageRecord'">
+    <div v-else-if="inputType === 'audioPassageRecord'">
       <AudioRecord
         :constraints="valueConstraints"
         :selected_language="selected_language"
@@ -53,7 +53,7 @@
     </div>
 
     <!-- If type is audioImageRecord -->
-    <div v-else-if="inputType==='audioImageRecord'">
+    <div v-else-if="inputType === 'audioImageRecord'">
       <AudioRecord
         :constraints="valueConstraints"
         :selected_language="selected_language"
@@ -62,7 +62,7 @@
     </div>
 
     <!-- If type is audioRecordNumberTask -->
-    <div v-else-if="inputType==='audioRecordNumberTask'">
+    <div v-else-if="inputType === 'audioRecordNumberTask'">
       <AudioRecord
         :constraints="valueConstraints"
         :selected_language="selected_language"
@@ -71,7 +71,7 @@
     </div>
 
     <!-- If type is text -->
-    <div v-else-if="inputType==='text'">
+    <div v-else-if="inputType === 'text'">
       <TextInput
         :constraints="valueConstraints"
         :selected_language="selected_language"
@@ -87,7 +87,7 @@
     </div>
 
     <!-- If type is time range -->
-    <div v-else-if="inputType==='timeRange'">
+    <div v-else-if="inputType === 'timeRange'">
       <TimeRange
         :constraints="valueConstraints"
         :selected_language="selected_language"
@@ -96,12 +96,12 @@
     </div>
 
     <!-- If type is multitext -->
-    <div v-else-if="inputType==='multitext'">
+    <div v-else-if="inputType === 'multitext'">
       <MultiTextInput :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
     </div>
 
     <!-- If type is integer -->
-    <div v-else-if="inputType==='number'">
+    <div v-else-if="inputType === 'number'">
       <IntegerInput
         :constraints="valueConstraints"
         :selected_language="selected_language"
@@ -109,7 +109,7 @@
     </div>
 
     <!-- If type is float -->
-    <div v-else-if="inputType==='float'">
+    <div v-else-if="inputType === 'float'">
         <FloatInput
           :constraints="valueConstraints"
           :selected_language="selected_language"
@@ -117,7 +117,7 @@
     </div>
 
     <!-- If type is date -->
-    <div v-else-if="inputType==='date' || inputType==='year'">
+    <div v-else-if="inputType === 'date' || inputType === 'year'">
       <DateInput
         :constraints="valueConstraints"
         :inputType="inputType"
@@ -126,7 +126,7 @@
     </div>
 
     <!-- If type is document upload -->
-    <div v-else-if="inputType==='documentUpload'">
+    <div v-else-if="inputType === 'documentUpload'">
       <DocumentUpload
         :constraints="valueConstraints"
         :selected_language="selected_language"
@@ -134,7 +134,7 @@
     </div>
 
     <!-- If type is a slider -->
-    <div v-else-if="inputType==='slider'">
+    <div v-else-if="inputType === 'slider'">
       <SliderInput
         :constraints="valueConstraints"
         :selected_language="selected_language"
@@ -142,7 +142,7 @@
     </div>
 
     <!-- If type is select input -->
-    <div v-else-if="inputType==='selectCountry' || inputType === 'selectState'
+    <div v-else-if="inputType === 'selectCountry' || inputType === 'selectState'
       || inputType === 'selectLanguage' || inputType === 'select'">
       <SelectInput
         :constraints="valueConstraints"
@@ -152,7 +152,7 @@
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
-    <div v-else-if="inputType ==='static' && readOnly">
+    <div v-else-if="inputType === 'static' && readOnly">
       <StaticReadOnly
         :constraints="valueConstraints"
         :selected_language="selected_language"
@@ -160,7 +160,7 @@
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
-    <div v-else-if="inputType ==='save'">
+    <div v-else-if="inputType === 'save'">
       <SaveData
         :constraints="valueConstraints"
         :selected_language="selected_language"
@@ -168,7 +168,7 @@
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
-    <div v-else-if="inputType ==='sign'">
+    <div v-else-if="inputType === 'sign'">
       <StudySign
         :constraints="valueConstraints"
         :selected_language="selected_language"
@@ -176,7 +176,7 @@
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
-    <div v-else-if="inputType ==='static'">
+    <div v-else-if="inputType === 'static'">
       <Static
         :constraints="valueConstraints"
         :selected_language="selected_language"
