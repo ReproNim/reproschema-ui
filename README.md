@@ -4,6 +4,10 @@
 
 
 ## Build Setup
+## App architecture
+
+![app architecture](docs/img/app_architecture.jpeg)
+
 ## Reference material
 
 This app use [Vue.js](https://vuejs.org/), a javascript framework.
@@ -75,5 +79,3 @@ npm run e2e
 ``` bash
 npm test
 ```
-
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
