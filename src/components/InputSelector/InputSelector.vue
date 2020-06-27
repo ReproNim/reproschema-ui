@@ -86,7 +86,7 @@
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
-    <!-- If type is time rnage -->
+    <!-- If type is time range -->
     <div v-else-if="inputType==='timeRange'">
       <TimeRange
         :constraints="valueConstraints"
@@ -95,12 +95,12 @@
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
-    <!-- If type is text -->
+    <!-- If type is multitext -->
     <div v-else-if="inputType==='multitext'">
       <MultiTextInput :constraints="valueConstraints" :init="init" v-on:valueChanged="sendData"/>
     </div>
 
-    <!-- If type is number -->
+    <!-- If type is integer -->
     <div v-else-if="inputType==='number'">
       <IntegerInput
         :constraints="valueConstraints"
@@ -133,7 +133,7 @@
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
-    <!-- If type is document upload -->
+    <!-- If type is a slider -->
     <div v-else-if="inputType==='slider'">
       <SliderInput
         :constraints="valueConstraints"
