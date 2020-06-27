@@ -104,6 +104,8 @@ StaticReadOnly -->
 
 ![app architecture](docs/img/app_architecture.jpeg)
 
+In order to make this UI render another schema, you should put modify the URL next to `githubSrc` in the file `src/config.js`.
+
 ## Reference material
 
 This app use [Vue.js](https://vuejs.org/), a javascript framework.
