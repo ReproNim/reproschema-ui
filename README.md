@@ -2,8 +2,104 @@
 
 [![Build Status](https://travis-ci.org/ReproNim/schema-ui.svg?branch=master)](https://travis-ci.org/ReproNim/schema-ui)
 
+This repository contains the code for the user-interface for the [ReproSchema](https://github.com/ReproNim/reproschema).
 
-## Build Setup
+See it in action [HERE](https://schema.repronim.org/ui/)
+
+<!-- TOC -->
+
+- [reproschema-ui](#reproschema-ui)
+  - [List of supported input types](#list-of-supported-input-types)
+    - [Text inputs](#text-inputs)
+    - [Numerical values](#numerical-values)
+    - [Audio inputs](#audio-inputs)
+    - [Time and dates inputs](#time-and-dates-inputs)
+    - [Multiple options inputs](#multiple-options-inputs)
+    - [Others](#others)
+  - [App architecture](#app-architecture)
+  - [Reference material](#reference-material)
+  - [Serve the app on your computer](#serve-the-app-on-your-computer)
+    - [Install the dependencies](#install-the-dependencies)
+    - [Serve the app locally](#serve-the-app-locally)
+    - [Build for production with minification](#build-for-production-with-minification)
+    - [Build for production and view the bundle analyzer report](#build-for-production-and-view-the-bundle-analyzer-report)
+    - [Run unit tests](#run-unit-tests)
+    - [Run e2e tests](#run-e2e-tests)
+    - [Run all tests](#run-all-tests)
+
+<!-- /TOC -->
+
+## List of supported input types
+
+The `inputType` is checked by `src/components/InputSelector/InputSelector.vue` which then calls the appropriate scrip from those listed in the folder `src/components/Inputs/`.
+
+### Text inputs
+
+-   text: `WebTextInput/TextInput.vue`
+-   multitext: `MultiTextInput/MultiTextInput.vue`
+-   email: `EmailInput/EmailInput.vue`
+
+### Numerical values
+
+-   number: `WebIntegerInput/IntegerInput.vue`
+-   float:  `WebFloatInput/FloatInput.vue`
+
+### Audio inputs
+
+-   audioCheck: `AudioCheck/AudioCheck.vue`
+-   audioRecord: `WebAudioRecord/Audio.vue`
+-   audioPassageRecord: `WebAudioRecord/Audio.vue`
+-   audioImageRecord: `WebAudioRecord/Audio.vue`
+-   audioRecordNumberTask: `WebAudioRecord/Audio.vue`
+-   audioAutoRecord: `AudioCheckRecord/AudioCheckRecord.vue`
+
+### Time and dates inputs
+
+-   date: `YearInput/YearInput.vue`
+-   year: `YearInput/YearInput.vue`
+-   timeRange: `TimeRange/TimeRange.vue`
+
+### Multiple options inputs
+
+-   radio: `WebRadio/Radio.vue`
+-   slider: `SliderInput/SliderInput.vue`
+-   select: `SelectInput/SelectInput.vue`
+-   selectLanguage: `SelectInput/SelectInput.vue`
+-   selectCountry: `SelectInput/SelectInput.vue`
+-   selectState: `SelectInput/SelectInput.vue`
+
+### Others
+
+-   documentUpload: `DocumentUpload/DocumentUpload.vue`
+
+<!-- MultiPart
+StudySign
+SaveData
+Static
+StaticReadOnly -->
+
+<!-- ```
+├── AudioCheck
+├── AudioCheckRecord
+├── DocumentUpload
+├── EmailInput
+├── MultiTextInput
+├── SaveData
+├── SelectInput
+├── SliderInput
+├── Static
+├── StaticReadOnly
+├── TimeRange
+├── Utils
+│   └── SelectImage
+├── WebAudioRecord
+├── WebFloatInput
+├── WebIntegerInput
+├── WebRadio
+├── WebTextInput
+└── YearInput
+``` -->
+
 ## App architecture
 
 ![app architecture](docs/img/app_architecture.jpeg)
@@ -16,9 +112,7 @@ Working on this will most likely require you to have some knowledge of HTML, CSS
 
 For some free introductory material to javascript you can check the [mozilla MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript) or the [W3 school](https://www.w3schools.com/js/default.asp).
 
-For introductory material on Vue you can start by having a look at the [guide](https://vuejs.org/v2/guide/).
-
-For a more detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+For introductory material on Vue you can start by having a look at the [guide](https://vuejs.org/v2/guide/). For a more detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
 
 You can also find many non-free courses for all of the above on [udemy](https://www.udemy.com/) or similar MOOC services.
 
