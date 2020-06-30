@@ -1,7 +1,6 @@
 module.exports = {
   /* eslint-disable */
-  githubSrc: 'https://raw.githubusercontent.com/ReproNim/reproschema/master/protocols/VoicePilot/VoicePilot_schema',
-  contentSrc: 'https://raw.githubusercontent.com/ReproNim/reproschema/master/protocols/VoicePilot/README.md',
+  githubSrc: 'https://raw.githubusercontent.com/ReproNim/demo-protocol/master/VoicePilot/VoicePilot_schema',
   banner: 'This service is a demonstration for the ReproNim project.',
   startButton: 'Join',
   assetsPublicPath: '/reproschema-ui/',
