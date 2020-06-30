@@ -2,7 +2,7 @@
   <div id="app" class="">
     <nav class="navbar sticky-top navbar-custom">
       <b-navbar-nav class="navbar-brand">
-        <b-nav-text>This service is a demonstration for the ReproNim project.</b-nav-text>
+        <b-nav-text>{{ banner }}</b-nav-text>
       </b-navbar-nav>
     </nav>
     <div class="wrapper">
@@ -128,6 +128,7 @@ export default {
       clientIp: '',
       reproterms2: '',
       protocolUrl: config.githubSrc,
+      banner: config.banner,
       // responses: [],
     };
   },
@@ -395,6 +396,9 @@ export default {
     }
   },
   mounted() {
+    axios.get(config.backendServer).then((response) => {
+      console.log(399, response);
+    });
     if (this.$route.query.lang) {
       this.selected_language = this.$route.query.lang;
     } else this.selected_language = 'en';
