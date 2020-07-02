@@ -16,8 +16,9 @@ See it in action [HERE](https://schema.repronim.org/ui/)
     - [Time and dates inputs](#time-and-dates-inputs)
     - [Multiple options inputs](#multiple-options-inputs)
     - [Others](#others)
-  - [App architecture](#app-architecture)
+  - [Viewing an certain protocol with the app](#viewing-an-certain-protocol-with-the-app)
   - [Reference material](#reference-material)
+    - [App architecture](#app-architecture)
   - [Serve the app on your computer](#serve-the-app-on-your-computer)
     - [Install the dependencies](#install-the-dependencies)
     - [Serve the app locally](#serve-the-app-locally)
@@ -31,7 +32,12 @@ See it in action [HERE](https://schema.repronim.org/ui/)
 
 ## List of supported input types
 
-The `inputType` is checked by `src/components/InputSelector/InputSelector.vue` which then calls the appropriate scrip from those listed in the folder `src/components/Inputs/`.
+The `inputType` is checked by `src/components/InputSelector/InputSelector.vue` which then calls the appropriate component. 
+
+Most of them are in the folder `src/components/Inputs/`
+
+One exception is :
+-   sign: `src/components/StudySign.StudySign.vue`
 
 ### Text inputs
 
@@ -62,7 +68,6 @@ The `inputType` is checked by `src/components/InputSelector/InputSelector.vue` w
 ### Multiple options inputs
 
 -   radio: `WebRadio/Radio.vue`
--   slider: `SliderInput/SliderInput.vue`
 -   select: `SelectInput/SelectInput.vue`
 -   selectLanguage: `SelectInput/SelectInput.vue`
 -   selectCountry: `SelectInput/SelectInput.vue`
@@ -70,39 +75,25 @@ The `inputType` is checked by `src/components/InputSelector/InputSelector.vue` w
 
 ### Others
 
+-   slider: `SliderInput/SliderInput.vue`
 -   documentUpload: `DocumentUpload/DocumentUpload.vue`
+-   save: `SaveData/SaveData.vue`
+-   static: `Static/Static.vue`
+-   StaticReadOnly: `Static/Static.vue`
 
-<!-- MultiPart
-StudySign
-SaveData
-Static
-StaticReadOnly -->
 
-<!-- ```
-├── AudioCheck
-├── AudioCheckRecord
-├── DocumentUpload
-├── EmailInput
-├── MultiTextInput
-├── SaveData
-├── SelectInput
-├── SliderInput
-├── Static
-├── StaticReadOnly
-├── TimeRange
-├── Utils
-│   └── SelectImage
-├── WebAudioRecord
-├── WebFloatInput
-├── WebIntegerInput
-├── WebRadio
-├── WebTextInput
-└── YearInput
-``` -->
+## Viewing an certain protocol with the app
 
-## App architecture
+If you wants to just view a protocol using the `reproschema-ui` you can pass in the URL of the protocol schema to the `url` query parameter like this:
 
-![app architecture](docs/img/app_architecture.jpeg)
+```https://schema.repronim.org/ui/#/?url=path-to-your-protocol_schema```
+
+Similarly, to view a single activity you simply do this:
+
+```https://schema.repronim.org/ui/#/activities/0?url=path-to-activity-schema```
+
+
+when you want to make a standalone app for your study/protocol.
 
 In order to make this UI render another schema, you should put modify the URL next to `githubSrc` in the file `src/config.js`.
 
@@ -117,6 +108,10 @@ For some free introductory material to javascript you can check the [mozilla MDN
 For introductory material on Vue you can start by having a look at the [guide](https://vuejs.org/v2/guide/). For a more detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
 
 You can also find many non-free courses for all of the above on [udemy](https://www.udemy.com/) or similar MOOC services.
+
+### App architecture
+
+![app architecture](docs/img/app_architecture.jpeg)
 
 ## Serve the app on your computer
 
