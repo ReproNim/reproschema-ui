@@ -16,7 +16,7 @@ See it in action [HERE](https://schema.repronim.org/ui/)
     - [Time and dates inputs](#time-and-dates-inputs)
     - [Multiple options inputs](#multiple-options-inputs)
     - [Others](#others)
-  - [Viewing an certain protocol with the app](#viewing-an-certain-protocol-with-the-app)
+  - [Viewing an certain protocol or activity with the app](#viewing-an-certain-protocol-or-activity-with-the-app)
   - [Reference material](#reference-material)
     - [App architecture](#app-architecture)
   - [Serve the app on your computer](#serve-the-app-on-your-computer)
@@ -82,20 +82,37 @@ One exception is :
 -   StaticReadOnly: `Static/Static.vue`
 
 
-## Viewing an certain protocol with the app
+## Viewing an certain protocol or activity with the app
 
-If you wants to just view a protocol using the `reproschema-ui` you can pass in the URL of the protocol schema to the `url` query parameter like this:
+If you just want to view a protocol using the `reproschema-ui` you can pass the URL of the protocol schema to the `url` query parameter like this:
 
-```https://schema.repronim.org/ui/#/?url=path-to-your-protocol_schema```
+```https://schema.repronim.org/ui/#/?url=url-to-your-protocol_schema```
 
-Similarly, to view a single activity you simply do this:
+If you are hosting a schema on github, make sure that you are passing the URL of the **raw** content of the protocol schema. For example, our demo protocol can be accessed at this URL:
 
-```https://schema.repronim.org/ui/#/activities/0?url=path-to-activity-schema```
+[https://github.com/ReproNim/demo-protocol/blob/master/VoicePilot/VoicePilot_schema](https://github.com/ReproNim/demo-protocol/blob/master/VoicePilot/VoicePilot_schema)
 
+But to get access to the raw content of that file you must click on the `Raw` button that will open this URL:
 
-when you want to make a standalone app for your study/protocol.
+[https://raw.githubusercontent.com/ReproNim/demo-protocol/master/VoicePilot/VoicePilot_schema](https://raw.githubusercontent.com/ReproNim/demo-protocol/master/VoicePilot/VoicePilot_schema).
 
-In order to make this UI render another schema, you should put modify the URL next to `githubSrc` in the file `src/config.js`.
+Similarly, to view a single activity you can simply do this:
+
+```https://schema.repronim.org/ui/#/activities/0?url=url-to-activity-schema```
+
+When you want to make a standalone app for your study / protocol, you should modify the URL next to `githubSrc` in the file `src/config.js` to make it point to the URL of your schema.
+
+```javascript
+module.exports = {
+  /* eslint-disable */
+  githubSrc: 'url-to-your-protocol_schema',
+  banner: 'This service is a demonstration for the ReproNim project.',
+  startButton: 'Join',
+  assetsPublicPath: '/reproschema-ui/',
+  backendServer: 'https://sig.mit.edu/vb/'
+};
+```
+
 
 ## Reference material
 
