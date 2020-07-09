@@ -21,7 +21,7 @@ const state = {
   activityIndex: null,
   storeReady: false,
   activityReady: false,
-  termUrl: 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/',
+  termUrl: 'http://schema.repronim.org/',
   schemaType: '',
   answeredLanguage: '',
 };

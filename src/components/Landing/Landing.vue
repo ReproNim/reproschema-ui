@@ -1,23 +1,11 @@
 <template>
   <div class="docked-layout">
-    <section id="smooth-scroller" class="smooth-scroller" style="padding-top: 0">
-      <section style="height: 30vw; min-height: 15rem;
-      background: linear-gradient(#268762, #15ac7f)">
-        <div style="
-          height: 30vw;
-          min-height: 15rem;
-          background-image: url(static/images/about%20the%20study.svg);
-          background-position: center;
-          background-size: contain;
-          background-repeat: no-repeat">
-        </div>
-      </section>
-      <br>
+    <section v-if="content" id="smooth-scroller" class="smooth-scroller" style="padding-top: 0">
       <vue-markdown v-if="content"> {{content}} </vue-markdown>
       <Loader v-else/>
     </section>
     <p style="margin-top: 2rem">
-      <button class="join-button" @click="doNext">Join</button>
+      <button class="join-button" @click="doNext">{{ startButton }}</button>
     </p>
   </div>
 </template>
@@ -31,7 +19,7 @@ import Loader from '../Loader';
 export default {
   name: 'Landing',
   props: {
-    contentSrc: {
+    startButton: {
       type: String,
     },
   },
@@ -59,37 +47,31 @@ export default {
       this.$router.push('/activities/0');
     },
     getContent() {
-      let landingUrl = this.contentSrc; // default to this for now.
       if (this.$store.state.schema[`${this.reprotermsUrl}landingPage`]) {
-        landingUrl = this.$store.state.schema[`${this.reprotermsUrl}landingPage`][0]['@value'];
+        const landingUrl = this.$store.state.schema[`${this.reprotermsUrl}landingPage`][0]['@id'];
+        axios.get(landingUrl).then((resp) => {
+          this.content = resp.data;
+        })
+          .then(() => {
+            // HTML injected into a component cannot be styled in the component?
+            // https://forum.vuejs.org/t/html-injected-into-a-component-from-a-vuex-store-cannot-be-styled-in-the-component/13691/24
+            const rootnode = document.getElementById('smooth-scroller');
+            const treeWalker = document.createTreeWalker(rootnode, NodeFilter.SHOW_ELEMENT, null);
+            let currentNode = treeWalker.currentNode;
+            while (currentNode) {
+              currentNode = treeWalker.nextNode();
+              if (currentNode) {
+                // eslint-disable-next-line no-underscore-dangle
+                currentNode.setAttribute(this.$options._scopeId, '');
+              }
+            }
+          });
       }
-      axios.get(landingUrl).then((resp) => {
-        this.content = resp.data;
-      }).then(() => {
-        // HTML injected into a component cannot be styled in the component?
-        // https://forum.vuejs.org/t/html-injected-into-a-component-from-a-vuex-store-cannot-be-styled-in-the-component/13691/24
-        const rootnode = document.getElementById('smooth-scroller');
-        const treeWalker = document.createTreeWalker(rootnode, NodeFilter.SHOW_ELEMENT, null);
-        let currentNode = treeWalker.currentNode;
-        while (currentNode) {
-          currentNode = treeWalker.nextNode();
-          if (currentNode) {
-            // eslint-disable-next-line no-underscore-dangle
-            currentNode.setAttribute(this.$options._scopeId, '');
-          }
-        }
-      });
     },
   },
   created() {
     const url = this.$route.query.url;
-    if (url) {
-      this.$store.dispatch('getReproTerm', url).then(() => {
-        this.$store.dispatch('getBaseSchema', url).then(() => this.getContent());
-      });
-    } else {
-      this.$store.dispatch('getBaseSchema', url).then(() => this.getContent());
-    }
+    this.$store.dispatch('getBaseSchema', url).then(() => this.getContent());
   },
 };
 </script>
