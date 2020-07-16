@@ -137,6 +137,8 @@ export default {
           let scoreFormula = a[`${this.reprotermsUrl}jsExpression`][0]['@value'];
           const scoreVariableName = a[`${this.reprotermsUrl}variableName`][0]['@value'];
           if (_.isString(scoreFormula)) {
+            console.log(140, scoreFormula);
+            console.log(141, responseMapper);
             scoreFormula = this.evaluateString(scoreFormula, responseMapper);
             // console.log(235, 'a.val', val);
           }
