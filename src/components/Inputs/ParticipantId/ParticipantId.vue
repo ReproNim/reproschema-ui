@@ -32,9 +32,19 @@ export default {
       p_uuid: '',
     };
   },
+  computed: {
+    getPId() {
+      return this.$store.getters.getParticipantId;
+    },
+  },
   mounted() {
-    this.p_uuid = uuidv4();
-    this.input = this.p_uuid; // initialize with the default uuid
+    if (this.$store.state.participantId) {
+      console.log(43, 'store uuid ', this.getPId);
+      this.input = this.getPId;
+    } else {
+      this.p_uuid = uuidv4();
+      this.input = this.p_uuid; // initialize with the default uuid
+    }
     if (this.init) {
       this.input = this.init;
     }

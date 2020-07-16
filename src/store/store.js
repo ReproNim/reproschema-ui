@@ -28,6 +28,10 @@ const state = {
 
 const getters = {
   // eslint-disable-next-line
+  getParticipantId(state) {
+    return state.participantId;
+  },
+  // eslint-disable-next-line
   getschemaType(state) {
     return state.schemaType;
   },
@@ -74,7 +78,10 @@ const mutations = {
     state.scores = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => ({}));
     state.activities = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => ({}));
     state.storeReady = true;
-    state.participantUuid = uuidv4();
+    if (state.participantId) {
+      console.log(82, state.participantId);
+    }
+    // state.participantId = uuidv4();
   },
   // eslint-disable-next-line
   setActivityIndex(state, idx) {
@@ -146,6 +153,9 @@ const actions = {
   },
   async setActivityIndex({ commit }, idx) {
     commit('setActivityIndex', idx);
+  },
+  saveParticipantId({ commit }, val) {
+    commit('saveParticipantId', val);
   },
   saveResponse({ commit }, { key, value }) {
     commit('saveResponse', { key, value });

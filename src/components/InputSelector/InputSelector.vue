@@ -79,7 +79,7 @@
     </div>
 
     <!-- If type is email -->
-    <div v-else-if="inputType === 'email'">
+    <div v-else-if="inputType === 'pid'">
       <ParticipantId
         :constraints="valueConstraints"
         :selected_language="selected_language"
