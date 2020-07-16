@@ -137,6 +137,8 @@ export default {
           let scoreFormula = a[`${this.reprotermsUrl}jsExpression`][0]['@value'];
           const scoreVariableName = a[`${this.reprotermsUrl}variableName`][0]['@value'];
           if (_.isString(scoreFormula)) {
+            console.log(140, scoreFormula);
+            console.log(141, responseMapper);
             scoreFormula = this.evaluateString(scoreFormula, responseMapper);
             // console.log(235, 'a.val', val);
           }
@@ -289,9 +291,9 @@ export default {
           if (_.isString(val)) {
             val = `'${val}'`; // put the string in quotes
           }
-          output = output.replace(k, val);
+          output = output.replace(new RegExp(`\\b${k}\\b`), val);
         } else {
-          output = output.replace(k, 0);
+          output = output.replace(new RegExp(`\\b${k}\\b`), 0);
         }
       });
       return safeEval(output);
@@ -299,8 +301,8 @@ export default {
     responseMapper(responses) {
       const keys = _.map(this.order(), c => c['@id']); // Object.keys(this.responses);
       // a variable map is defined! great
-      if (this.activity[`${this.reprotermsUrl}variableMap`]) {
-        const vmap = this.activity[`${this.reprotermsUrl}variableMap`];
+      if (this.activity[`${this.reprotermsUrl}addProperties`]) {
+        const vmap = this.activity[`${this.reprotermsUrl}addProperties`];
         const keyArr = _.map(vmap, (v) => {
           const key = v[`${this.reprotermsUrl}isAbout`][0]['@id'];
           const qId = v[`${this.reprotermsUrl}variableName`][0]['@value'];
@@ -333,17 +335,19 @@ export default {
     },
     getVisibility(responses) {
       const responseMapper = this.responseMapper(responses);
-      if (!_.isEmpty(this.activity[`${this.reprotermsUrl}visibility`])) {
+      if (!_.isEmpty(this.activity[`${this.reprotermsUrl}addProperties`])) {
         const visibilityMapper = {};
-        _.map(this.activity[`${this.reprotermsUrl}visibility`], (a) => {
-          let val = a[`${this.reprotermsUrl}isVis`][0]['@value'];
+        _.map(this.activity[`${this.reprotermsUrl}addProperties`], (a) => {
+          let val = true; // true by default if not mentioned
+          if (a[`${this.reprotermsUrl}isVis`]) {
+            val = a[`${this.reprotermsUrl}isVis`][0]['@value'];
+          }
           if (_.isString(val)) {
             val = this.evaluateString(val, responseMapper);
           }
           if (responseMapper[a[`${this.reprotermsUrl}variableName`][0]['@value']]) {
             visibilityMapper[responseMapper[a[`${this.reprotermsUrl}variableName`][0]['@value']].ref] = val;
           }
-          // visibilityMapper[responseMapper[a['@index']].ref] = val;
         });
         return visibilityMapper;
       }

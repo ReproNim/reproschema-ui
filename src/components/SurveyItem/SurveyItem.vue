@@ -175,7 +175,6 @@ export default {
     ui() {
       /* eslint-disable */
         if (this.data[`${this.reprotermsUrl}inputType`]) {
-          // console.log(180, this.data[`${this.reprotermsUrl}inputType`]);
           return this.data[`${this.reprotermsUrl}inputType`][0]['@value'];
         }
         return 'N/A';
@@ -189,7 +188,6 @@ export default {
     },
     title() {
       if (this.data['http://schema.org/question']) {
-        // console.log(186, this.selected_language, this.data['http://schema.org/question']);
         const activeQuestion = _.filter(this.data['http://schema.org/question'], q => q['@language'] === this.selected_language);
         if (!Array.isArray(activeQuestion) || !activeQuestion.length) {
           // array does not exist, is not an array, or empty - when selected_language string absent
@@ -211,26 +209,27 @@ export default {
       return null;
     },
     valueConstraints() {
-      if (this.data[`${this.reprotermsUrl}valueconstraints`]) {
+      if (this.data[`${this.reprotermsUrl}responseOptions`]) {
         // eslint-disable-next-line
-        // console.log(216, this.data[`${this.reprotermsUrl}valueconstraints`]);
+        // console.log(216, this.data[`${this.reprotermsUrl}responseOptions`]);
         return this.valueC;
       }
       /* eslint-enable */
       return { requiredValue: false };
     },
     findPassOptions() {
-      if (this.data[`${this.reprotermsUrl}valueconstraints`]) {
-        // when valueConstraints is a remote object
-        if (Object.keys(this.data[`${this.reprotermsUrl}valueconstraints`][0]).indexOf('@id') > -1) {
+      if (this.data[`${this.reprotermsUrl}responseOptions`]) {
+        // when responseOptions is a remote object
+        if (Object.keys(this.data[`${this.reprotermsUrl}responseOptions`][0]).indexOf('@id') > -1) {
           this.getRequiredVal();
           return this.requireVal;
         }
-        // when valueConstraints in embedded in item object itself
-        if (this.data[`${this.reprotermsUrl}valueconstraints`][0]) {
+        // when responseOptions in embedded in item object itself
+        if (this.data[`${this.reprotermsUrl}responseOptions`][0]) {
           // make sure the requiredValue key is defined
-          if (this.data[`${this.reprotermsUrl}valueconstraints`][0][`${this.reprotermsUrl}requiredValue`]) {
-            return this.data[`${this.reprotermsUrl}valueconstraints`][0][`${this.reprotermsUrl}requiredValue`][0]['@value'];
+          // todo: requiredValue has moved to activity level, so change the code here
+          if (this.data[`${this.reprotermsUrl}responseOptions`][0][`${this.reprotermsUrl}requiredValue`]) {
+            return this.data[`${this.reprotermsUrl}responseOptions`][0][`${this.reprotermsUrl}requiredValue`][0]['@value'];
           }
         }
       }
@@ -238,15 +237,15 @@ export default {
     },
   },
   methods: {
-    getRequiredVal() {
-      jsonld.expand(this.data[`${this.reprotermsUrl}valueconstraints`][0]['@id'])
+    getRequiredVal() { // todo: this needs to change. requiredValue is in activity level now
+      jsonld.expand(this.data[`${this.reprotermsUrl}responseOptions`][0]['@id'])
         .then((rsp) => {
           // console.log(237, rsp);
           this.requireVal = rsp[0][`${this.reprotermsUrl}requiredValue`][0]['@value'];
           // eslint-disable-next-line no-unused-vars
         }).catch((e) => {
           // console.log(240, 'constraint error', e);
-          jsonld.expand(`${this.data[`${this.reprotermsUrl}valueconstraints`][0]['@id']}.jsonld`).then((resp) => {
+          jsonld.expand(`${this.data[`${this.reprotermsUrl}responseOptions`][0]['@id']}.jsonld`).then((resp) => {
             // console.log(250, resp);
             this.requireVal = resp[0][`${this.reprotermsUrl}requiredValue`][0]['@value'];
             // eslint-disable-next-line no-unused-vars
@@ -273,12 +272,12 @@ export default {
       // console.log(247, resp);
       if (resp.length) {
         this.data = resp[0];
-        if (this.data[`${this.reprotermsUrl}valueconstraints`]) {
-          if (Object.keys(this.data[`${this.reprotermsUrl}valueconstraints`][0]).indexOf('@id') > -1) {
-            // console.log(260, this.data[`${this.reprotermsUrl}valueconstraints`][0]['@id']);
-            this.getValueConstraintsData(this.data[`${this.reprotermsUrl}valueconstraints`][0]['@id']);
+        if (this.data[`${this.reprotermsUrl}responseOptions`]) {
+          if (Object.keys(this.data[`${this.reprotermsUrl}responseOptions`][0]).indexOf('@id') > -1) {
+            // console.log(260, this.data[`${this.reprotermsUrl}responseOptions`][0]['@id']);
+            this.getValueConstraintsData(this.data[`${this.reprotermsUrl}responseOptions`][0]['@id']);
           } else {
-            this.valueC = this.data[`${this.reprotermsUrl}valueconstraints`][0];
+            this.valueC = this.data[`${this.reprotermsUrl}responseOptions`][0];
           }
         } else {
           // console.log(this.data);

@@ -2,14 +2,14 @@
   <div id="app" class="">
     <nav class="navbar sticky-top navbar-custom">
       <b-navbar-nav class="navbar-brand">
-        <b-nav-text>This service is a demonstration for the ReproNim project.</b-nav-text>
+        <b-nav-text>{{ banner }}</b-nav-text>
       </b-navbar-nav>
     </nav>
     <div class="wrapper">
       <!-- Sidebar -->
       <nav id="sidebar" v-bind:class="{'active':checkDisableBack}" ref="sidebar">
         <div class="sidebar-header">
-          <h3>Activities</h3>
+          <h4>{{ sidebarHeader }}</h4>
         </div>
         <div>
           <select v-model="selected_language">
@@ -38,7 +38,7 @@
           </li>
         </ul>
         <div>
-          <b-button class="align-middle" @click="downloadZipData"
+          <b-button v-if="allowExport" class="align-middle" @click="downloadZipData"
                     :disabled="!isAnswered">Export</b-button>
         </div>
       </nav>
@@ -95,7 +95,7 @@ import { saveAs } from 'file-saver';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import circleProgress from './components/Circle/';
-import config from "./config";
+import config from './config';
 
 Vue.use(BootstrapVue);
 Vue.filter('reverse', value => value.slice().reverse());
@@ -118,6 +118,7 @@ export default {
     return {
       sidebarActive: true,
       selected_language: '',
+      sidebarHeader: '',
       visibility: {},
       displayNames: {},
       labelMap: {},
@@ -127,6 +128,7 @@ export default {
       clientIp: '',
       reproterms2: '',
       protocolUrl: config.githubSrc,
+      banner: config.banner,
       // responses: [],
     };
   },
@@ -194,17 +196,17 @@ export default {
     },
     getDisplayName(activityUrl) {
       if (!_.isEmpty(this.$store.state.schema)) {
-        if (this.$store.state.schema[`${this.reprotermsUrl}displayNameMap`]) {
-          // TODO: displayNameMap can be used to override prefLabel
-          const displayNameMap = this.$store.state.schema[`${this.reprotermsUrl}displayNameMap`];
-          const s = _.filter(displayNameMap, v1 => v1[`${this.reprotermsUrl}isAbout`][0]['@id'] === activityUrl);
+        // console.log(197, this.$store.state.schema[`${this.reprotermsUrl}addProperties`]);
+        if (this.$store.state.schema[`${this.reprotermsUrl}addProperties`][0]['http://www.w3.org/2004/02/skos/core#prefLabel']) {
+          const addProperties = this.$store.state.schema[`${this.reprotermsUrl}addProperties`];
+          const s = _.filter(addProperties, v1 => v1[`${this.reprotermsUrl}isAbout`][0]['@id'] === activityUrl);
           // console.log(152, s);
-          const dName = _.filter(s[0]['http://schema.org/alternateName'], d => d['@language'] === this.selected_language);
+          const dName = _.filter(s[0]['http://www.w3.org/2004/02/skos/core#prefLabel'], d => d['@language'] === this.selected_language);
           // console.log(154, dName);
           if (!Array.isArray(dName) || !dName.length) {
             // array does not exist, is not an array, or is empty
             // return display name corresponding to default language
-            return s[0]['http://schema.org/alternateName'][0]['@value'];
+            return s[0]['http://www.w3.org/2004/02/skos/core#prefLabel'][0]['@value'];
           }
           return dName[0]['@value'];
         }
@@ -212,6 +214,12 @@ export default {
       } return '';
     },
     getPrefLabel() {
+      const baseSchema = this.$store.state.schema;
+      let sidebarHeader = _.filter(baseSchema['http://www.w3.org/2004/02/skos/core#prefLabel'], n => n['@language'] === this.selected_language);
+      if (!sidebarHeader.length) { // selected_language absent, return label in default language
+        sidebarHeader = baseSchema['http://www.w3.org/2004/02/skos/core#prefLabel'];
+      }
+      this.sidebarHeader = sidebarHeader[0]['@value']; // set sidebar header
       if (this.schemaOrder) {
         _.map(this.schemaOrder, (s) => {
           jsonld.expand(s).then((resp) => {
@@ -353,6 +361,9 @@ export default {
           saveAs(myzipfile, 'study-data.zip');
         });
     },
+    processSchema(url) {
+      this.$store.dispatch('getBaseSchema', url).then(() => this.getPrefLabel());
+    },
   },
   watch: {
     $route() {
@@ -377,19 +388,17 @@ export default {
     // console.log('url is', url);
     if (url) {
       this.$store.dispatch('getReproTerm', url).then(() => {
-        this.$store.dispatch('getBaseSchema', url).then(() => this.getPrefLabel());
+        this.processSchema(url);
       });
       this.protocolUrl = url;
     } else {
-      this.$store.dispatch('getBaseSchema', url).then(() => this.getPrefLabel());
+      this.processSchema(url);
     }
   },
   mounted() {
-    // console.log(329, this.$route.query.uid, this.$route.query.consented);
-    // if (this.$route.query.uid && this.$route.query.consented === 'True') {
-    //   this.$router.push('/activities/0');
-    // }
-    // `http://api.ipstack.com/check?access_key=${accessKey}&hostname=1`
+    axios.get(config.backendServer).then((response) => {
+      console.log(399, response);
+    });
     if (this.$route.query.lang) {
       this.selected_language = this.$route.query.lang;
     } else this.selected_language = 'en';
@@ -397,10 +406,6 @@ export default {
     if (this.$route.query.uid) {
       this.$store.dispatch('saveParticipantId', this.$route.query.uid);
     }
-    // axios.get('https://api.muctool.de/whois').then((resp) => {
-    //   // console.log(32, resp.data.ip);
-    //   this.clientIp = resp.data.ip;
-    // });
     if (this.$route.params.id) {
       this.$store.dispatch('setActivityIndex', this.$route.params.id);
     }
@@ -485,40 +490,37 @@ export default {
       return output;
     },
     visibilityConditions() {
-      if (this.schema[`${this.reprotermsUrl}visibility`]) {
+      if (this.schema[`${this.reprotermsUrl}addProperties`]) {
         return _.map(this.schemaOrder, (s) => {
-          let keyName = '';
-          if (this.schema[`${this.reprotermsUrl}variableMap`]) {
-            keyName = this.getVariableName(s, this.schema[`${this.reprotermsUrl}variableMap`]);
-          } else {
-            // TODO: remove this backwards compatibility else
-            keyName = getFilename(s);
+          // let keyName = '';
+          const addProperties = this.schema[`${this.reprotermsUrl}addProperties`];
+          const currentActivityObj = _.filter(addProperties, v1 => v1[`${this.reprotermsUrl}isAbout`][0]['@id'] === s);
+          let varName = _.filter(currentActivityObj[0][`${this.reprotermsUrl}variableName`], v => v['@language'] === this.selected_language);
+          if (!varName.length) {
+            // if selected lang is not in schema, return corresponding to default lang
+            varName = currentActivityObj[0][`${this.reprotermsUrl}variableName`];
           }
-          // look through the "https://schema.repronim.org/visibility" field
-          // and reformat nicely
-
-          let condition = _.filter(this.schema[`${this.reprotermsUrl}visibility`], c => c['@index'] === keyName);
-          const condition1 = _.filter(this.schema[`${this.reprotermsUrl}vis`], c => c[`${this.reprotermsUrl}variableName`][0]['@value'] === keyName);
-          if (condition.length === 1) {
-            condition = condition[0];
-            if ('@value' in condition1[0][`${this.reprotermsUrl}isVis`][0]) {
-              return condition1[0][`${this.reprotermsUrl}isVis`][0]['@value'];
+          // keyName = varName[0]['@value'];
+          if (currentActivityObj[0][`${this.reprotermsUrl}isVis`]) {
+            const condition1 = currentActivityObj[0][`${this.reprotermsUrl}isVis`][0];
+            if ('@value' in condition1) {
+              return condition1['@value'];
             }
-            if (('http://schema.org/httpMethod' in condition1[0][`${this.reprotermsUrl}isVis`][0]) &&
-                ('http://schema.org/url' in condition1[0][`${this.reprotermsUrl}isVis`][0]) &&
-                (`${this.reprotermsUrl}payload` in condition1[0][`${this.reprotermsUrl}isVis`][0])) {
+            if (('http://schema.org/httpMethod' in condition1) &&
+                ('http://schema.org/url' in condition1) &&
+                (`${this.reprotermsUrl}payload` in condition1)) {
               // lets fill the payload here.
               const payload = {};
               // const payloadList = condition[`${this.reprotermsUrl}payload`];
-              const payloadList = condition1[0][`${this.reprotermsUrl}isVis`][0][`${this.reprotermsUrl}payload`];
+              const payloadList = condition1[`${this.reprotermsUrl}payload`]; // todo: check when its payload
               _.map(payloadList, (p) => {
                 const item = p['@value'];
                 const index = this.schemaOrder.indexOf(this.schemaNameMapper[item]);
                 payload[this.schemaNameMapper[item]] = this.scores[index];
               });
               return {
-                url: condition['http://schema.org/url'][0]['@value'],
-                method: condition['http://schema.org/httpMethod'][0]['@value'],
+                url: condition1['http://schema.org/url'][0]['@value'],
+                method: condition1['http://schema.org/httpMethod'][0]['@value'],
                 payload,
               };
             }

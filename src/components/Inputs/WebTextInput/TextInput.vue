@@ -16,7 +16,7 @@
 <script>
 export default {
   name: 'TextInput',
-  props: ['constraints', 'init'],
+  props: ['constraints', 'init', 'inputType', 'selected_language'],
   methods: {
     onSubmit(e) {
       e.preventDefault();
@@ -29,6 +29,7 @@ export default {
     };
   },
   mounted() {
+    console.log(32, 'in text', this.inputType);
     if (this.init) {
       this.input = this.init;
     }

@@ -70,8 +70,7 @@ export default {
   computed: {
     options() {
       let text = '';
-      // console.log(64, this.constraints['http://schema.org/itemListElement'][0]['@list']);
-      return _.map(this.constraints['http://schema.org/itemListElement'][0]['@list'], (v) => {
+      return _.map(this.constraints['http://schema.org/itemListElement'], (v) => {
         const activeValueChoices = _.filter(v['http://schema.org/name'], ac => ac['@language'] === this.selected_language);
         if (!Array.isArray(activeValueChoices) || !activeValueChoices.length) {
           // array does not exist, is not an array, or empty - when selected_language string absent
@@ -119,7 +118,6 @@ export default {
     // },
   },
   mounted() {
-    console.log(117, this.constraints);
     if (this.init !== undefined) {
       if (this.init instanceof Array) { // checkbox
         this.checkboxSelected = this.init;
