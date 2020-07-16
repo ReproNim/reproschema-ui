@@ -174,15 +174,15 @@ export default {
     },
     ui() {
       /* eslint-disable */
-        if (this.data[`${this.reprotermsUrl}inputType`]) {
-          return this.data[`${this.reprotermsUrl}inputType`][0]['@value'];
+        if (this.data['http://schema.repronim.org/inputType']) {
+          return this.data['http://schema.repronim.org/inputType'][0]['@value'];
         }
         return 'N/A';
         /* eslint-enable */
     },
     widgetType() {
-      if (this.data[`${this.reprotermsUrl}readOnly`]) {
-        return this.data[`${this.reprotermsUrl}readOnly`][0]['@value'];
+      if (this.data['http://schema.org/readonlyValue']) {
+        return this.data['http://schema.repronim.org/readonlyValue'][0]['@value'];
       }
       return false;
     },
@@ -202,34 +202,34 @@ export default {
       return null;
     },
     itemPreamble() {
-      if (this.data[`${this.reprotermsUrl}preamble`]) {
-        const activePreamble = _.filter(this.data[`${this.reprotermsUrl}preamble`], q => q['@language'] === this.selected_language);
+      if (this.data['http://schema.repronim.org/preamble']) {
+        const activePreamble = _.filter(this.data['http://schema.repronim.org/preamble'], q => q['@language'] === this.selected_language);
         return activePreamble[0]['@value'];
       }
       return null;
     },
     valueConstraints() {
-      if (this.data[`${this.reprotermsUrl}responseOptions`]) {
+      if (this.data['http://schema.repronim.org/responseOptions']) {
         // eslint-disable-next-line
-        // console.log(216, this.data[`${this.reprotermsUrl}responseOptions`]);
+        // console.log(216, this.data['http://schema.repronim.org/responseOptions']);
         return this.valueC;
       }
       /* eslint-enable */
       return { requiredValue: false };
     },
     findPassOptions() {
-      if (this.data[`${this.reprotermsUrl}responseOptions`]) {
+      if (this.data['http://schema.repronim.org/responseOptions']) {
         // when responseOptions is a remote object
-        if (Object.keys(this.data[`${this.reprotermsUrl}responseOptions`][0]).indexOf('@id') > -1) {
+        if (Object.keys(this.data['http://schema.repronim.org/responseOptions'][0]).indexOf('@id') > -1) {
           this.getRequiredVal();
           return this.requireVal;
         }
         // when responseOptions in embedded in item object itself
-        if (this.data[`${this.reprotermsUrl}responseOptions`][0]) {
+        if (this.data['http://schema.repronim.org/responseOptions'][0]) {
           // make sure the requiredValue key is defined
           // todo: requiredValue has moved to activity level, so change the code here
-          if (this.data[`${this.reprotermsUrl}responseOptions`][0][`${this.reprotermsUrl}requiredValue`]) {
-            return this.data[`${this.reprotermsUrl}responseOptions`][0][`${this.reprotermsUrl}requiredValue`][0]['@value'];
+          if (this.data['http://schema.repronim.org/responseOptions'][0]['http://schema.org/valueRequired']) {
+            return this.data['http://schema.repronim.org/responseOptions'][0]['http://schema.org/valueRequired'][0]['@value'];
           }
         }
       }
@@ -238,16 +238,16 @@ export default {
   },
   methods: {
     getRequiredVal() { // todo: this needs to change. requiredValue is in activity level now
-      jsonld.expand(this.data[`${this.reprotermsUrl}responseOptions`][0]['@id'])
+      jsonld.expand(this.data['http://schema.repronim.org/responseOptions'][0]['@id'])
         .then((rsp) => {
           // console.log(237, rsp);
-          this.requireVal = rsp[0][`${this.reprotermsUrl}requiredValue`][0]['@value'];
+          this.requireVal = rsp[0]['http://schema.org/valueRequired'][0]['@value'];
           // eslint-disable-next-line no-unused-vars
         }).catch((e) => {
           // console.log(240, 'constraint error', e);
-          jsonld.expand(`${this.data[`${this.reprotermsUrl}responseOptions`][0]['@id']}.jsonld`).then((resp) => {
+          jsonld.expand(`${this.data['http://schema.repronim.org/responseOptions'][0]['@id']}.jsonld`).then((resp) => {
             // console.log(250, resp);
-            this.requireVal = resp[0][`${this.reprotermsUrl}requiredValue`][0]['@value'];
+            this.requireVal = resp[0]['http://schema.org/valueRequired'][0]['@value'];
             // eslint-disable-next-line no-unused-vars
           }).catch((e1) => {
             // console.log(252, e1);
@@ -272,12 +272,12 @@ export default {
       // console.log(247, resp);
       if (resp.length) {
         this.data = resp[0];
-        if (this.data[`${this.reprotermsUrl}responseOptions`]) {
-          if (Object.keys(this.data[`${this.reprotermsUrl}responseOptions`][0]).indexOf('@id') > -1) {
-            // console.log(260, this.data[`${this.reprotermsUrl}responseOptions`][0]['@id']);
-            this.getValueConstraintsData(this.data[`${this.reprotermsUrl}responseOptions`][0]['@id']);
+        if (this.data['http://schema.repronim.org/responseOptions']) {
+          if (Object.keys(this.data['http://schema.repronim.org/responseOptions'][0]).indexOf('@id') > -1) {
+            // console.log(260, this.data['http://schema.repronim.org/responseOptions'][0]['@id']);
+            this.getValueConstraintsData(this.data['http://schema.repronim.org/responseOptions'][0]['@id']);
           } else {
-            this.valueC = this.data[`${this.reprotermsUrl}responseOptions`][0];
+            this.valueC = this.data['http://schema.repronim.org/responseOptions'][0];
           }
         } else {
           // console.log(this.data);
@@ -291,7 +291,7 @@ export default {
       }
     },
     getData() {
-      // console.log(242, this.item['@id']);
+      console.log(242, this.item['@id']);
       jsonld.expand(this.item['@id'], {
         onDownloadProgress() {
           // TODO: for some reason pEvent has total defined as 0.

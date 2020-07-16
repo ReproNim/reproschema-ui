@@ -25,6 +25,9 @@ import JSZip from 'jszip';
 import axios from 'axios';
 import Loader from '../../Loader';
 
+const clientId = 'c75b50bcf1aa417fa428dd590f093aee';
+const queryString = require('query-string');
+
 export default {
   name: 'SaveData',
   props: ['constraints', 'init', 'selected_language', 'ipAddress'],
@@ -98,29 +101,27 @@ export default {
       // jsonData.score = JSONscores[0];
       jszip.generateAsync({ type: 'blob' })
         .then((myzipfile) => {
-          axios.post('http://localhost:8000/check', JSONscores[0], {
           // axios.post('https://sig.mit.edu/vb/check', JSONscores[0], {
-            ContentType: 'application/json',
-          })
-            .then((response) => {
-              const formData = new FormData();
-              formData.append('file', myzipfile);
-              formData.append('token', response.data.token);
-              // formData.append('clientIP', this.ipAddress);
-              axios.post('http://localhost:8000/submit', formData, {
+          axios.get(`http://localhost:8000/token/?client_id=${clientId}`).then((response) => {
+            console.log(106, response.request.responseURL);
+            const authToken = 'ac62af5e6cbe40e39e1ef423fe43328f'; // todo: get this from response
+            const formData = new FormData();
+            formData.append('file', myzipfile);
+            formData.append('auth_token', `${authToken}`);
+            axios.post('http://localhost:8000/submit', formData, {
               // axios.post('https://sig.mit.edu/vb/submit', formData, {
-                'Content-Type': 'multipart/form-data',
-              }).then((res) => {
-                this.hasData = true;
-                this.isUploading = false;
-                // console.log('SUCCESS!!', res);
-                this.$emit('valueChanged', { status: res.status });
-              })
-                // eslint-disable-next-line no-unused-vars
-                .catch((e) => {
-                  // console.log('FAILURE!!', e);
-                });
+              'Content-Type': 'multipart/form-data',
+            }).then((res) => {
+              this.hasData = true;
+              this.isUploading = false;
+              console.log('SUCCESS!!', res);
+              this.$emit('valueChanged', { status: res.status });
             })
+              // eslint-disable-next-line no-unused-vars
+              .catch((e) => {
+                // console.log('FAILURE!!', e);
+              });
+          })
             // eslint-disable-next-line no-unused-vars
             .catch((error) => {
               // console.log(error);

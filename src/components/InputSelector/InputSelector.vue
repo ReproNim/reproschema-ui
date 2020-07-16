@@ -74,6 +74,7 @@
     <div v-else-if="inputType==='text'">
       <TextInput
         :constraints="valueConstraints"
+        :inputType="inputType"
         :selected_language="selected_language"
         :init="init" v-on:valueChanged="sendData"/>
     </div>

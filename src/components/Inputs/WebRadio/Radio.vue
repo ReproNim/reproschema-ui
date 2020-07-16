@@ -70,7 +70,7 @@ export default {
   computed: {
     options() {
       let text = '';
-      return _.map(this.constraints['http://schema.org/itemListElement'], (v) => {
+      return _.map(this.constraints['http://schema.repronim.org/choices'], (v) => {
         const activeValueChoices = _.filter(v['http://schema.org/name'], ac => ac['@language'] === this.selected_language);
         if (!Array.isArray(activeValueChoices) || !activeValueChoices.length) {
           // array does not exist, is not an array, or empty - when selected_language string absent
@@ -80,14 +80,14 @@ export default {
         }
         return {
           text, // ESLint object-shorthand
-          value: v['http://schema.org/value'][0]['@value'],
+          value: v['http://schema.repronim.org/value'][0]['@value'],
           image: v['http://schema.org/image'] ? v['http://schema.org/image'][0]['@value'] : null,
         };
       });
     },
     isMultipleChoice() {
-      if (this.constraints[`${this.reprotermsUrl}multipleChoice`]) { // checkbox field
-        return this.constraints[`${this.reprotermsUrl}multipleChoice`][0]['@value'];
+      if (this.constraints['http://schema.repronim.org/multipleChoice']) { // checkbox field
+        return this.constraints['http://schema.repronim.org/multipleChoice'][0]['@value'];
       } return false; // default to radio
     },
     isImageSelect() {

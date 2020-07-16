@@ -70,6 +70,7 @@ export default {
     },
   },
   mounted() {
+    console.log(73, 'in select');
     if (this.init) {
       // console.log(74, this.init);
       if (Array.isArray(this.init)) {

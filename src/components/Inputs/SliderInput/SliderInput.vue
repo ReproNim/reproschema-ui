@@ -50,9 +50,11 @@ export default {
   },
   computed: {
     interval() {
-      return _.map(this.constraints['http://schema.org/itemListElement'][0]['@list'], (v) => {
+      return _.map(this.constraints['http://schema.org/itemListElement'], (v) => {
+        console.log(54, v);
         const activeValueChoices = _.filter(v['http://schema.org/name'], ac => ac['@language'] === this.selected_language);
-        return activeValueChoices[0]['@value'];
+        console.log(55, activeValueChoices);
+        return activeValueChoices['@value'];
       });
     },
     getMinLabel() {
@@ -64,14 +66,14 @@ export default {
       return activeMaxLabel[0]['@value'];
     },
     getMinImageLabel() {
-      const vcList = this.constraints['http://schema.org/itemListElement'][0]['@list'];
+      const vcList = this.constraints['http://schema.org/itemListElement'];
       if (vcList[0]['http://schema.org/image']) {
         return vcList[0]['http://schema.org/image'][0]['@value'];
       }
       return false;
     },
     getMaxImageLabel() {
-      const vcList = this.constraints['http://schema.org/itemListElement'][0]['@list'];
+      const vcList = this.constraints['http://schema.org/itemListElement'];
       const N = vcList.length;
       if (vcList[N - 1]['http://schema.org/image']) {
         return vcList[N - 1]['http://schema.org/image'][0]['@value'];
