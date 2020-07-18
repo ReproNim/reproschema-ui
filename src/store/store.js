@@ -42,7 +42,7 @@ const getters = {
   // eslint-disable-next-line
   srcUrl(state) {
     if (!_.isEmpty(state.schema) && state.activityIndex) {
-      state.schemaType = (state.schema['@type'][0]).split('schemas/')[1];
+      state.schemaType = (state.schema['@type'][0]).split('/').slice(-1)[0];
       if (state.schemaType === 'Activity') {
         return state.schema['@id']; // for rendering parameterized activities
       } return state.schema[`${state.termUrl}order`][0]['@list'][state.activityIndex]['@id'];
@@ -61,11 +61,15 @@ const getters = {
 
 const mutations = {
   // eslint-disable-next-line
-  setReprotermUrl(state, url) {
+  async setReprotermUrl(state, url) {
     axios.get(url).then((response) => {
-      const ctx = _.filter(response.data['@context'], c => c.includes('contexts/generic'));
-      axios.get(ctx[0]).then((resp) => {
-        state.termUrl = resp.data['@context'].reproterms;
+      console.log(67, response.data);
+      const ctx = response.data['@context'];
+      // const ctx = _.filter(response.data['@context'], c => c.includes('contexts/generic'));
+      axios.get(ctx).then((resp) => {
+        console.log(68, resp.data);
+        // state.termUrl = resp.data['@context'].reproterms;
+        state.termUrl = 'http://schema.repronim.org/'; // change this
       });
     });
   },

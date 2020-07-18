@@ -74,13 +74,22 @@
     <div v-else-if="inputType==='text'">
       <TextInput
         :constraints="valueConstraints"
+        :inputType="inputType"
+        :selected_language="selected_language"
+        :init="init" v-on:valueChanged="sendData"/>
+    </div>
+
+    <!-- If type is pid -->
+    <div v-else-if="inputType === 'pid'">
+      <ParticipantId
+        :constraints="valueConstraints"
         :selected_language="selected_language"
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
     <!-- If type is email -->
-    <div v-else-if="inputType === 'pid'">
-      <ParticipantId
+    <div v-else-if="inputType === 'email'">
+      <EmailInput
         :constraints="valueConstraints"
         :selected_language="selected_language"
         :init="init" v-on:valueChanged="sendData"/>

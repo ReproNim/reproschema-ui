@@ -125,9 +125,9 @@ export default {
     },
     getVisibility(responses) {
       const responseMapper = this.responseMapper(responses);
-      if (!_.isEmpty(this.activity[`${this.reprotermsUrl}addProperties`])) {
+      if (!_.isEmpty(this.activity['http://schema.repronim.org/addProperties'])) {
         const visibilityMapper = {};
-        _.map(this.activity[`${this.reprotermsUrl}addProperties`], (a) => {
+        _.map(this.activity['http://schema.repronim.org/addProperties'], (a) => {
           let val = true; // true by default if not mentioned
           if (a[`${this.reprotermsUrl}isVis`]) {
             val = a[`${this.reprotermsUrl}isVis`][0]['@value'];
@@ -139,13 +139,14 @@ export default {
             visibilityMapper[responseMapper[a[`${this.reprotermsUrl}variableName`][0]['@value']].ref] = val;
           }
         });
+        console.log(142, 'in section', visibilityMapper);
         return visibilityMapper;
       }
       return {};
     },
     responseMapper(responses) {
       // a variable map is defined! great
-      const vmap = this.activity[`${this.reprotermsUrl}addProperties`];
+      const vmap = this.activity['http://schema.repronim.org/addProperties'];
       const keyArr = _.map(vmap, (v) => {
         const key = v[`${this.reprotermsUrl}isAbout`][0]['@id'];
         const qId = v[`${this.reprotermsUrl}variableName`][0]['@value'];
@@ -188,11 +189,14 @@ export default {
     },
     updateProgress() {
       let totalQ = this.context.length;
+      console.log(191, this.context.length);
       // TODO: add back branching logic to this.
       if (!_.isEmpty(this.visibility)) {
         totalQ = _.filter(this.visibility).length;
+        console.log()
       }
       const progress = ((Object.keys(this.responses).length) / totalQ) * 100;
+      console.log(196, totalQ, progress);
       this.$emit('updateProgress', progress);
       if (progress === 100) {
         this.$emit('valueChanged', this.responses);

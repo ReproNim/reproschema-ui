@@ -68,6 +68,7 @@
             :srcUrl="srcUrl" :responses="responses[activityIndex]"
             :selected_language="selected_language"
             :ipAddress="clientIp"
+            :participantID="getPId"
             :progress="progress[activityIndex]"
             :autoAdvance="checkAdvance"
             :actVisibility="Object.values(visibility)"
@@ -100,7 +101,6 @@ import config from './config';
 Vue.use(BootstrapVue);
 Vue.filter('reverse', value => value.slice().reverse());
 
-// let this.reprotermsUrl = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
 
 function getFilename(s) {
   const folders = s.split('/');
@@ -144,8 +144,8 @@ export default {
       const vmap = variableMap;
       const mapper = {};
       _.map(vmap, (v) => {
-        const uri = v[`${this.reprotermsUrl}isAbout`][0]['@id'];
-        const variable = v[`${this.reprotermsUrl}variableName`][0]['@value'];
+        const uri = v['http://schema.repronim.org/isAbout'][0]['@id'];
+        const variable = v['http://schema.repronim.org/variableName'][0]['@value'];
         mapper[uri] = variable;
       });
       return mapper[s];
@@ -196,10 +196,10 @@ export default {
     },
     getDisplayName(activityUrl) {
       if (!_.isEmpty(this.$store.state.schema)) {
-        // console.log(197, this.$store.state.schema[`${this.reprotermsUrl}addProperties`]);
-        if (this.$store.state.schema[`${this.reprotermsUrl}addProperties`][0]['http://www.w3.org/2004/02/skos/core#prefLabel']) {
-          const addProperties = this.$store.state.schema[`${this.reprotermsUrl}addProperties`];
-          const s = _.filter(addProperties, v1 => v1[`${this.reprotermsUrl}isAbout`][0]['@id'] === activityUrl);
+        // console.log(197, this.$store.state.schema['http://schema.repronim.org/addProperties']);
+        if (this.$store.state.schema['http://schema.repronim.org/addProperties'][0]['http://www.w3.org/2004/02/skos/core#prefLabel']) {
+          const addProperties = this.$store.state.schema['http://schema.repronim.org/addProperties'];
+          const s = _.filter(addProperties, v1 => v1['http://schema.repronim.org/isAbout'][0]['@id'] === activityUrl);
           // console.log(152, s);
           const dName = _.filter(s[0]['http://www.w3.org/2004/02/skos/core#prefLabel'], d => d['@language'] === this.selected_language);
           // console.log(154, dName);
@@ -452,7 +452,7 @@ export default {
     },
     schemaOrder() {
       if (!_.isEmpty(this.$store.state.schema)) {
-        const order = _.map(this.$store.state.schema[`${this.reprotermsUrl}order`][0]['@list'],
+        const order = _.map(this.$store.state.schema['http://schema.repronim.org/order'][0]['@list'],
           u => u['@id']);
         return order;
       }
@@ -466,11 +466,11 @@ export default {
       } return [];
     },
     allowExport() {
-      if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema[`${this.reprotermsUrl}allow`]) {
-        // console.log(351, this.$store.state.schema[this.reprotermsUrl+'allow'][0]['@list']);
-        const allowList = _.map(this.$store.state.schema[`${this.reprotermsUrl}allow`][0]['@list'],
+      if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema['http://schema.repronim.org/allow']) {
+        // console.log(351, this.$store.state.schema['http://schema.repronim.org/'+'allow'][0]['@list']);
+        const allowList = _.map(this.$store.state.schema['http://schema.repronim.org/allow'][0]['@list'],
           u => u['@id']);
-        return allowList.includes(`${this.reprotermsUrl}allow_export`);
+        return allowList.includes('http://schema.repronim.org/AllowExport');
       }
       return false;
     },
@@ -479,8 +479,8 @@ export default {
       if (this.schemaOrder) {
         _.map(this.schemaOrder, (s) => {
           let fname = '';
-          if (this.schema[`${this.reprotermsUrl}variableMap`]) {
-            fname = this.getVariableName(s, this.schema[`${this.reprotermsUrl}variableMap`]);
+          if (this.schema['http://schema.repronim.org/variableMap']) {
+            fname = this.getVariableName(s, this.schema['http://schema.repronim.org/variableMap']);
           } else {
             // TODO: remove this backwards compatibility else
             fname = getFilename(s);
@@ -491,29 +491,29 @@ export default {
       return output;
     },
     visibilityConditions() {
-      if (this.schema[`${this.reprotermsUrl}addProperties`]) {
+      if (this.schema['http://schema.repronim.org/addProperties']) {
         return _.map(this.schemaOrder, (s) => {
           // let keyName = '';
-          const addProperties = this.schema[`${this.reprotermsUrl}addProperties`];
-          const currentActivityObj = _.filter(addProperties, v1 => v1[`${this.reprotermsUrl}isAbout`][0]['@id'] === s);
-          let varName = _.filter(currentActivityObj[0][`${this.reprotermsUrl}variableName`], v => v['@language'] === this.selected_language);
+          const addProperties = this.schema['http://schema.repronim.org/addProperties'];
+          const currentActivityObj = _.filter(addProperties, v1 => v1['http://schema.repronim.org/isAbout'][0]['@id'] === s);
+          let varName = _.filter(currentActivityObj[0]['http://schema.repronim.org/variableName'], v => v['@language'] === this.selected_language);
           if (!varName.length) {
             // if selected lang is not in schema, return corresponding to default lang
-            varName = currentActivityObj[0][`${this.reprotermsUrl}variableName`];
+            varName = currentActivityObj[0]['http://schema.repronim.org/variableName'];
           }
           // keyName = varName[0]['@value'];
-          if (currentActivityObj[0][`${this.reprotermsUrl}isVis`]) {
-            const condition1 = currentActivityObj[0][`${this.reprotermsUrl}isVis`][0];
+          if (currentActivityObj[0]['http://schema.repronim.org/isVis']) {
+            const condition1 = currentActivityObj[0]['http://schema.repronim.org/isVis'][0];
             if ('@value' in condition1) {
               return condition1['@value'];
             }
             if (('http://schema.org/httpMethod' in condition1) &&
                 ('http://schema.org/url' in condition1) &&
-                (`${this.reprotermsUrl}payload` in condition1)) {
+                ('http://schema.repronim.org/payload' in condition1)) {
               // lets fill the payload here.
               const payload = {};
-              // const payloadList = condition[`${this.reprotermsUrl}payload`];
-              const payloadList = condition1[`${this.reprotermsUrl}payload`]; // todo: check when its payload
+              // const payloadList = condition['http://schema.repronim.org/payload'];
+              const payloadList = condition1['http://schema.repronim.org/payload']; // todo: check when its payload
               _.map(payloadList, (p) => {
                 const item = p['@value'];
                 const index = this.schemaOrder.indexOf(this.schemaNameMapper[item]);
@@ -534,18 +534,21 @@ export default {
       return _.mapValues(this.schemaOrder, () => true);
     },
     checkDisableBack() {
-      if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema[`${this.reprotermsUrl}allow`]) {
-        const allowList = _.map(this.$store.state.schema[`${this.reprotermsUrl}allow`][0]['@list'],
+      if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema['http://schema.repronim.org/allow']) {
+        const allowList = _.map(this.$store.state.schema['http://schema.repronim.org/allow'][0]['@list'],
           u => u['@id']);
-        return allowList.includes(`${this.reprotermsUrl}disable_back`); // if true then hide sidebar on-load and activities cannot be clicked
+        return allowList.includes('http://schema.repronim.org/DisableBack'); // if true then hide sidebar on-load and activities cannot be clicked
       }
       return false;
     },
+    getPId() {
+      return this.$store.getters.getParticipantId;
+    },
     checkAdvance() {
-      if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema[`${this.reprotermsUrl}allow`]) {
-        const allowList = _.map(this.$store.state.schema[`${this.reprotermsUrl}allow`][0]['@list'],
+      if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema['http://schema.repronim.org/allow']) {
+        const allowList = _.map(this.$store.state.schema['http://schema.repronim.org/allow'][0]['@list'],
           u => u['@id']);
-        return allowList.includes(`${this.reprotermsUrl}auto_advance`);
+        return allowList.includes('http://schema.repronim.org/AutoAdvance');
       }
       return false;
     },
