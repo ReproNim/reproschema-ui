@@ -88,7 +88,7 @@ const safeEval = require('safe-eval');
 
 export default {
   name: 'Survey',
-  props: ['reprotermsUrl', 'srcUrl', 'responses', 'selected_language', 'progress', 'autoAdvance', 'actVisibility', 'nextActivity', 'ipAddress'],
+  props: ['reprotermsUrl', 'srcUrl', 'responses', 'selected_language', 'progress', 'autoAdvance', 'actVisibility', 'nextActivity', 'ipAddress', 'participantID'],
   data() {
     return {
       activity: {},
@@ -466,7 +466,7 @@ export default {
       /* eslint-disable */
         if (this.activity['http://schema.repronim.org/order']) {
           const keys = this.order();
-
+          console.log(461, this.participantId, keys); // make invisible pid item
           // if (!_.isEmpty(this.visibility)) {
           //   return _.filter(keys, k => this.visibility[k['@id']]);
           // }

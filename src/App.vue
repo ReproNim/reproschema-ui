@@ -68,6 +68,7 @@
             :srcUrl="srcUrl" :responses="responses[activityIndex]"
             :selected_language="selected_language"
             :ipAddress="clientIp"
+            :participantID="getPId"
             :progress="progress[activityIndex]"
             :autoAdvance="checkAdvance"
             :actVisibility="Object.values(visibility)"
@@ -403,6 +404,7 @@ export default {
     } else this.selected_language = 'en';
 
     if (this.$route.query.uid) {
+      console.log(407, this.$route.query.uid);
       this.$store.dispatch('saveParticipantId', this.$route.query.uid);
     }
     if (this.$route.params.id) {
@@ -538,6 +540,9 @@ export default {
         return allowList.includes('http://schema.repronim.org/DisableBack'); // if true then hide sidebar on-load and activities cannot be clicked
       }
       return false;
+    },
+    getPId() {
+      return this.$store.getters.getParticipantId;
     },
     checkAdvance() {
       if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema['http://schema.repronim.org/allow']) {
