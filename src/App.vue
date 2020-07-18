@@ -68,6 +68,7 @@
             :srcUrl="srcUrl" :responses="responses[activityIndex]"
             :selected_language="selected_language"
             :ipAddress="clientIp"
+            :participantID="getPId"
             :progress="progress[activityIndex]"
             :autoAdvance="checkAdvance"
             :actVisibility="Object.values(visibility)"
@@ -540,6 +541,9 @@ export default {
         return allowList.includes(`${this.reprotermsUrl}disable_back`); // if true then hide sidebar on-load and activities cannot be clicked
       }
       return false;
+    },
+    getPId() {
+      return this.$store.getters.getParticipantId;
     },
     checkAdvance() {
       if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema[`${this.reprotermsUrl}allow`]) {

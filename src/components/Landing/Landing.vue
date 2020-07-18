@@ -15,6 +15,7 @@
 import axios from 'axios';
 import VueMarkdown from 'vue-markdown';
 import Loader from '../Loader';
+import config from '../../config';
 
 export default {
   name: 'Landing',
@@ -30,6 +31,7 @@ export default {
   data() {
     return {
       content: null,
+      consent: config.consent,
     };
   },
   computed: {
@@ -44,6 +46,10 @@ export default {
       }
     },
     doNext() {
+      if (this.consent) {
+        console.log(50, this.consent);
+        // integrate docusign here
+      }
       this.$router.push('/activities/0');
     },
     getContent() {

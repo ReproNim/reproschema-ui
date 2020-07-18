@@ -38,7 +38,7 @@ export default {
     },
   },
   mounted() {
-    if (this.$store.state.participantId) {
+    if (this.getPId) {
       console.log(43, 'store uuid ', this.getPId);
       this.input = this.getPId;
     } else {
