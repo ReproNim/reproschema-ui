@@ -404,6 +404,7 @@ export default {
     } else this.selected_language = 'en';
 
     if (this.$route.query.uid) {
+      console.log(407, this.$route.query.uid);
       this.$store.dispatch('saveParticipantId', this.$route.query.uid);
     }
     if (this.$route.params.id) {

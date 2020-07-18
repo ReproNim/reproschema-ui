@@ -175,7 +175,6 @@ export default {
     ui() {
       /* eslint-disable */
         if (this.data[`${this.reprotermsUrl}inputType`]) {
-          // console.log(180, this.data[`${this.reprotermsUrl}inputType`]);
           return this.data[`${this.reprotermsUrl}inputType`][0]['@value'];
         }
         return 'N/A';
@@ -189,7 +188,6 @@ export default {
     },
     title() {
       if (this.data['http://schema.org/question']) {
-        // console.log(186, this.selected_language, this.data['http://schema.org/question']);
         const activeQuestion = _.filter(this.data['http://schema.org/question'], q => q['@language'] === this.selected_language);
         if (!Array.isArray(activeQuestion) || !activeQuestion.length) {
           // array does not exist, is not an array, or empty - when selected_language string absent
@@ -258,7 +256,6 @@ export default {
     },
     getValueConstraintsData(url) {
       jsonld.expand(url).then((rsp) => {
-        console.log(262, rsp);
         this.valueC = rsp[0];
         // eslint-disable-next-line no-unused-vars
       }).catch((e) => {

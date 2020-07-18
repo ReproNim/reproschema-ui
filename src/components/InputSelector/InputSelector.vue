@@ -79,8 +79,8 @@
     </div>
 
     <!-- If type is email -->
-    <div v-else-if="inputType === 'email'">
-      <EmailInput
+    <div v-else-if="inputType === 'pid'">
+      <ParticipantId
         :constraints="valueConstraints"
         :selected_language="selected_language"
         :init="init" v-on:valueChanged="sendData"/>
@@ -224,6 +224,7 @@ import SaveData from '../Inputs/SaveData/SaveData';
 import StudySign from '../StudySign/StudySign';
 import Static from '../Inputs/Static';
 import EmailInput from '../Inputs/EmailInput';
+import ParticipantId from '../Inputs/ParticipantId/ParticipantId';
 
 
 export default {
@@ -261,6 +262,7 @@ export default {
     },
   },
   components: {
+    ParticipantId,
     StudySign,
     SaveData,
     Radio,
