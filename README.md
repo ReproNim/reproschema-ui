@@ -1,6 +1,6 @@
 # reproschema-ui
 
-[![Build Status](https://travis-ci.org/ReproNim/schema-ui.svg?branch=master)](https://travis-ci.org/ReproNim/schema-ui)
+![CI](https://github.com/ReproNim/reproschema-ui/workflows/CI/badge.svg)
 
 This repository contains the code for the user-interface for the [ReproSchema](https://github.com/ReproNim/reproschema).
 
