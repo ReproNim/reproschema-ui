@@ -4,7 +4,7 @@
 
 This repository contains the code for the user-interface for the [ReproSchema](https://github.com/ReproNim/reproschema).
 
-See it in action [HERE](https://schema.repronim.org/ui/)
+See it in action [HERE](https://www.repronim.org/reproschema-ui/)
 
 <!-- TOC -->
 
@@ -32,7 +32,8 @@ See it in action [HERE](https://schema.repronim.org/ui/)
 
 ## List of supported input types
 
-The `inputType` is checked by `src/components/InputSelector/InputSelector.vue` which then calls the appropriate component. 
+The `inputType` is checked by `src/components/InputSelector/InputSelector.vue` 
+which then calls the appropriate component. 
 
 Most of them are in the folder `src/components/Inputs/`
 
@@ -84,15 +85,19 @@ One exception is :
 
 ## Viewing an certain protocol or activity with the app
 
-If you just want to view a protocol using the `reproschema-ui` you can pass the URL of the protocol schema to the `url` query parameter like this:
+If you just want to view a protocol using the `reproschema-ui` you can pass the 
+URL of the protocol schema to the `url` query parameter like this:
 
 ```https://schema.repronim.org/ui/#/?url=url-to-your-protocol_schema```
 
-If you are hosting a schema on github, make sure that you are passing the URL of the **raw** content of the protocol schema. For example, our demo protocol can be accessed at this URL:
+If you are hosting a schema on github, make sure that you are passing the URL of 
+the **raw** content of the protocol schema. For example, our demo protocol can be 
+accessed at this URL:
 
 [https://github.com/ReproNim/demo-protocol/blob/master/VoicePilot/VoicePilot_schema](https://github.com/ReproNim/demo-protocol/blob/master/VoicePilot/VoicePilot_schema)
 
-But to get access to the raw content of that file you must click on the `Raw` button that will open this URL:
+But to get access to the raw content of that file you must click on the `Raw` 
+button that will open this URL:
 
 [https://raw.githubusercontent.com/ReproNim/demo-protocol/master/VoicePilot/VoicePilot_schema](https://raw.githubusercontent.com/ReproNim/demo-protocol/master/VoicePilot/VoicePilot_schema).
 
@@ -100,7 +105,10 @@ Similarly, to view a single activity you can simply do this:
 
 ```https://schema.repronim.org/ui/#/activities/0?url=url-to-activity-schema```
 
-When you want to make a standalone app for your study / protocol, you should modify the URL next to `githubSrc` in the file `src/config.js` to make it point to the URL of your schema.
+When you want to make a standalone app for your study / protocol, you should 
+modify the URL next to `githubSrc` in the file `src/config.js` to make it point 
+to the URL of your schema. If you are using GitHub it should point to the raw
+Github pointer.
 
 ```javascript
 module.exports = {
@@ -118,13 +126,18 @@ module.exports = {
 
 This app use [Vue.js](https://vuejs.org/), a javascript framework.
 
-Working on this will most likely require you to have some knowledge of HTML, CSS and javascript.
+Working on this will most likely require you to have some knowledge of HTML, CSS 
+and javascript.
 
-For some free introductory material to javascript you can check the [mozilla MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript) or the [W3 school](https://www.w3schools.com/js/default.asp).
+For some free introductory material to javascript you can check the [mozilla MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript) 
+or the [W3 school](https://www.w3schools.com/js/default.asp).
 
-For introductory material on Vue you can start by having a look at the [guide](https://vuejs.org/v2/guide/). For a more detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+For introductory material on Vue you can start by having a look at the [guide](https://vuejs.org/v2/guide/). 
+For a more detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) 
+and [docs for vue-loader](http://vuejs.github.io/vue-loader).
 
-You can also find many non-free courses for all of the above on [udemy](https://www.udemy.com/) or similar MOOC services.
+You can also find many non-free courses for all of the above on [udemy](https://www.udemy.com/) 
+or similar MOOC services.
 
 ### App architecture
 
@@ -132,9 +145,14 @@ You can also find many non-free courses for all of the above on [udemy](https://
 
 ## Serve the app on your computer
 
-If you want help us improve the app and work on it on your computer, you will need to [fork this repository](https://help.github.com/en/github/getting-started-with-github/fork-a-repo) and [clone it](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository) on your machine.
+If you want help us improve the app and work on it on your computer, you will 
+need to [fork this repository](https://help.github.com/en/github/getting-started-with-github/fork-a-repo) 
+and [clone it](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository) 
+on your machine.
 
-To then run the app locally, you will have to install javascript `node.js`. A good way to do this, is to install [node version manager](https://github.com/nvm-sh/nvm) (NVM) to help you deal with different version of `node.js`.
+To then run the app locally, you will have to install javascript `node.js`. A 
+good way to do this, is to install [node version manager](https://github.com/nvm-sh/nvm) 
+(NVM) to help you deal with different version of `node.js`.
 
 If you are running linux, you can install NVM by typing:
 
@@ -142,7 +160,8 @@ If you are running linux, you can install NVM by typing:
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
 ```
 
-Then close your terminal and reopen it then run the following to install the version 9 of `node.js`
+Then close your terminal and reopen it then run the following to install the 
+version 9 of `node.js`
 
 ```
 nvm install node
@@ -161,7 +180,9 @@ npm install
 npm run dev
 ```
 
-This serves the app with hot reload at `localhost:8080`: in other words you will be able to see the app run if you open a browser and go to this URL [localhost:8080](localhost:8080).
+This serves the app with hot reload at `localhost:8080`: in other words you will 
+be able to see the app run if you open a browser and go to this URL 
+[localhost:8080](localhost:8080).
 
 ### Build for production with minification
 ``` bash

@@ -4,6 +4,6 @@ module.exports = {
   banner: 'This service is a demonstration for the ReproNim project.',
   startButton: 'Join',
   assetsPublicPath: '/reproschema-ui/',
-  backendServer: 'https://sig.mit.edu/vb/',
+  backendServer: null,
   consent: true
 };
