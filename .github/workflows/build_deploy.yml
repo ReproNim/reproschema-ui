@@ -31,7 +31,7 @@ jobs:
     - name: Run a multi-line script
       run: |
         npm install
-        npm run build --report
+        npm run build
         npm test
         touch dist/.nojekyll
 
