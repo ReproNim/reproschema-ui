@@ -467,8 +467,7 @@ export default {
     },
     allowExport() {
       if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema['http://schema.repronim.org/allow']) {
-        // console.log(351, this.$store.state.schema['http://schema.repronim.org/'+'allow'][0]['@list']);
-        const allowList = _.map(this.$store.state.schema['http://schema.repronim.org/allow'][0]['@list'],
+        const allowList = _.map(this.$store.state.schema['http://schema.repronim.org/allow'],
           u => u['@id']);
         return allowList.includes('http://schema.repronim.org/AllowExport');
       }
@@ -546,7 +545,7 @@ export default {
     },
     checkAdvance() {
       if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema['http://schema.repronim.org/allow']) {
-        const allowList = _.map(this.$store.state.schema['http://schema.repronim.org/allow'][0]['@list'],
+        const allowList = _.map(this.$store.state.schema['http://schema.repronim.org/allow'],
           u => u['@id']);
         return allowList.includes('http://schema.repronim.org/AutoAdvance');
       }
