@@ -137,8 +137,6 @@ export default {
           let scoreFormula = a['http://schema.repronim.org/jsExpression'][0]['@value'];
           const scoreVariableName = a['http://schema.repronim.org/variableName'][0]['@value'];
           if (_.isString(scoreFormula)) {
-            console.log(140, scoreFormula);
-            console.log(141, responseMapper);
             scoreFormula = this.evaluateString(scoreFormula, responseMapper);
             // console.log(235, 'a.val', val);
           }
@@ -349,7 +347,6 @@ export default {
             visibilityMapper[responseMapper[a['http://schema.repronim.org/variableName'][0]['@value']].ref] = val;
           }
         });
-        console.log(142, 'in survey getvis', visibilityMapper);
         return visibilityMapper;
       }
       return {};
@@ -358,15 +355,11 @@ export default {
       let totalQ = this.context.length;
       if (!_.isEmpty(this.visibility)) {
         totalQ = _.filter(this.visibility).length;
-        console.log(360, this.visibility, _.filter(this.visibility));
       }
-      console.log(361, this.context, this.visibility, totalQ);
       const progress = ((Object.keys(this.responses).length) / totalQ) * 100;
-      console.log(362, progress);
       this.$emit('updateProgress', progress);
     },
     order() {
-      console.log(368, this.activity);
       if (this.activity['http://schema.repronim.org/shuffle'][0]['@value']) { // when shuffle is true
         const orderList = this.activity['http://schema.repronim.org/order'][0]['@list'];
         const listToShuffle = orderList.slice(1, orderList.length - 3);
@@ -439,12 +432,10 @@ export default {
     },
     storeContext() {
       if (this.$store) {
-        console.log(441, this.$store.state);
         const state = this.$store.state;
         if (state.activities.length && state.activityIndex != null) {
           if (state.activities[state.activityIndex].activity) {
             const currentActivity = state.activities[state.activityIndex].activity;
-            console.log(45, currentActivity);
             const actList = currentActivity['http://schema.repronim.org/order'][0]['@list'];
             return actList;
           }
@@ -466,7 +457,7 @@ export default {
       /* eslint-disable */
         if (this.activity['http://schema.repronim.org/order']) {
           const keys = this.order();
-          console.log(461, this.participantId, keys); // make invisible pid item
+          // console.log(461, this.participantId, keys); // make invisible pid item
           // if (!_.isEmpty(this.visibility)) {
           //   return _.filter(keys, k => this.visibility[k['@id']]);
           // }

@@ -56,6 +56,7 @@
     <div v-else-if="inputType==='audioImageRecord'">
       <AudioRecord
         :constraints="valueConstraints"
+        :fieldData="fieldData"
         :selected_language="selected_language"
         :init="init" v-on:valueChanged="sendData"
         mode="audioImageRecord" />
@@ -252,6 +253,9 @@ export default {
       type: String,
     },
     valueConstraints: {
+      type: Object,
+    },
+    fieldData: {
       type: Object,
     },
     init: {

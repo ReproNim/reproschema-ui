@@ -397,20 +397,20 @@ export default {
   },
   mounted() {
     axios.get(config.backendServer).then((response) => {
-      console.log(399, response);
+      // console.log(399, response);
     });
     if (this.$route.query.lang) {
       this.selected_language = this.$route.query.lang;
     } else this.selected_language = 'en';
 
     if (this.$route.query.uid) {
-      console.log(407, this.$route.query.uid);
+      // console.log(407, this.$route.query.uid);
       this.$store.dispatch('saveParticipantId', this.$route.query.uid);
     }
     if (this.$route.params.id) {
       this.$store.dispatch('setActivityIndex', this.$route.params.id);
     }
-    axios.get('https://raw.githubusercontent.com/ReproNim/reproschema/master/resources/languages.json').then((resp) => {
+    axios.get('https://raw.githubusercontent.com/ReproNim/reproschema-library /master/resources/languages.json').then((resp) => {
       this.langMap = resp.data;
     });
   },

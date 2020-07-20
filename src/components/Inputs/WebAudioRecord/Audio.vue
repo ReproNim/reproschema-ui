@@ -3,7 +3,7 @@
     <b-alert :show="!supported">Oh no, your browser doesn't support audio</b-alert>
     <div v-if="supported">
       <div v-if="mode==='audioImageRecord'" class="mb-3">
-        <img class="img-fluid" :src="constraints['http://schema.org/image'][0]['@value']" />
+        <img class="img-fluid" :src="fieldData['http://schema.org/image'][0]['@id']" />
       </div>
       <div v-if="mode==='audioRecordNumberTask'" class="mb-3">
         <strong style="font-size:30px">{{ generateNumber }}</strong>
@@ -50,6 +50,9 @@ export default {
       default: 'audioRecord',
     },
     constraints: {
+      type: Object,
+    },
+    fieldData: {
       type: Object,
     },
   },
