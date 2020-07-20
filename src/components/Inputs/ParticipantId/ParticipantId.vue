@@ -22,7 +22,7 @@ export default {
   methods: {
     onSubmit(e) {
       e.preventDefault();
-      console.log(25, 'submit', this.input);
+      // console.log(25, 'submit', this.input);
       this.$emit('valueChanged', this.input);
     },
   },
@@ -39,7 +39,7 @@ export default {
   },
   mounted() {
     if (this.getPId) {
-      console.log(43, 'store uuid ', this.getPId);
+      // console.log(43, 'store uuid ', this.getPId);
       this.input = this.getPId;
     } else {
       this.p_uuid = uuidv4();
