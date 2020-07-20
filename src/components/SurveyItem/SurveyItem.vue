@@ -10,6 +10,7 @@
                        :title="title"
                        :preamble="itemPreamble"
                        :valueConstraints="valueConstraints"
+                       :fieldData="fieldData"
                        :init="init"
                        :responses="responses"
                        :selected_language="selected_language"
@@ -217,6 +218,9 @@ export default {
       /* eslint-enable */
       return { requiredValue: false };
     },
+    fieldData() {
+      return this.data;
+    },
     findPassOptions() {
       if (this.data['http://schema.repronim.org/responseOptions']) {
         // when responseOptions is a remote object
@@ -240,7 +244,6 @@ export default {
     getRequiredVal() { // todo: this needs to change. requiredValue is in activity level now
       jsonld.expand(this.data['http://schema.repronim.org/responseOptions'][0]['@id'])
         .then((rsp) => {
-          // console.log(237, rsp);
           this.requireVal = rsp[0]['http://schema.org/valueRequired'][0]['@value'];
           // eslint-disable-next-line no-unused-vars
         }).catch((e) => {
@@ -291,7 +294,6 @@ export default {
       }
     },
     getData() {
-      console.log(242, this.item['@id']);
       jsonld.expand(this.item['@id'], {
         onDownloadProgress() {
           // TODO: for some reason pEvent has total defined as 0.

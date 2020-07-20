@@ -47,7 +47,7 @@ export default {
     },
     doNext() {
       if (this.consent) {
-        console.log(50, this.consent);
+        // console.log(50, this.consent);
         // integrate docusign here
       }
       this.$router.push('/activities/0');
