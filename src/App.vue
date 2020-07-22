@@ -90,6 +90,7 @@ import BootstrapVue from 'bootstrap-vue';
 import axios from 'axios';
 import _ from 'lodash';
 import JSZip from 'jszip';
+import { v4 as uuidv4 } from 'uuid';
 import jsonld from 'jsonld/dist/jsonld.min';
 import 'jszip/dist/jszip.min';
 import { saveAs } from 'file-saver';
@@ -297,10 +298,8 @@ export default {
           if (itemObj['@type'] === 'reproterms:Response') {
             const voiceMap = {};
             _.map(itemObj, (value, key1) => {
-              // console.log(294, value, key1);
               if (value instanceof Blob) {
-                // fileUploadData[key1] = value;
-                const keyStrings = (key1.split('/items/')[1]);
+                const keyStrings = (itemObj.isAbout.split('/items/')[1]);
                 const rId = itemObj['@id'].split('uuid:')[1];
                 jszip.folder('responses').file(`${keyStrings}-${rId}.wav`, value);
                 // eslint-disable-next-line no-param-reassign
@@ -413,6 +412,13 @@ export default {
     axios.get('https://raw.githubusercontent.com/ReproNim/reproschema-library /master/resources/languages.json').then((resp) => {
       this.langMap = resp.data;
     });
+    this.$store.dispatch('setParticipantUUID', uuidv4()); // set participant UUID for the current user
+    if (this.$route.query.token) {
+      this.$store.dispatch('setToken', this.$route.query.token);
+    }
+    if (this.$route.query.expiry_minutes) {
+      this.$store.dispatch('setExpiryMinutes', this.$route.query.expiry_minutes);
+    }
   },
   computed: {
     getschemaType() {

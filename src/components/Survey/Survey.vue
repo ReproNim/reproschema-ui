@@ -130,9 +130,9 @@ export default {
       // console.log(225, 'responses', responses);
       const responseMapper = this.responseMapper(responses);
       // console.log(227, 'response mapper', responseMapper);
-      if (!_.isEmpty(this.activity['http://schema.repronim.org/scoringLogic'])) {
+      if (!_.isEmpty(this.activity['http://schema.repronim.org/compute'])) {
         const scoreMapper = {};
-        _.map(this.activity['http://schema.repronim.org/scoringLogic'], (a) => {
+        _.map(this.activity['http://schema.repronim.org/compute'], (a) => {
           // console.log(231, 'logic a', a);
           let scoreFormula = a['http://schema.repronim.org/jsExpression'][0]['@value'];
           const scoreVariableName = a['http://schema.repronim.org/variableName'][0]['@value'];
@@ -167,14 +167,14 @@ export default {
       if (skip) {
         this.$emit('saveResponse', this.context[idx]['@id'], 'skipped');
         this.setResponse('skipped', idx);
-        // if (!_.isEmpty(this.activity['http://schema.repronim.org/scoringLogic'])) {
+        // if (!_.isEmpty(this.activity['http://schema.repronim.org/compute'])) {
         //   this.evaluateScoringLogic();
         // }
       }
       if (dontKnow) {
         this.$emit('saveResponse', this.context[idx]['@id'], 'dontKnow');
         this.setResponse('dontknow', idx);
-        // if (!_.isEmpty(this.activity['http://schema.repronim.org/scoringLogic'])) {
+        // if (!_.isEmpty(this.activity['http://schema.repronim.org/compute'])) {
         //   this.evaluateScoringLogic();
         // }
       }
@@ -242,10 +242,13 @@ export default {
         '@id': `uuid:${responseUuid}`,
         'prov:wasAttributedTo': {
           '@id': this.$store.state.participantUuid,
-          'nidm:subject_id': this.participantId,
         },
+        isAbout: itemUrl,
+        value: val,
       };
-      respData[itemUrl] = val;
+      if (this.participantId) {
+        respData['prov:wasAttributedTo']['nidm:subject_id'] = this.participantId;
+      }
       const valueAndDataExport = [val, responseActivity, respData];
       this.$emit('saveResponse', this.context[index]['@id'], valueAndDataExport);
       this.t0 = t1;
@@ -256,11 +259,11 @@ export default {
         currResponses[this.context[index]['@id']] = val;
       }
       this.visibility = this.getVisibility(currResponses);
-      // if (!_.isEmpty(this.activity['http://schema.repronim.org/scoringLogic'])) {
+      // if (!_.isEmpty(this.activity['http://schema.repronim.org/compute'])) {
       //   // TODO: if you uncomment the scoring logic evaluation, things break w/ multipart.
       //   this.evaluateScoringLogic();
       // }
-      if (!_.isEmpty(this.activity['http://schema.repronim.org/scoringLogic'])) {
+      if (!_.isEmpty(this.activity['http://schema.repronim.org/compute'])) {
         _.map(this.getScoring(this.responses), (score, key) => {
           if (!_.isNaN(score)) {
             this.scores[key] = score;
@@ -521,7 +524,10 @@ export default {
     },
     participantId() {
       return this.$store.state.participantId;
-    }
+    },
+    getparticipantUUID() {
+      return this.$store.getters.getparticipantUUID;
+    },
   },
   mounted() {
       if (this.srcUrl) {
@@ -532,6 +538,7 @@ export default {
       const d = new Date();
       this.t0 = d.toISOString();
       // this.t0 = performance.now();
+
     },
   };
 </script>

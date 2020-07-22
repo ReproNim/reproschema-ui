@@ -25,9 +25,6 @@ import JSZip from 'jszip';
 import axios from 'axios';
 import Loader from '../../Loader';
 
-const clientId = 'c75b50bcf1aa417fa428dd590f093aee';
-const queryString = require('query-string');
-
 export default {
   name: 'SaveData',
   props: ['constraints', 'init', 'selected_language', 'ipAddress'],
@@ -49,67 +46,98 @@ export default {
       this.uploadZipData();
     },
     uploadZipData() {
-      const Response = this.$store.state.responses;
+      const Response = this.$store.state.exportResponses;
       const totalScores = this.$store.state.scores;
-      const totalResponse = { response: Response, scores: totalScores };
+      const uId = this.$store.state.participantId;
+      const totalResponse = { response: Response, scores: totalScores, participantId: uId };
       this.formatData(totalResponse);
     },
     formatData(data) {
+      const TOKEN = this.$store.state.token;
+      const expiryMinutes = this.$store.state.expiryMinutes;
       const jszip = new JSZip();
-      const fileUploadData = {};
-      const JSONdata = {};
-      const JSONscores = {};
-      // const jsonData = {};
       // sort out blobs from JSONdata
-      _.map(data.response, (val, key) => {
-        if (val instanceof Blob) {
-          fileUploadData[key] = val;
-        } else if (_.isObject(val)) {
-          // make sure there aren't any Blobs here.
-          // if there are, add them to fileUploadData
-          _.map(val, (val2, key2) => {
-            if (val2 instanceof Blob) {
-              fileUploadData[`${key2}`] = val2;
-            } else {
-              // refill the object.
-              if (!JSONdata[key]) {
-                JSONdata[key] = {};
+      let key = 0;
+      _.map(data.response, (eachActivityList) => {
+        _.map(eachActivityList, (itemObj) => {
+          if (itemObj['@type'] === 'reproterms:Response') {
+            const voiceMap = {};
+            _.map(itemObj, (value, key1) => {
+              // console.log(294, value, key1);
+              if (value instanceof Blob) {
+                // fileUploadData[key1] = value;
+                const keyStrings = (itemObj.isAbout.split('/items/')[1]);
+                const rId = itemObj['@id'].split('uuid:')[1];
+                jszip.folder('responses').file(`${keyStrings}-${rId}.wav`, value);
+                // eslint-disable-next-line no-param-reassign
+                voiceMap[key1] = `${keyStrings}-${rId}.wav`;
               }
-              JSONdata[key][key2] = val2;
-            }
-          });
-        } else {
-          JSONdata[key] = val;
+              // todo: check if sections are present, they are no longer object but lists
+              // else if (_.isObject(value)) {
+              //   // make sure there aren't any Blobs here.
+              //   // if there are, add them to fileUploadData
+              //   _.map(value, (val2, key2) => {
+              //     if (val2 instanceof Blob) {
+              //       // console.log(322, val, key2, val2);
+              //       fileUploadData[`${key2}`] = val2;
+              //     }
+              //     else {
+              //       // refill the object.
+              //       if (!JSONdata[key]) {
+              //         JSONdata[key] = {};
+              //       }
+              //       JSONdata[key][key2] = val2;
+              //     }
+              //   });
+              // }
+              // else {
+              //   JSONdata[key] = val;
+              // }
+            });
+            _.map(voiceMap, (v, ky) => {
+              if (ky in itemObj) {
+                const newObj = itemObj;
+                // console.log(327, itemObj);
+                newObj[ky] = v;
+              }
+            });
+          }
+        });
+        // write out the activity files
+        if (eachActivityList.length) { // if activity is answered then write to file
+          jszip.folder('responses').file(`activity_${key}.jsonld`, JSON.stringify(eachActivityList, null, 4));
+          key += 1;
         }
       });
-      _.map(data.scores, (val, key) => { // todo: check if score object not null?
-        if (!_.isEmpty(val)) {
-          JSONscores[key] = val;
-        }
-      });
-      _.map(JSONdata, (val, key) => {
-        jszip.folder('data/responses').file(`activity_${key}.json`, JSON.stringify(val, null, 4));
-      });
-      _.map(JSONscores, (val, key) => {
-        jszip.folder('data/scores').file(`activity_${key}_score.json`, JSON.stringify(val, null, 4));
-      });
-      let f = 0;
-      _.map(fileUploadData, (val) => {
-        jszip.folder('data').file(`voice_item_${f + 1}.wav`, val);
-        f += 1;
-      });
-      // jsonData.score = JSONscores[0];
+
+      // _.map(data.scores, (val, key) => { // todo: check if score object not null?
+      //   if (!_.isEmpty(val)) {
+      //     JSONscores[key] = val;
+      //   }
+      // });
+      // _.map(JSONdata, (val, key) => {
+      //   // console.log(342, (key));
+      // jszip.folder('responses').file(`activity_${key}.json`, JSON.stringify(val, null, 4));
+      // });
+      // _.map(JSONscores, (val, key) => {
+      // jszip.folder('scores').file(`activity_${key}_score.json`, JSON.stringify(val, null, 4));
+      // });
+
+      let registrationURL = `https://sig.mit.edu/vb/token?token=${TOKEN}`;
+      if (expiryMinutes) {
+        registrationURL = `https://sig.mit.edu/vb/token?token=${TOKEN}&expiry_minutes=${expiryMinutes}`;
+      }
       jszip.generateAsync({ type: 'blob' })
         .then((myzipfile) => {
-          // axios.post('https://sig.mit.edu/vb/check', JSONscores[0], {
-          axios.get(`http://localhost:8000/token/?client_id=${clientId}`).then((response) => {
-            console.log(106, response.request.responseURL);
-            const authToken = 'ac62af5e6cbe40e39e1ef423fe43328f'; // todo: get this from response
+          axios.get(registrationURL).then((response) => {
+            const authToken = response.data.auth_token;
+            const expires = response.data.expires;
             const formData = new FormData();
-            formData.append('file', myzipfile);
+            formData.append('file', myzipfile, 'study-data.zip');
             formData.append('auth_token', `${authToken}`);
-            axios.post('http://localhost:8000/submit', formData, {
-              // axios.post('https://sig.mit.edu/vb/submit', formData, {
+            formData.append('expires', `${expires}`);
+            // axios.post('http://localhost:8000/submit', formData, {
+            axios.post('https://sig.mit.edu/vb/submit', formData, {
               'Content-Type': 'multipart/form-data',
             }).then((res) => {
               this.hasData = true;
