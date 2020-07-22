@@ -183,7 +183,7 @@ export default {
     },
     widgetType() {
       if (this.data['http://schema.org/readonlyValue']) {
-        return this.data['http://schema.repronim.org/readonlyValue'][0]['@value'];
+        return this.data['http://schema.org/readonlyValue'][0]['@value'];
       }
       return false;
     },

@@ -24,6 +24,8 @@ const state = {
   termUrl: 'http://schema.repronim.org/',
   schemaType: '',
   answeredLanguage: '',
+  participantUuid: '',
+  expiryMinutes: null,
 };
 
 const getters = {
@@ -63,11 +65,11 @@ const mutations = {
   // eslint-disable-next-line
   async setReprotermUrl(state, url) {
     axios.get(url).then((response) => {
-      console.log(67, response.data);
+      // console.log(67, response.data);
       const ctx = response.data['@context'];
       // const ctx = _.filter(response.data['@context'], c => c.includes('contexts/generic'));
       axios.get(ctx).then((resp) => {
-        console.log(68, resp.data);
+        // console.log(68, resp.data);
         // state.termUrl = resp.data['@context'].reproterms;
         state.termUrl = 'http://schema.repronim.org/'; // change this
       });
@@ -82,15 +84,24 @@ const mutations = {
     state.scores = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => ({}));
     state.activities = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => ({}));
     state.storeReady = true;
-    if (state.participantId) {
-      console.log(82, state.participantId);
-    }
     // state.participantId = uuidv4();
   },
   // eslint-disable-next-line
   setActivityIndex(state, idx) {
     state.activityIndex = idx;
     state.activityReady = true;
+  },
+  // eslint-disable-next-line
+  setToken(state, tok) {
+    state.token = tok;
+  },
+  // eslint-disable-next-line
+  setParticipantUUID(state, uid) {
+    state.participantUuid = uid;
+  },
+  // eslint-disable-next-line
+  setExpiryMinutes(state, minutes) {
+    state.expiryMinutes = minutes;
   },
   // eslint-disable-next-line
   saveResponse(state, { key, value }) {
@@ -185,6 +196,15 @@ const actions = {
   },
   clearResponses({ commit }, actIndex) {
     commit('clearResponses', actIndex);
+  },
+  setParticipantUUID({ commit }, puid) {
+    commit('setParticipantUUID', puid);
+  },
+  setToken({ commit }, tok) {
+    commit('setToken', tok);
+  },
+  setExpiryMinutes({ commit }, mins) {
+    commit('setExpiryMinutes', mins);
   },
 };
 

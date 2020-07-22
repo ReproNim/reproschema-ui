@@ -212,7 +212,7 @@ export default {
       // this.visibility = this.getVisibility(currResponses);
 
       // TODO: add back scoring logic to this component.
-      // if (!_.isEmpty(this.activity[this.reprotermsUrl+'scoringLogic'])) {
+      // if (!_.isEmpty(this.activity[this.reprotermsUrl+'compute'])) {
       //   this.evaluateScoringLogic();
       // }
       this.updateProgress();

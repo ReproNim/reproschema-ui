@@ -217,7 +217,7 @@ export default {
       this.visibility = this.getVisibility(currResponses);
 
       // TODO: add back scoring logic to this component.
-      if (!_.isEmpty(this.activity[`${this.reprotermsUrl}scoringLogic`])) {
+      if (!_.isEmpty(this.activity['http://schema.repronim.org/compute'])) {
         _.map(this.getScoring(this.responses), (score, key) => {
           if (!_.isNaN(score)) {
             this.scores[key] = score;
@@ -234,9 +234,9 @@ export default {
       // console.log(225, 'responses', responses);
       const responseMapper = this.responseMapper(responses);
       // console.log(227, 'response mapper', responseMapper);
-      if (!_.isEmpty(this.activity[`${this.reprotermsUrl}scoringLogic`])) {
+      if (!_.isEmpty(this.activity['http://schema.repronim.org/compute'])) {
         const scoreMapper = {};
-        _.map(this.activity[`${this.reprotermsUrl}scoringLogic`], (a) => {
+        _.map(this.activity['http://schema.repronim.org/compute'], (a) => {
           // console.log(231, 'logic a', a);
           let scoreFormula = a[`${this.reprotermsUrl}jsExpression`][0]['@value'];
           const scoreVariableName = a[`${this.reprotermsUrl}variableName`][0]['@value'];
