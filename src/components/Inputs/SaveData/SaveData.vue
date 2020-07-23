@@ -123,36 +123,28 @@ export default {
       // jszip.folder('scores').file(`activity_${key}_score.json`, JSON.stringify(val, null, 4));
       // });
 
-      let registrationURL = `https://sig.mit.edu/vb/token?token=${TOKEN}`;
-      if (expiryMinutes) {
-        registrationURL = `https://sig.mit.edu/vb/token?token=${TOKEN}&expiry_minutes=${expiryMinutes}`;
-      }
+      // let registrationURL = `https://sig.mit.edu/vb/token?token=${TOKEN}`;
+      // if (expiryMinutes) {
+      //   registrationURL = `https://sig.mit.edu/vb/token?token=${TOKEN}&expiry_minutes=${expiryMinutes}`;
+      // }
       jszip.generateAsync({ type: 'blob' })
         .then((myzipfile) => {
-          axios.get(registrationURL).then((response) => {
-            const authToken = response.data.auth_token;
-            const expires = response.data.expires;
-            const formData = new FormData();
-            formData.append('file', myzipfile, 'study-data.zip');
-            formData.append('auth_token', `${authToken}`);
-            formData.append('expires', `${expires}`);
-            // axios.post('http://localhost:8000/submit', formData, {
-            axios.post('https://sig.mit.edu/vb/submit', formData, {
-              'Content-Type': 'multipart/form-data',
-            }).then((res) => {
-              this.hasData = true;
-              this.isUploading = false;
-              console.log('SUCCESS!!', res);
-              this.$emit('valueChanged', { status: res.status });
-            })
-              // eslint-disable-next-line no-unused-vars
-              .catch((e) => {
-                // console.log('FAILURE!!', e);
-              });
+          const formData = new FormData();
+          formData.append('file', myzipfile, 'study-data.zip');
+          formData.append('auth_token', `${TOKEN}`);
+          formData.append('expires', `${expiryMinutes}`);
+          // axios.post('http://localhost:8000/submit', formData, {
+          axios.post('https://sig.mit.edu/vb/submit', formData, {
+            'Content-Type': 'multipart/form-data',
+          }).then((res) => {
+            this.hasData = true;
+            this.isUploading = false;
+            console.log('SUCCESS!!', res);
+            this.$emit('valueChanged', { status: res.status });
           })
             // eslint-disable-next-line no-unused-vars
-            .catch((error) => {
-              // console.log(error);
+            .catch((e) => {
+              // console.log('FAILURE!!', e);
             });
         });
     },

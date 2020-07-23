@@ -419,6 +419,9 @@ export default {
     if (this.$route.query.expiry_minutes) {
       this.$store.dispatch('setExpiryMinutes', this.$route.query.expiry_minutes);
     }
+    if (this.$route.query.auth_token) {
+      this.$store.dispatch('setAuthToken', this.$route.query.auth_token);
+    }
   },
   computed: {
     getschemaType() {

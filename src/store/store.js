@@ -26,6 +26,7 @@ const state = {
   answeredLanguage: '',
   participantUuid: '',
   expiryMinutes: null,
+  token: null,
 };
 
 const getters = {
@@ -92,8 +93,8 @@ const mutations = {
     state.activityReady = true;
   },
   // eslint-disable-next-line
-  setToken(state, tok) {
-    state.token = tok;
+  setAuthToken(state, authToken) {
+    state.token = authToken;
   },
   // eslint-disable-next-line
   setParticipantUUID(state, uid) {
@@ -200,8 +201,8 @@ const actions = {
   setParticipantUUID({ commit }, puid) {
     commit('setParticipantUUID', puid);
   },
-  setToken({ commit }, tok) {
-    commit('setToken', tok);
+  setAuthToken({ commit }, tok) {
+    commit('setAuthToken', tok);
   },
   setExpiryMinutes({ commit }, mins) {
     commit('setExpiryMinutes', mins);
