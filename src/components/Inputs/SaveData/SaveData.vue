@@ -113,13 +113,6 @@ export default {
               //   JSONdata[key] = val;
               // }
             });
-            _.map(voiceMap, (v, ky) => {
-              if (ky in itemObj) {
-                const newObj = itemObj;
-                // console.log(327, itemObj);
-                newObj[ky] = v;
-              }
-            });
           }
         });
         // write out the activity files
