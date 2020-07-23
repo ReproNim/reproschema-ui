@@ -1,8 +1,19 @@
 <template>
   <div class="SaveData ml-3 mr-3 pl-3 pr-3">
-    <b-button v-if="!isUploading && !hasData" @click="record" variant="danger">
-      Upload
-    </b-button>
+    <div v-if="!isUploading && !hasData">
+      <div v-if="serverUrl">
+        <p>Please save your data now.</p>
+        <b-button @click="record" variant="danger">
+          Upload
+        </b-button>
+      </div>
+      <div v-else>
+        <p>You can click the "Export" button on sidebar if you wish to save your data. Click below to finish.</p>
+        <b-button @click="finish" variant="danger">
+          Finish
+        </b-button>
+      </div>
+    </div>
     <div v-if="isUploading" class="loader">
       <Loader />
     </div>
@@ -24,6 +35,7 @@ import _ from 'lodash';
 import JSZip from 'jszip';
 import axios from 'axios';
 import Loader from '../../Loader';
+import config from '../../../config';
 
 export default {
   name: 'SaveData',
@@ -39,8 +51,15 @@ export default {
     };
   },
   computed: {
+    serverUrl() {
+      return config.backendServer;
+    },
   },
   methods: {
+    finish() {
+      this.hasData = true;
+      this.$emit('valueChanged', 'completed');
+    },
     record() {
       this.isUploading = true;
       this.uploadZipData();
@@ -94,13 +113,6 @@ export default {
               //   JSONdata[key] = val;
               // }
             });
-            _.map(voiceMap, (v, ky) => {
-              if (ky in itemObj) {
-                const newObj = itemObj;
-                // console.log(327, itemObj);
-                newObj[ky] = v;
-              }
-            });
           }
         });
         // write out the activity files
@@ -122,22 +134,14 @@ export default {
       // _.map(JSONscores, (val, key) => {
       // jszip.folder('scores').file(`activity_${key}_score.json`, JSON.stringify(val, null, 4));
       // });
-
-      let registrationURL = `https://sig.mit.edu/vb/token?token=${TOKEN}`;
-      if (expiryMinutes) {
-        registrationURL = `https://sig.mit.edu/vb/token?token=${TOKEN}&expiry_minutes=${expiryMinutes}`;
-      }
       jszip.generateAsync({ type: 'blob' })
         .then((myzipfile) => {
-          axios.get(registrationURL).then((response) => {
-            const authToken = response.data.auth_token;
-            const expires = response.data.expires;
-            const formData = new FormData();
-            formData.append('file', myzipfile, 'study-data.zip');
-            formData.append('auth_token', `${authToken}`);
-            formData.append('expires', `${expires}`);
-            // axios.post('http://localhost:8000/submit', formData, {
-            axios.post('https://sig.mit.edu/vb/submit', formData, {
+          const formData = new FormData();
+          formData.append('file', myzipfile, 'study-data.zip');
+          formData.append('auth_token', `${TOKEN}`);
+          formData.append('expires', `${expiryMinutes}`);
+          if (config.backendServer) {
+            axios.post(`${config.backendServer}/submit`, formData, {
               'Content-Type': 'multipart/form-data',
             }).then((res) => {
               this.hasData = true;
@@ -149,11 +153,7 @@ export default {
               .catch((e) => {
                 // console.log('FAILURE!!', e);
               });
-          })
-            // eslint-disable-next-line no-unused-vars
-            .catch((error) => {
-              // console.log(error);
-            });
+          }
         });
     },
   },

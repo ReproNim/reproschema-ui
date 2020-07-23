@@ -281,6 +281,7 @@ export default {
     },
     downloadZipData() {
       const Response = this.$store.state.exportResponses;
+      console.log(284, Response);
       const totalScores = this.$store.state.scores;
       const uId = this.$store.state.participantId;
       const totalResponse = { response: Response, scores: totalScores, participantId: uId };
@@ -327,13 +328,13 @@ export default {
               //   JSONdata[key] = val;
               // }
             });
-            _.map(voiceMap, (v, ky) => {
-              if (ky in itemObj) {
-                const newObj = itemObj;
-                // console.log(327, itemObj);
-                newObj[ky] = v;
-              }
-            });
+            // _.map(voiceMap, (v, ky) => {
+            //   if (ky in itemObj) {
+            //     const newObj = itemObj;
+            //     // console.log(327, itemObj);
+            //     newObj[ky] = v;
+            //   }
+            // });
           }
         });
         // write out the activity files
@@ -418,6 +419,9 @@ export default {
     }
     if (this.$route.query.expiry_minutes) {
       this.$store.dispatch('setExpiryMinutes', this.$route.query.expiry_minutes);
+    }
+    if (this.$route.query.auth_token) {
+      this.$store.dispatch('setAuthToken', this.$route.query.auth_token);
     }
   },
   computed: {

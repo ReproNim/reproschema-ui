@@ -108,23 +108,40 @@ export default {
     getData() {
       jsonld.expand(this.srcUrl).then((resp) => {
         this.activity = resp[0];
-        this.listShow = [0];
+        // const l = this.initializeListShow();
+        // this.listShow = [0];
         this.$nextTick(() => {
           // set listShow if there are responses for items in the context
           const answered = _.filter(this.context, c =>
             Object.keys(this.responses).indexOf(c['@id']) > -1);
           if (!answered.length) {
-            this.listShow = [0];
+            this.listShow = [this.initializeListShow()];
             // eslint-disable-next-line
               // console.log(92, this.listShow);
           } else {
             this.listShow = _.map(new Array(answered.length + 1), (c, i) => i);
             // eslint-disable-next-line
-              // console.log(95, this.listShow);
           }
           this.visibility = this.getVisibility(this.responses);
         });
       });
+    },
+    initializeListShow() {
+      let i = 0;
+      for (i = 0; i < this.context.length; i += 1) {
+        const eachItem = (this.context)[i];
+        // return _.map(this.context, (o, index) => {
+        const matchedObject = _.filter(this.activity['http://schema.repronim.org/addProperties'], a => a['http://schema.repronim.org/isAbout'][0]['@id'] === eachItem['@id']);
+        let val = true; // true by default if not mentioned
+        if (matchedObject[0]['http://schema.repronim.org/isVis']) {
+          val = matchedObject[0]['http://schema.repronim.org/isVis'][0]['@value'];
+        }
+        if (val === true) { // first visible item
+          break;
+        }
+      }
+      return i;
+      // });
     },
     getScoring(responses) {
       // console.log(225, 'responses', responses);
@@ -179,7 +196,7 @@ export default {
         // }
       }
       this.$forceUpdate();
-      if (idx === this.listShow.length - 1) {
+      if (idx >= this.listShow.length - 1) {
         const nextQuestionIdx = _.max(this.listShow) + 1;
         this.listShow.push(nextQuestionIdx);
         // update the listShow with the next index in case this one we added isn't visible
@@ -280,7 +297,7 @@ export default {
     },
     restart() {
       this.$emit('clearResponses');
-      this.listShow = [0];
+      this.listShow = [this.initializeListShow()];
     },
     evaluateString(string, responseMapper) {
       const keys = Object.keys(responseMapper);
@@ -447,12 +464,18 @@ export default {
       return [{}];
     },
     shouldShow() {
+      // console.log(472, this.initializeListShow());
+      // console.log(463, this.visibility);
       return _.map(this.contextReverse, (o, index) => {
+        // console.log(454, 'list show', this.listShow, this.contextReverse.length, index);
         const criteria1 = this.listShow.indexOf(this.contextReverse.length - index - 1) >= 0;
+        // console.log(452, 'present in ui.order', o['@id'], criteria1);
         let criteria2 = true;
         if (!_.isEmpty(this.visibility)) {
           criteria2 = this.visibility[o['@id']];
         }
+        // console.log(457, 'vis condition', criteria2);
+        // console.log(458, 'should show? ', o['@id'], criteria1, criteria2, criteria1 && criteria2);
         return criteria1 && criteria2;
       });
     },
