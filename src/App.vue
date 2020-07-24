@@ -9,7 +9,7 @@
       <!-- Sidebar -->
       <nav id="sidebar" v-bind:class="{'active':checkDisableBack}" ref="sidebar">
         <div class="sidebar-header">
-          <h4>{{ sidebarHeader }}</h4>
+          <h4>{{ getPrefLabel }}</h4>
         </div>
         <div>
           <select v-model="selected_language">
@@ -214,21 +214,6 @@ export default {
         return this.labelMap[activityUrl];
       } return '';
     },
-    getPrefLabel() {
-      const baseSchema = this.$store.state.schema;
-      let sidebarHeader = _.filter(baseSchema['http://www.w3.org/2004/02/skos/core#prefLabel'], n => n['@language'] === this.selected_language);
-      if (!sidebarHeader.length) { // selected_language absent, return label in default language
-        sidebarHeader = baseSchema['http://www.w3.org/2004/02/skos/core#prefLabel'];
-      }
-      this.sidebarHeader = sidebarHeader[0]['@value']; // set sidebar header
-      if (this.schemaOrder) {
-        _.map(this.schemaOrder, (s) => {
-          jsonld.expand(s).then((resp) => {
-            this.labelMap[s] = resp[0]['http://www.w3.org/2004/02/skos/core#prefLabel'][0]['@value'];
-          });
-        });
-      }
-    },
     async computeVisibilityCondition(cond, index) {
       if (_.isObject(cond)) {
         const request = {
@@ -362,7 +347,7 @@ export default {
         });
     },
     processSchema(url) {
-      this.$store.dispatch('getBaseSchema', url).then(() => this.getPrefLabel());
+      this.$store.dispatch('getBaseSchema', url);
     },
   },
   watch: {
@@ -396,9 +381,6 @@ export default {
     }
   },
   mounted() {
-    axios.get(config.backendServer).then((response) => {
-      // console.log(399, response);
-    });
     if (this.$route.query.lang) {
       this.selected_language = this.$route.query.lang;
     } else this.selected_language = 'en';
@@ -474,6 +456,14 @@ export default {
         const langList = _.map(langCodeList, c => ({ value: c, text: this.langMap[c] }));
         return langList;
       } return [];
+    },
+    getPrefLabel() {
+      if (!_.isEmpty(this.$store.state.schema)) {
+        const protocolLabel = _.filter(this.$store.state.schema['http://www.w3.org/2004/02/skos/core#prefLabel'], n => n['@language'] === this.selected_language);
+        if (protocolLabel) {
+          return protocolLabel[0]['@value'];
+        } return this.$store.state.schema['http://www.w3.org/2004/02/skos/core#prefLabel'][0]['@value']; // return label in default language
+      } return '';
     },
     allowExport() {
       if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema['http://schema.repronim.org/allow']) {
