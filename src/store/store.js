@@ -27,6 +27,7 @@ const state = {
   participantUuid: '',
   expiryMinutes: null,
   token: null,
+  landing: [],
 };
 
 const getters = {
@@ -41,6 +42,10 @@ const getters = {
   // eslint-disable-next-line
   getTermsUrl(state) {
     return state.termUrl;
+  },
+  // eslint-disable-next-line
+  getLand(state) {
+    return state.landing;
   },
   // eslint-disable-next-line
   srcUrl(state) {
@@ -76,8 +81,26 @@ const mutations = {
       });
     });
   },
+  // eslint-disable-next-line no-shadow
+  setLanding(state) {
+    console.log(82, 'store setbase', state.schema['http://schema.repronim.org/landingPage']);
+    if (state.schema[`${this.reprotermsUrl}landingPage`]) {
+      // eslint-disable-next-line max-len
+      // const selectedLandingPage = _.filter(this.$store.state.schema[`${this.reprotermsUrl}landingPage`], l => l['@language'] === this.selected_language);
+      _.map(state.schema[`${this.reprotermsUrl}landingPage`], (lc) => {
+        console.log(86, lc);
+        const landingUrl = lc['@id'];
+        axios.get(landingUrl).then((resp) => {
+          (state.landing)[lc['@language']] = resp.data;
+        })
+          .then(() => {
+            console.log(93, state.landing);
+          });
+      });
+    }
+  },
   // eslint-disable-next-line
-  setBaseSchema(state, data) {
+  async setBaseSchema(state, data) {
     state.schema = data[0];
     state.progress = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => 0);
     state.responses = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => ({}));
@@ -85,6 +108,15 @@ const mutations = {
     state.scores = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => ({}));
     state.activities = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => ({}));
     state.storeReady = true;
+    const landingPage = state.schema['http://schema.repronim.org/landingPage'];
+    const landingContents = landingPage.map(async (lc) => {
+      const landContent = {};
+      const resp = await axios.get(lc['@id']);
+      landContent['@language'] = lc['@language'];
+      landContent.content = resp.data;
+      return landContent;
+    });
+    state.landing = await Promise.all(landingContents);
     // state.participantId = uuidv4();
   },
   // eslint-disable-next-line

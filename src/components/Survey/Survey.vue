@@ -241,30 +241,34 @@ export default {
       const respActivityUuid = uuidv4();
       const responseUuid = uuidv4();
       const responseActivity = {
-        '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/master/contexts/generic',
-        '@type': 'reproterms:ResponseActivity',
+        '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/1.0.0-rc1/contexts/generic',
+        '@type': 'reproschema:ResponseActivity',
         '@id': `uuid:${respActivityUuid}`,
-        'prov:used': [`${itemUrl}`,
+        used: [`${itemUrl}`,
           `${this.srcUrl}`,
         ],
-        lang: this.getAnsweredLanguage,
-        'prov:startedAtTime': this.t0,
-        'prov:endedAtTime': t1,
-        'prov:wasAssociatedWith': uiUrl,
-        'prov:generated': `uuid:${responseUuid}`,
+        inLanguage: this.getAnsweredLanguage,
+        startedAtTime: this.t0,
+        endedAtTime: t1,
+        wasAssociatedWith: {
+          version: '0.0.1',
+          url: uiUrl,
+          '@id': 'https://github.com/ReproNim/reproschema-ui'
+        },
+        generated: `uuid:${responseUuid}`,
       };
       const respData = {
-        '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/master/contexts/generic',
-        '@type': 'reproterms:Response',
+        '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/1.0.0-rc1/contexts/generic',
+        '@type': 'reproschema:Response',
         '@id': `uuid:${responseUuid}`,
-        'prov:wasAttributedTo': {
+        wasAttributedTo: {
           '@id': this.$store.state.participantUuid,
         },
         isAbout: itemUrl,
         value: val,
       };
       if (this.participantId) {
-        respData['prov:wasAttributedTo']['nidm:subject_id'] = this.participantId;
+        respData.wasAttributedTo.subject_id = this.participantId;
       }
       const valueAndDataExport = [val, responseActivity, respData];
       this.$emit('saveResponse', this.context[index]['@id'], valueAndDataExport);
