@@ -2,9 +2,9 @@
   <div class="docked-layout">
     <section v-if="selectedContent" id="smooth-scroller"
              class="smooth-scroller" style="padding-top: 0">
-      <vue-markdown v-if="selectedContent"> {{selectedContent.content}} </vue-markdown>
-      <Loader v-else/>
+      <vue-markdown :source="selectedContent.content"></vue-markdown>
     </section>
+    <Loader v-else/>
     <p style="margin-top: 2rem">
       <button class="join-button" @click="doNext">{{ startButton }}</button>
     </p>
@@ -54,7 +54,6 @@ export default {
     },
     selectedContent() {
       const landingC = _.filter(this.$store.state.landing, c => c['@language'] === this.selected_language);
-      console.log(56, landingC[0]);
       return landingC[0];
     },
   },
