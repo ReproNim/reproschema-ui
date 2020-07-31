@@ -1,9 +1,10 @@
 <template>
   <div class="docked-layout">
-    <section v-if="content" id="smooth-scroller" class="smooth-scroller" style="padding-top: 0">
-      <vue-markdown v-if="content"> {{content}} </vue-markdown>
-      <Loader v-else/>
+    <section v-if="selectedContent" id="smooth-scroller"
+             class="smooth-scroller" style="padding-top: 0">
+      <vue-markdown :source="selectedContent.content"></vue-markdown>
     </section>
+    <Loader v-else/>
     <p style="margin-top: 2rem">
       <button class="join-button" @click="doNext">{{ startButton }}</button>
     </p>
@@ -11,8 +12,7 @@
 </template>
 
 <script>
-
-import axios from 'axios';
+import _ from 'lodash';
 import VueMarkdown from 'vue-markdown';
 import Loader from '../Loader';
 import config from '../../config';
@@ -23,6 +23,12 @@ export default {
     startButton: {
       type: String,
     },
+    selected_language: {
+      type: String,
+    },
+    contents: {
+      type: Object,
+    },
   },
   components: {
     VueMarkdown,
@@ -30,13 +36,25 @@ export default {
   },
   data() {
     return {
-      content: null,
+      content: {},
       consent: config.consent,
     };
   },
   computed: {
     reprotermsUrl() {
       return this.$store.getters.getTermsUrl;
+    },
+    selectedLanguage() {
+      return this.selected_language;
+    },
+    hasContent() {
+      if (this.$store.state.landing) {
+        return true;
+      } return false;
+    },
+    selectedContent() {
+      const landingC = _.filter(this.$store.state.landing, c => c['@language'] === this.selected_language);
+      return landingC[0];
     },
   },
   methods: {
@@ -52,32 +70,6 @@ export default {
       }
       this.$router.push('/activities/0');
     },
-    getContent() {
-      if (this.$store.state.schema[`${this.reprotermsUrl}landingPage`]) {
-        const landingUrl = this.$store.state.schema[`${this.reprotermsUrl}landingPage`][0]['@id'];
-        axios.get(landingUrl).then((resp) => {
-          this.content = resp.data;
-        })
-          .then(() => {
-            // HTML injected into a component cannot be styled in the component?
-            // https://forum.vuejs.org/t/html-injected-into-a-component-from-a-vuex-store-cannot-be-styled-in-the-component/13691/24
-            const rootnode = document.getElementById('smooth-scroller');
-            const treeWalker = document.createTreeWalker(rootnode, NodeFilter.SHOW_ELEMENT, null);
-            let currentNode = treeWalker.currentNode;
-            while (currentNode) {
-              currentNode = treeWalker.nextNode();
-              if (currentNode) {
-                // eslint-disable-next-line no-underscore-dangle
-                currentNode.setAttribute(this.$options._scopeId, '');
-              }
-            }
-          });
-      }
-    },
-  },
-  created() {
-    const url = this.$route.query.url;
-    this.$store.dispatch('getBaseSchema', url).then(() => this.getContent());
   },
 };
 </script>
