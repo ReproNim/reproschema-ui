@@ -36,6 +36,7 @@ import JSZip from 'jszip';
 import axios from 'axios';
 import Loader from '../../Loader';
 import config from '../../../config';
+import { v4 as uuidv4 } from 'uuid';
 
 export default {
   name: 'SaveData',
@@ -77,47 +78,49 @@ export default {
       const jszip = new JSZip();
       // sort out blobs from JSONdata
       let key = 0;
+      const voiceMap = {};
       _.map(data.response, (eachActivityList) => {
+        const activityData = [];
         _.map(eachActivityList, (itemObj) => {
-          if (itemObj['@type'] === 'reproterms:Response') {
-            const voiceMap = {};
-            _.map(itemObj, (value, key1) => {
-              // console.log(294, value, key1);
-              if (value instanceof Blob) {
-                // fileUploadData[key1] = value;
-                const keyStrings = (itemObj.isAbout.split('/items/')[1]);
-                const rId = itemObj['@id'].split('uuid:')[1];
-                jszip.folder('responses').file(`${keyStrings}-${rId}.wav`, value);
-                // eslint-disable-next-line no-param-reassign
-                voiceMap[key1] = `${keyStrings}-${rId}.wav`;
-              }
-              // todo: check if sections are present, they are no longer object but lists
-              // else if (_.isObject(value)) {
-              //   // make sure there aren't any Blobs here.
-              //   // if there are, add them to fileUploadData
-              //   _.map(value, (val2, key2) => {
-              //     if (val2 instanceof Blob) {
-              //       // console.log(322, val, key2, val2);
-              //       fileUploadData[`${key2}`] = val2;
-              //     }
-              //     else {
-              //       // refill the object.
-              //       if (!JSONdata[key]) {
-              //         JSONdata[key] = {};
-              //       }
-              //       JSONdata[key][key2] = val2;
-              //     }
-              //   });
-              // }
-              // else {
-              //   JSONdata[key] = val;
-              // }
-            });
+          const newObj = { ...itemObj };
+          if (itemObj['@type'] === 'reproschema:Response') {
+            // console.log(294, value, key1);
+            if (itemObj.value instanceof Blob) {
+              // fileUploadData[key1] = value;
+              const keyStrings = (itemObj.isAbout.split('/items/')[1]);
+              const rId = itemObj['@id'].split('uuid:')[1];
+              jszip.folder('responses').file(`${keyStrings}-${rId}.wav`, itemObj.value);
+              newObj.value = `${keyStrings}-${rId}.wav`;
+              // eslint-disable-next-line no-param-reassign
+              voiceMap[itemObj['@id']] = `${keyStrings}-${rId}.wav`;
+            }
+            // todo: check if sections are present, they are no longer object but lists
+            // else if (_.isObject(value)) {
+            //   // make sure there aren't any Blobs here.
+            //   // if there are, add them to fileUploadData
+            //   _.map(value, (val2, key2) => {
+            //     if (val2 instanceof Blob) {
+            //       // console.log(322, val, key2, val2);
+            //       fileUploadData[`${key2}`] = val2;
+            //     }
+            //     else {
+            //       // refill the object.
+            //       if (!JSONdata[key]) {
+            //         JSONdata[key] = {};
+            //       }
+            //       JSONdata[key][key2] = val2;
+            //     }
+            //   });
+            // }
+            // else {
+            //   JSONdata[key] = val;
+            // }
           }
+          activityData.push(newObj);
         });
         // write out the activity files
-        if (eachActivityList.length) { // if activity is answered then write to file
-          jszip.folder('responses').file(`activity_${key}.jsonld`, JSON.stringify(eachActivityList, null, 4));
+        if (activityData.length) { // if activity is answered then write to file
+          jszip.folder('responses').file(`activity_${key}.jsonld`, JSON.stringify(activityData, null, 4));
           key += 1;
         }
       });
@@ -136,11 +139,13 @@ export default {
       // });
       jszip.generateAsync({ type: 'blob' })
         .then((myzipfile) => {
+          const fileName = `study-data-${uuidv4()}.zip`;
           const formData = new FormData();
-          formData.append('file', myzipfile, 'study-data.zip');
+          formData.append('file', myzipfile, fileName);
           formData.append('auth_token', `${TOKEN}`);
           formData.append('expires', `${expiryMinutes}`);
           if (config.backendServer) {
+            console.log(148, `${config.backendServer}/submit`);
             axios.post(`${config.backendServer}/submit`, formData, {
               'Content-Type': 'multipart/form-data',
             }).then((res) => {
@@ -149,7 +154,7 @@ export default {
               console.log('SUCCESS!!', res);
               this.$emit('valueChanged', { status: res.status });
             })
-              // eslint-disable-next-line no-unused-vars
+            // eslint-disable-next-line no-unused-vars
               .catch((e) => {
                 // console.log('FAILURE!!', e);
               });
