@@ -356,7 +356,8 @@ export default {
       // });
       jszip.generateAsync({ type: 'blob' })
         .then((myzipfile) => {
-          saveAs(myzipfile, 'study-data.zip');
+          const fileName = `study-data-${uuidv4()}`;
+          saveAs(myzipfile, fileName);
         });
     },
   },
@@ -401,9 +402,6 @@ export default {
       this.langMap = resp.data;
     });
     this.$store.dispatch('setParticipantUUID', uuidv4()); // set participant UUID for the current user
-    if (this.$route.query.token) {
-      this.$store.dispatch('setToken', this.$route.query.token);
-    }
     if (this.$route.query.expiry_minutes) {
       this.$store.dispatch('setExpiryMinutes', this.$route.query.expiry_minutes);
     }
