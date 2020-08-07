@@ -54,6 +54,9 @@ export default {
     },
     selectedContent() {
       const landingC = _.filter(this.$store.state.landing, c => c['@language'] === this.selected_language);
+      if (_.isEmpty(landingC)) {
+        return (this.$store.state.landing)[0]; // return default language content
+      }
       return landingC[0];
     },
   },
