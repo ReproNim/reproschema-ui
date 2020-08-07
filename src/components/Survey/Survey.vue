@@ -386,14 +386,16 @@ export default {
       this.$emit('updateProgress', progress);
     },
     order() {
-      if (this.activity['http://schema.repronim.org/shuffle']) { // when shuffle is true
-        const orderList = this.activity['http://schema.repronim.org/order'][0]['@list'];
-        const listToShuffle = orderList.slice(1, orderList.length - 3);
-        const newList = _.shuffle(listToShuffle);
-        newList.unshift(orderList[0]);
-        newList.push(orderList[orderList.length - 3],
-          orderList[orderList.length - 2], orderList[orderList.length - 1]);
-        return newList;
+      if (this.activity['http://schema.repronim.org/shuffle']) {
+        if (this.activity['http://schema.repronim.org/shuffle'][0]['@value']) { // when shuffle is true
+          const orderList = this.activity['http://schema.repronim.org/order'][0]['@list'];
+          const listToShuffle = orderList.slice(1, orderList.length - 3);
+          const newList = _.shuffle(listToShuffle);
+          newList.unshift(orderList[0]);
+          newList.push(orderList[orderList.length - 3],
+            orderList[orderList.length - 2], orderList[orderList.length - 1]);
+          return newList;
+        }
       } return this.activity['http://schema.repronim.org/order'][0]['@list'];
     },
     nextActivity1() {
