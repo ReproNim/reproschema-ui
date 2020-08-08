@@ -88,7 +88,7 @@ One exception is :
 If you just want to view a protocol using the `reproschema-ui` you can pass the 
 URL of the protocol schema to the `url` query parameter like this:
 
-```https://schema.repronim.org/ui/#/?url=url-to-your-protocol_schema```
+```https://www.repronim.org/reproschema-ui/#/?url=url-to-your-protocol_schema```
 
 If you are hosting a schema on github, make sure that you are passing the URL of 
 the **raw** content of the protocol schema. For example, our demo protocol can be 
@@ -103,12 +103,14 @@ button that will open this URL:
 
 Similarly, to view a single activity you can simply do this:
 
-```https://schema.repronim.org/ui/#/activities/0?url=url-to-activity-schema```
+```https://www.repronim.org/reproschema-ui/#/activities/0?url=url-to-activity-schema```
 
 When you want to make a standalone app for your study / protocol, you should 
 modify the URL next to `githubSrc` in the file `src/config.js` to make it point 
 to the URL of your schema. If you are using GitHub it should point to the raw
 Github pointer.
+
+Also make sure that assetsPublicPath and backendServer are pointing the correct things. 
 
 ```javascript
 module.exports = {
