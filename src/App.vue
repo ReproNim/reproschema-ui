@@ -23,6 +23,7 @@
         <ul class="list-unstyled components">
           <!-- <p>Dummy Heading</p> -->
           <li v-for="(ui, index) in schemaOrder" :key="index">
+<!--            hi {{ index }} {{ visibility }}-->
             <a @click="setActivity(index)"
                v-if="visibility[index]"
                :class="{'current': index===activityIndex}">
@@ -101,7 +102,7 @@ import config from './config';
 
 Vue.use(BootstrapVue);
 Vue.filter('reverse', value => value.slice().reverse());
-
+const safeEval = require('safe-eval');
 
 function getFilename(s) {
   const folders = s.split('/');
@@ -177,6 +178,7 @@ export default {
     },
     saveResponse(key, value) {
       let needsVizUpdate = false;
+      console.log(180, key, value);
       if (this.currentResponse[key] !== value[0] && this.progress[this.activityIndex] === 100) {
         // there has been a change in an already completed activity
         needsVizUpdate = true;
@@ -185,6 +187,7 @@ export default {
       value[1].used.push(this.protocolUrl);
       this.$store.dispatch('saveResponse', { key, value });
       if (needsVizUpdate) {
+        console.log(188, key, value);
         this.setVisbility();
       }
       this.isAnswered = true;
@@ -215,6 +218,51 @@ export default {
         return this.labelMap[activityUrl];
       } return '';
     },
+    evaluateString(string, responseMapper) {
+      const keys = Object.keys(responseMapper);
+      let output = string;
+      _.map(keys, (k) => {
+        // grab the value of the key from responseMapper
+        let val = responseMapper[k].val;
+        if (val !== 'skipped' && val !== 'dontknow') {
+          if (_.isString(val)) {
+            val = `'${val}'`; // put the string in quotes
+          }
+          if (_.isArray(val)) {
+            val = `[${val}]`; // put braces for array
+          }
+          output = output.replace(new RegExp(`\\b${k}\\b` || `\\b${k}\\.`), val);
+        } else {
+          output = output.replace(new RegExp(`\\b${k}\\b`), 0);
+        }
+      });
+      console.log(237, output);
+      return safeEval(output);
+    },
+    responseMapper(index, responses) {
+      console.log(238, index, responses, this.schema);
+      // a variable map is defined! great
+      if (this.schema['http://schema.repronim.org/addProperties']) {
+        const vmap = this.schema['http://schema.repronim.org/addProperties'];
+        const keyArr = _.map(vmap, (v) => {
+          const key = v['http://schema.repronim.org/isAbout'][0]['@id'];
+          const qId = v['http://schema.repronim.org/variableName'][0]['@value'];
+          const rp = _.filter(responses, r => key in r);
+          let val = rp[0];
+          if (rp[0]) {
+            console.log(251, rp[0][key]);
+            val = rp[0][key];
+          }
+          return { key, val, qId };
+        });
+        const outMapper = {};
+        _.map(keyArr, (a) => {
+          outMapper[a.qId] = { val: a.val, ref: a.key };
+        });
+        return outMapper;
+      }
+      return {};
+    },
     async computeVisibilityCondition(cond, index) {
       if (_.isObject(cond)) {
         const request = {
@@ -241,20 +289,30 @@ export default {
         this.cache[cacheKey] = resp.data.qualified;
         return resp.data.qualified;
       } else if (_.isString(cond)) {
+        const responseMapper = this.responseMapper(index, this.$store.state.responses);
+        console.log(292, index, cond, responseMapper);
+        const v = this.evaluateString(cond, responseMapper);
+        console.log(294, v);
+        // this.visibilty[index] = v;
+        return v;
         // todo: implement client-side evaluation!
-        Error('Client-side branching at activity set level is not implemented yet');
+        // Error('Client-side branching at activity set level is not implemented yet');
       }
       // this.visibility[index] = cond;
+      // console.log(248, cond);
       return cond;
     },
     visibilityChain(conditionList) {
+      // console.log(251, conditionList);
       if (!conditionList[0]) {
         return 0;
       }
       return this.computeVisibilityCondition(conditionList[0].condition,
         conditionList[0].index)
         .then((resp) => {
+          console.log(312, conditionList[0].index, conditionList[0].condition, resp);
           this.visibility[conditionList[0].index] = resp;
+          console.log(314, 'this.vis ---', this.visibility);
           this.$forceUpdate();
           const newConditionList = [...conditionList];
           newConditionList.shift();
@@ -372,6 +430,7 @@ export default {
     },
     visibilityConditions: {
       handler(newC) {
+        console.log(381, newC);
         if (!_.isEmpty(newC)) {
           this.setVisbility();
         }
@@ -420,10 +479,6 @@ export default {
     },
     srcUrl() {
       return this.$store.getters.srcUrl;
-    },
-    getLandCont() {
-      console.log(486, '~~~~~~~~~~', this.$store.getters.getLand);
-      return this.$store.getters.getLand;
     },
     reprotermsUrl() {
       return this.$store.getters.getTermsUrl;
@@ -511,6 +566,7 @@ export default {
           if (currentActivityObj[0]['http://schema.repronim.org/isVis']) {
             const condition1 = currentActivityObj[0]['http://schema.repronim.org/isVis'][0];
             if ('@value' in condition1) {
+              console.log(571, '-----', condition1);
               return condition1['@value'];
             }
             if (('http://schema.org/httpMethod' in condition1) &&
