@@ -23,6 +23,7 @@
         <ul class="list-unstyled components">
           <!-- <p>Dummy Heading</p> -->
           <li v-for="(ui, index) in schemaOrder" :key="index">
+<!--            hi {{ index }} {{ visibility }}-->
             <a @click="setActivity(index)"
                v-if="visibility[index]"
                :class="{'current': index===activityIndex}">
@@ -101,7 +102,7 @@ import config from './config';
 
 Vue.use(BootstrapVue);
 Vue.filter('reverse', value => value.slice().reverse());
-
+const safeEval = require('safe-eval');
 
 function getFilename(s) {
   const folders = s.split('/');
@@ -215,6 +216,49 @@ export default {
         return this.labelMap[activityUrl];
       } return '';
     },
+    evaluateString(string, responseMapper) {
+      const keys = Object.keys(responseMapper);
+      let output = string;
+      _.map(keys, (k) => {
+        // grab the value of the key from responseMapper
+        let val = responseMapper[k].val;
+        if (val !== 'skipped' && val !== 'dontknow') {
+          if (_.isString(val)) {
+            val = `'${val}'`; // put the string in quotes
+          }
+          if (_.isArray(val)) {
+            val = `[${val}]`; // put braces for array
+          }
+          output = output.replace(new RegExp(`\\b${k}\\b` || `\\b${k}\\.`), val);
+        } else {
+          output = output.replace(new RegExp(`\\b${k}\\b`), 0);
+        }
+      });
+      return safeEval(output);
+    },
+    responseMapper(index, responses) {
+      // a variable map is defined! great
+      if (this.schema['http://schema.repronim.org/addProperties']) {
+        const vmap = this.schema['http://schema.repronim.org/addProperties'];
+        const keyArr = _.map(vmap, (v) => {
+          const key = v['http://schema.repronim.org/isAbout'][0]['@id'];
+          const qId = v['http://schema.repronim.org/variableName'][0]['@value'];
+          const rp = _.filter(responses, r => key in r);
+          let val = rp[0];
+          if (rp[0]) {
+            console.log(251, rp[0][key]);
+            val = rp[0][key];
+          }
+          return { key, val, qId };
+        });
+        const outMapper = {};
+        _.map(keyArr, (a) => {
+          outMapper[a.qId] = { val: a.val, ref: a.key };
+        });
+        return outMapper;
+      }
+      return {};
+    },
     async computeVisibilityCondition(cond, index) {
       if (_.isObject(cond)) {
         const request = {
@@ -241,10 +285,11 @@ export default {
         this.cache[cacheKey] = resp.data.qualified;
         return resp.data.qualified;
       } else if (_.isString(cond)) {
-        // todo: implement client-side evaluation!
-        Error('Client-side branching at activity set level is not implemented yet');
+        const responseMapper = this.responseMapper(index, this.$store.state.responses);
+        const v = this.evaluateString(cond, responseMapper);
+        // this.visibilty[index] = v;
+        return v;
       }
-      // this.visibility[index] = cond;
       return cond;
     },
     visibilityChain(conditionList) {
@@ -421,10 +466,6 @@ export default {
     srcUrl() {
       return this.$store.getters.srcUrl;
     },
-    getLandCont() {
-      console.log(486, '~~~~~~~~~~', this.$store.getters.getLand);
-      return this.$store.getters.getLand;
-    },
     reprotermsUrl() {
       return this.$store.getters.getTermsUrl;
     },
@@ -541,7 +582,7 @@ export default {
     },
     checkDisableBack() {
       if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema['http://schema.repronim.org/allow']) {
-        const allowList = _.map(this.$store.state.schema['http://schema.repronim.org/allow'][0]['@list'],
+        const allowList = _.map(this.$store.state.schema['http://schema.repronim.org/allow'],
           u => u['@id']);
         return allowList.includes('http://schema.repronim.org/DisableBack'); // if true then hide sidebar on-load and activities cannot be clicked
       }
