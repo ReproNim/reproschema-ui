@@ -246,7 +246,6 @@ export default {
           const rp = _.filter(responses, r => key in r);
           let val = rp[0];
           if (rp[0]) {
-            console.log(251, rp[0][key]);
             val = rp[0][key];
           }
           return { key, val, qId };
