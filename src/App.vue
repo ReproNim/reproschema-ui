@@ -178,7 +178,6 @@ export default {
     },
     saveResponse(key, value) {
       let needsVizUpdate = false;
-      console.log(180, key, value);
       if (this.currentResponse[key] !== value[0] && this.progress[this.activityIndex] === 100) {
         // there has been a change in an already completed activity
         needsVizUpdate = true;
@@ -187,7 +186,6 @@ export default {
       value[1].used.push(this.protocolUrl);
       this.$store.dispatch('saveResponse', { key, value });
       if (needsVizUpdate) {
-        console.log(188, key, value);
         this.setVisbility();
       }
       this.isAnswered = true;
@@ -236,11 +234,9 @@ export default {
           output = output.replace(new RegExp(`\\b${k}\\b`), 0);
         }
       });
-      console.log(237, output);
       return safeEval(output);
     },
     responseMapper(index, responses) {
-      console.log(238, index, responses, this.schema);
       // a variable map is defined! great
       if (this.schema['http://schema.repronim.org/addProperties']) {
         const vmap = this.schema['http://schema.repronim.org/addProperties'];
@@ -290,29 +286,20 @@ export default {
         return resp.data.qualified;
       } else if (_.isString(cond)) {
         const responseMapper = this.responseMapper(index, this.$store.state.responses);
-        console.log(292, index, cond, responseMapper);
         const v = this.evaluateString(cond, responseMapper);
-        console.log(294, v);
         // this.visibilty[index] = v;
         return v;
-        // todo: implement client-side evaluation!
-        // Error('Client-side branching at activity set level is not implemented yet');
       }
-      // this.visibility[index] = cond;
-      // console.log(248, cond);
       return cond;
     },
     visibilityChain(conditionList) {
-      // console.log(251, conditionList);
       if (!conditionList[0]) {
         return 0;
       }
       return this.computeVisibilityCondition(conditionList[0].condition,
         conditionList[0].index)
         .then((resp) => {
-          console.log(312, conditionList[0].index, conditionList[0].condition, resp);
           this.visibility[conditionList[0].index] = resp;
-          console.log(314, 'this.vis ---', this.visibility);
           this.$forceUpdate();
           const newConditionList = [...conditionList];
           newConditionList.shift();
@@ -430,7 +417,6 @@ export default {
     },
     visibilityConditions: {
       handler(newC) {
-        console.log(381, newC);
         if (!_.isEmpty(newC)) {
           this.setVisbility();
         }
@@ -566,7 +552,6 @@ export default {
           if (currentActivityObj[0]['http://schema.repronim.org/isVis']) {
             const condition1 = currentActivityObj[0]['http://schema.repronim.org/isVis'][0];
             if ('@value' in condition1) {
-              console.log(571, '-----', condition1);
               return condition1['@value'];
             }
             if (('http://schema.org/httpMethod' in condition1) &&
@@ -597,7 +582,7 @@ export default {
     },
     checkDisableBack() {
       if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema['http://schema.repronim.org/allow']) {
-        const allowList = _.map(this.$store.state.schema['http://schema.repronim.org/allow'][0]['@list'],
+        const allowList = _.map(this.$store.state.schema['http://schema.repronim.org/allow'],
           u => u['@id']);
         return allowList.includes('http://schema.repronim.org/DisableBack'); // if true then hide sidebar on-load and activities cannot be clicked
       }

@@ -230,7 +230,6 @@ export default {
       });
     },
     setResponse(val, index) {
-      console.log(233, val, index);
       const itemUrl = this.context[index]['@id'];
       const d2 = new Date();
       const t1 = d2.toISOString();
@@ -281,7 +280,6 @@ export default {
         currResponses[this.context[index]['@id']] = val;
       }
       this.visibility = this.getVisibility(currResponses);
-      console.log(284, '$$$$$$$$$$$$$$', this.visibility);
       // if (!_.isEmpty(this.activity['http://schema.repronim.org/compute'])) {
       //   // TODO: if you uncomment the scoring logic evaluation, things break w/ multipart.
       //   this.evaluateScoringLogic();
