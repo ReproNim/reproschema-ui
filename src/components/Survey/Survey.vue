@@ -400,7 +400,7 @@ export default {
       const currentIndex = parseInt(this.$store.state.activityIndex);
       let nextIndex = currentIndex + 1;
       let remainingActivities = this.actVisibility.length - 1;
-      while (remainingActivities > 1) {
+      while (remainingActivities > 0) {
         if (this.actVisibility[nextIndex]) {
           if (this.$route.query.url) {
             this.$router.push(`/activities/${nextIndex}?url=${this.$route.query.url}`);
