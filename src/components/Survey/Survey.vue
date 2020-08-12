@@ -398,14 +398,20 @@ export default {
     },
     nextActivity1() {
       const currentIndex = parseInt(this.$store.state.activityIndex);
-      const nextIndex = currentIndex + 1;
-      if (this.actVisibility[nextIndex]) {
-        if (this.$route.query.url) {
-          this.$router.push(`/activities/${nextIndex}?url=${this.$route.query.url}`);
-        } else {
-          this.$router.push(`/activities/${nextIndex}`);
+      let nextIndex = currentIndex + 1;
+      let remainingActivities = this.actVisibility.length - 1;
+      while (remainingActivities > 0) {
+        if (this.actVisibility[nextIndex]) {
+          if (this.$route.query.url) {
+            this.$router.push(`/activities/${nextIndex}?url=${this.$route.query.url}`);
+          } else {
+            this.$router.push(`/activities/${nextIndex}`);
+          }
+          // this.$router.push(`/activities/${nextIndex}`);
+          break;
         }
-        // this.$router.push(`/activities/${nextIndex}`);
+        nextIndex += 1;
+        remainingActivities -= 1;
       }
     },
   },
