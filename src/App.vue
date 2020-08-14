@@ -411,9 +411,6 @@ export default {
         this.$store.dispatch('setActivityIndex', this.$route.params.id);
       }
     },
-    selected_language() {
-      this.$store.dispatch('setLanguage', this.selected_language);
-    },
     visibilityConditions: {
       handler(newC) {
         if (!_.isEmpty(newC)) {
