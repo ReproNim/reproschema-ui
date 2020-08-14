@@ -144,7 +144,7 @@ export default {
   data() {
     return {
       data: [],
-      valueC: [],
+      valueC: {},
       status: 'loading',
       mp_responses: {},
       mp_progress: 0,

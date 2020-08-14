@@ -24,7 +24,7 @@
     </div>
 
     <transition-group name="list" tag="div" mode="in-out">
-      <div v-for="(content, index) in contextReverse" :key="content['@id']+index" class="mt-3 mb-3">
+      <div v-for="(content, index) in contextReverse" :key="content['@id']+'f'+ index" class="mt-3 mb-3">
         <transition name="list" :key="'t'+content['@id']">
           <survey-item
             :key="'c' + content['@id']"
@@ -116,8 +116,6 @@ export default {
             Object.keys(this.responses).indexOf(c['@id']) > -1);
           if (!answered.length) {
             this.listShow = [this.initializeListShow()];
-            // eslint-disable-next-line
-              // console.log(92, this.listShow);
           } else {
             this.listShow = _.map(new Array(answered.length + 1), (c, i) => i);
             // eslint-disable-next-line
@@ -144,13 +142,10 @@ export default {
       // });
     },
     getScoring(responses) {
-      // console.log(225, 'responses', responses);
       const responseMapper = this.responseMapper(responses);
-      // console.log(227, 'response mapper', responseMapper);
       if (!_.isEmpty(this.activity['http://schema.repronim.org/compute'])) {
         const scoreMapper = {};
         _.map(this.activity['http://schema.repronim.org/compute'], (a) => {
-          // console.log(231, 'logic a', a);
           let scoreFormula = a['http://schema.repronim.org/jsExpression'][0]['@value'];
           const scoreVariableName = a['http://schema.repronim.org/variableName'][0]['@value'];
           if (_.isString(scoreFormula)) {
@@ -253,7 +248,7 @@ export default {
         wasAssociatedWith: {
           version: '0.0.1',
           url: uiUrl,
-          '@id': 'https://github.com/ReproNim/reproschema-ui'
+          '@id': 'https://github.com/ReproNim/reproschema-ui',
         },
         generated: `uuid:${responseUuid}`,
       };
@@ -398,20 +393,13 @@ export default {
     },
     nextActivity1() {
       const currentIndex = parseInt(this.$store.state.activityIndex);
-      let nextIndex = currentIndex + 1;
-      let remainingActivities = this.actVisibility.length - 1;
-      while (remainingActivities > 0) {
-        if (this.actVisibility[nextIndex]) {
-          if (this.$route.query.url) {
-            this.$router.push(`/activities/${nextIndex}?url=${this.$route.query.url}`);
-          } else {
-            this.$router.push(`/activities/${nextIndex}`);
-          }
-          // this.$router.push(`/activities/${nextIndex}`);
-          break;
-        }
-        nextIndex += 1;
-        remainingActivities -= 1;
+      // eslint-disable-next-line consistent-return
+      const visibleAct = _.map(this.actVisibility, (ac, key) => (ac === true ? key : '')).filter(String);
+      const nextIndex = visibleAct[visibleAct.indexOf(currentIndex) + 1];
+      if (this.$route.query.url) {
+        this.$router.push(`/activities/${nextIndex}?url=${this.$route.query.url}`);
+      } else {
+        this.$router.push(`/activities/${nextIndex}`);
       }
     },
   },
@@ -476,18 +464,12 @@ export default {
       return [{}];
     },
     shouldShow() {
-      // console.log(472, this.initializeListShow());
-      // console.log(463, this.visibility);
       return _.map(this.contextReverse, (o, index) => {
-        // console.log(454, 'list show', this.listShow, this.contextReverse.length, index);
         const criteria1 = this.listShow.indexOf(this.contextReverse.length - index - 1) >= 0;
-        // console.log(452, 'present in ui.order', o['@id'], criteria1);
         let criteria2 = true;
         if (!_.isEmpty(this.visibility)) {
           criteria2 = this.visibility[o['@id']];
         }
-        // console.log(457, 'vis condition', criteria2);
-        // console.log(458, 'should show? ', o['@id'], criteria1, criteria2, criteria1 && criteria2);
         return criteria1 && criteria2;
       });
     },

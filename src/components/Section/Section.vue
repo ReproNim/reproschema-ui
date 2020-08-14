@@ -139,7 +139,7 @@ export default {
             visibilityMapper[responseMapper[a[`${this.reprotermsUrl}variableName`][0]['@value']].ref] = val;
           }
         });
-        console.log(142, 'in section', visibilityMapper);
+        // console.log(142, 'in section', visibilityMapper);
         return visibilityMapper;
       }
       return {};
