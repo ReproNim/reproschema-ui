@@ -108,15 +108,17 @@ const mutations = {
     state.scores = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => ({}));
     state.activities = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => ({}));
     state.storeReady = true;
-    const landingPage = state.schema['http://schema.repronim.org/landingPage'];
-    const landingContents = landingPage.map(async (lc) => {
-      const landContent = {};
-      const resp = await axios.get(lc['@id']);
-      landContent['@language'] = lc['@language'];
-      landContent.content = resp.data;
-      return landContent;
-    });
-    state.landing = await Promise.all(landingContents);
+    if (state.schema['http://schema.repronim.org/landingPage']) {
+      const landingPage = state.schema['http://schema.repronim.org/landingPage'];
+      const landingContents = landingPage.map(async (lc) => {
+        const landContent = {};
+        const resp = await axios.get(lc['@id']);
+        landContent['@language'] = lc['@language'];
+        landContent.content = resp.data;
+        return landContent;
+      });
+      state.landing = await Promise.all(landingContents);
+    }
     // state.participantId = uuidv4();
   },
   // eslint-disable-next-line

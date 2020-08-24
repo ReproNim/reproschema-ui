@@ -9,7 +9,7 @@
       <!-- Sidebar -->
       <nav id="sidebar" v-bind:class="{'active':checkDisableBack}" ref="sidebar">
         <div class="sidebar-header">
-          <h4>{{ getPrefLabel }}</h4>
+          <h4>{{ sidebarHeader }}</h4>
         </div>
         <div>
           <select v-model="selected_language">
@@ -200,20 +200,30 @@ export default {
     getDisplayName(activityUrl) {
       if (!_.isEmpty(this.$store.state.schema)) {
         // console.log(197, this.$store.state.schema['http://schema.repronim.org/addProperties']);
+        let labelList = this.labelMap[activityUrl];
         if (this.$store.state.schema['http://schema.repronim.org/addProperties'][0]['http://www.w3.org/2004/02/skos/core#prefLabel']) {
           const addProperties = this.$store.state.schema['http://schema.repronim.org/addProperties'];
           const s = _.filter(addProperties, v1 => v1['http://schema.repronim.org/isAbout'][0]['@id'] === activityUrl);
           // console.log(152, s);
-          const dName = _.filter(s[0]['http://www.w3.org/2004/02/skos/core#prefLabel'], d => d['@language'] === this.selected_language);
+          labelList = s[0]['http://www.w3.org/2004/02/skos/core#prefLabel'];
+          const dName = _.filter(labelList, d => d['@language'] === this.selected_language);
           // console.log(154, dName);
           if (!Array.isArray(dName) || !dName.length) {
             // array does not exist, is not an array, or is empty
             // return display name corresponding to default language
-            return s[0]['http://www.w3.org/2004/02/skos/core#prefLabel'][0]['@value'];
+            return labelList[0]['@value'];
           }
           return dName[0]['@value'];
         }
-        return this.labelMap[activityUrl];
+        // console.log(216, this.labelMap[activityUrl]);
+        const dName = _.filter(labelList, d => d['@language'] === this.selected_language);
+        // console.log(154, dName);
+        if (!Array.isArray(dName) || !dName.length) {
+          // array does not exist, is not an array, or is empty
+          // return display name corresponding to default language
+          return labelList;
+        }
+        return dName[0]['@value'];
       } return '';
     },
     evaluateString(string, responseMapper) {
@@ -257,6 +267,21 @@ export default {
         return outMapper;
       }
       return {};
+    },
+    getPrefLabel() {
+      const baseSchema = this.$store.state.schema;
+      let sidebarHeader = _.filter(baseSchema['http://www.w3.org/2004/02/skos/core#prefLabel'], n => n['@language'] === this.selected_language);
+      if (!sidebarHeader.length) { // selected_language absent, return label in default language
+        sidebarHeader = baseSchema['http://www.w3.org/2004/02/skos/core#prefLabel'];
+      }
+      this.sidebarHeader = sidebarHeader[0]['@value']; // set sidebar header
+      if (this.schemaOrder) {
+        _.map(this.schemaOrder, (s) => {
+          jsonld.expand(s).then((resp) => {
+            this.labelMap[s] = resp[0]['http://www.w3.org/2004/02/skos/core#prefLabel'];
+          });
+        });
+      }
     },
     async computeVisibilityCondition(cond, index) {
       if (_.isObject(cond)) {
@@ -425,7 +450,8 @@ export default {
     if (url) {
       this.protocolUrl = url;
     }
-    this.$store.dispatch('getBaseSchema', url);
+    this.$store.dispatch('getBaseSchema', url).then(() => this.getPrefLabel());
+    // this.$store.dispatch('getBaseSchema', url);
   },
   mounted() {
     if (this.$route.query.lang) {
@@ -501,14 +527,15 @@ export default {
         return langList;
       } return [];
     },
-    getPrefLabel() {
-      if (!_.isEmpty(this.$store.state.schema)) {
-        const protocolLabel = _.filter(this.$store.state.schema['http://www.w3.org/2004/02/skos/core#prefLabel'], n => n['@language'] === this.selected_language);
-        if (protocolLabel) {
-          return protocolLabel[0]['@value'];
-        } return this.$store.state.schema['http://www.w3.org/2004/02/skos/core#prefLabel'][0]['@value']; // return label in default language
-      } return '';
-    },
+    // getPrefLabel() {
+    //   if (!_.isEmpty(this.$store.state.schema)) {
+    //     const preferredLabel = _.filter(this.$store.state.schema['http://www.w3.org/2004/02/skos/core#prefLabel'], n => n['@language'] === this.selected_language);
+    //     console.log(508, 'get label', preferredLabel);
+    //     if (preferredLabel) {
+    //       return preferredLabel[0]['@value'];
+    //     } return this.$store.state.schema['http://www.w3.org/2004/02/skos/core#prefLabel'][0]['@value']; // return label in default language
+    //   } return '';
+    // },
     allowExport() {
       if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema['http://schema.repronim.org/allow']) {
         const allowList = _.map(this.$store.state.schema['http://schema.repronim.org/allow'],
