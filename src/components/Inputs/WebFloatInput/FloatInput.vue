@@ -52,7 +52,7 @@ export default {
   },
   mounted() {
     if (this.init) {
-      this.input = this.init.value;
+      this.input = this.init;
     }
   },
 };

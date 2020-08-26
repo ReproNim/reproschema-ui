@@ -52,7 +52,8 @@ export default {
   },
   mounted() {
     if (this.init) {
-      this.input = this.init.value;
+      console.log(55, this.init);
+      this.input = this.init;
     }
   },
 };
