@@ -202,6 +202,7 @@ export default {
       e.preventDefault();
       this.hasRecording = false;
       this.isRecording = false;
+      navigator.mediaDevices.getUserMedia(this.audioConstraints).then(this.initialize, this.error);
     },
     initialize(audioStream) {
       this.mediaRecorder = new MediaStreamRecorder(audioStream);

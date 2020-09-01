@@ -22,14 +22,6 @@
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
-    <!-- If type is audioAutoRecord -->
-    <div v-else-if="inputType === 'audioAutoRecord'">
-      <AudioCheckRecord
-        :constraints="valueConstraints"
-        :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"/>
-    </div>
-
     <div v-else-if="inputType === 'audioCheck'">
       <AudioCheck
         :constraints="valueConstraints"
@@ -226,7 +218,6 @@ import MultiTextInput from '../Inputs/MultiTextInput';
 import SliderInput from '../Inputs/SliderInput';
 import TimeRange from '../Inputs/TimeRange';
 import SelectInput from '../Inputs/SelectInput';
-import AudioCheckRecord from '../Inputs/AudioCheckRecord';
 import AudioCheck from '../Inputs/AudioCheck';
 import StaticReadOnly from '../Inputs/StaticReadOnly';
 import SaveData from '../Inputs/SaveData/SaveData';
@@ -289,7 +280,6 @@ export default {
     SliderInput,
     TimeRange,
     SelectInput,
-    AudioCheckRecord,
     AudioCheck,
     StaticReadOnly,
     Static,
