@@ -70,7 +70,6 @@ export default {
     },
   },
   mounted() {
-    console.log(73, 'in select');
     if (this.init) {
       // console.log(74, this.init);
       if (Array.isArray(this.init)) {
@@ -78,13 +77,13 @@ export default {
         this.otherInput = this.init[1];
       } else this.selected = this.init;
     }
-    if (this.constraints['http://schema.org/itemListElement'].length > 1) { // if choices defined in schema
-      this.options = _.map(this.constraints['http://schema.org/itemListElement'], (v) => {
+    if (this.constraints['http://schema.repronim.org/choices'].length > 1) { // if choices defined in schema
+      this.options = _.map(this.constraints['http://schema.repronim.org/choices'], (v) => {
         const activeValueChoices = _.filter(v['http://schema.org/name'], ac => ac['@language'] === this.selected_language);
         return (activeValueChoices[0]['@value']);
       });
-    } else if (this.constraints['http://schema.org/itemListElement'].length === 1) { // choice list defined in external file
-      axios.get(this.constraints['http://schema.org/itemListElement'][0]['@value'])
+    } else if (this.constraints['http://schema.repronim.org/choices'].length === 1) { // choice list defined in external file
+      axios.get(this.constraints['http://schema.repronim.org/choices'][0]['@value'])
         .then((resp) => {
           if (this.inputType === 'selectCountry') {
             this.options = _.map(resp.data, c => c.country);
@@ -96,8 +95,7 @@ export default {
   },
   computed: {
     multipleAllowed() {
-      // console.log(93, 'here', this.constraints);
-      if (this.constraints[`${this.reprotermsUrl}multipleChoice`]) {
+      if (this.constraints['http://schema.repronim.org/multipleChoice']) {
         // console.log(94, this.constraints[this.reprotermsUrl+'multipleChoice']);
         return true;
       } return false;
