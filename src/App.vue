@@ -50,7 +50,6 @@
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
           <div class="container-fluid">
             <b-navbar-nav>
-              <b-button v-b-toggle.sidebar>Toggle Sidebar</b-button>
               <button @click="toggleSidebar"
                       type="button"
                       id="sidebarCollapse"
@@ -662,36 +661,18 @@ export default {
     max-width: 250px;
   }
 
-  /*@media screen and (min-width: 769px) {*/
-  /*  #sidebar {*/
-  /*    display: none;*/
-  /*  }*/
-  /*}*/
-
-  /*@media screen and (min-width: 1001px) {*/
-  /*  #sidebar {*/
-  /*    display:block ;*/
-  /*  }*/
-  /*}*/
-
-  @media (min-width: 768px) and (max-width: 1000px) {
-    .collapse {
-      display: none !important;
-    }
-  }
-
   #sidebar.active {
     margin-left: -250px;
   }
 
-  /*@media (max-width: 768px) {*/
-  /*  #sidebar {*/
-  /*    margin-left: -250px;*/
-  /*  }*/
-  /*  #sidebar.active {*/
-  /*    margin-left: 0;*/
-  /*  }*/
-  /*}*/
+  @media (max-width: 768px) {
+    #sidebar {
+      margin-left: -250px;
+    }
+    /*#sidebar.active {*/
+    /*  margin-left: 0;*/
+    /*}*/
+  }
 
   #sidebar {
     /* don't forget to add all the previously mentioned styles here too */
