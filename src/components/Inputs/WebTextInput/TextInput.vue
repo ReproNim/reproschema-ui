@@ -4,7 +4,7 @@
       <b-row>
         <b-col lg="4" class="col-4 col-md-4">
           <b-form-group>
-            <b-form-input type="text" v-model="input">
+            <b-form-input type="text" v-model="input1">
             </b-form-input>
           </b-form-group>
         </b-col>

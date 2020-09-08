@@ -669,9 +669,9 @@ export default {
     #sidebar {
       margin-left: -250px;
     }
-    #sidebar.active {
-      margin-left: 0;
-    }
+    /*#sidebar.active {*/
+    /*  margin-left: 0;*/
+    /*}*/
   }
 
   #sidebar {

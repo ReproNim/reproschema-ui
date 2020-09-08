@@ -253,6 +253,8 @@ export default {
       return {};
     },
     nextQuestion(idx, skip, dontKnow) {
+      document.body.scrollTop = 0; // For Safari
+      document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
       if (idx === 8 && this.responses[this.context[idx]['@id']] > 0) {
         // Trigger notification for non-zero suicidal ideation
         const notification = ' <i> If this is how you feel, think about getting help. </i><br> ' +
