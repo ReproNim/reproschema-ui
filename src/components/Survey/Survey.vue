@@ -161,6 +161,8 @@ export default {
       return {};
     },
     nextQuestion(idx, skip, dontKnow) {
+      document.body.scrollTop = 0; // For Safari
+      document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
       if (idx === 8 && (this.context[idx]['@id']).split('items/')[1] === 'phq9_9') {
         // console.log('idx and resp contxt id', idx, this.context);
         if (this.responses[this.context[idx]['@id']] > 0) {
@@ -212,6 +214,7 @@ export default {
         if (this.$store) {
           this.$store.dispatch('updateListShow', this.listShow);
         }
+
       }
     },
     computeNewShow(listShow) {
