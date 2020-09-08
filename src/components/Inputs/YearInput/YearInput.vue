@@ -51,7 +51,9 @@ export default {
   },
   mounted() {
     if (this.init) {
-      this.input = this.init;
+      if (this.inputType === 'year') {
+        this.input = new Date(this.init, 0, 365);
+      } else this.input = this.init;
     }
   },
 };
