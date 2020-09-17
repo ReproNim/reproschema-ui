@@ -746,4 +746,9 @@ export default {
   .navbar-brand {
     font-size: 1.75rem;
   }
+
+  a:not([href]):not([tabindex]) {
+    color: inherit;
+    text-decoration: none;
+  }
 </style>
