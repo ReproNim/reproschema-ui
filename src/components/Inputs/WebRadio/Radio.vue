@@ -7,6 +7,7 @@
             v-model="checkboxSelected"
             :options="options"
             stacked
+            plain
             class="text-left"
             ref="checkboxbutton"
           ></b-form-checkbox-group>
