@@ -751,4 +751,10 @@ export default {
     color: inherit;
     text-decoration: none;
   }
+
+  /* fix for blue border box around checkbox and radio */
+  *, ::after, ::before {
+    outline: none;
+    box-shadow: none;
+  }
 </style>
