@@ -94,75 +94,6 @@ export default {
     },
   },
   methods: {
-    startCheck() {
-      this.isRecording = true;
-      this.mediaRecorder.start(this.recordingTime);
-      this.interval = setInterval(this.countdown, 1000);
-      this.audioCheck();
-    },
-    audioCheck() {
-      if (navigator.mediaDevices.getUserMedia) {
-        this.supported = true;
-        navigator.mediaDevices.getUserMedia({ audio: true, video: false })
-          .then((stream) => {
-            this.mediaRecorder = new MediaStreamRecorder(stream);
-            this.mediaRecorder.mimeType = 'audio/wav'; // check this line for audio/wav
-            this.timeRemaining = this.recordingTime / 1000; // schema:maxValue
-            window.mediaRecorder = this.mediaRecorder;
-            const self = this;
-            this.mediaRecorder.ondataavailable = (e) => {
-              const blobURL = URL.createObjectURL(e);
-              self.recording.src = blobURL;
-              self.recording.blob = e;
-              self.stop();
-            };
-            // this.mediaRecorder.start(this.recordingTime);
-            // this.interval = setInterval(this.countdown, 1000);
-
-            // check audio level
-            const audioContext = new AudioContext();
-            const analyser = audioContext.createAnalyser();
-            const microphone = audioContext.createMediaStreamSource(stream);
-            const javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
-
-            analyser.smoothingTimeConstant = 0.8;
-            analyser.fftSize = 1024;
-
-            microphone.connect(analyser);
-            analyser.connect(javascriptNode);
-            javascriptNode.connect(audioContext.destination);
-            javascriptNode.onaudioprocess = function () {
-              const array = new Uint8Array(analyser.frequencyBinCount);
-              analyser.getByteFrequencyData(array);
-              let values = 0;
-
-              const length = array.length;
-              for (let i = 0; i < length; i += 1) {
-                values += (array[i]);
-              }
-              const average = values / length;
-
-              // console.log(77, Math.round(average));
-              const allPids = document.getElementsByClassName('pid');
-              const amoutOfPids = Math.round(average / 10);
-              for (let i = 0; i < allPids.length; i += 1) {
-                allPids[i].style.backgroundColor = '#e6e7e8';
-              }
-
-              if (amoutOfPids <= allPids.length) {
-                for (let i = 0; i < amoutOfPids; i += 1) {
-                  allPids[i].style.backgroundColor = '#69ce2b';
-                }
-              }
-            };
-          })
-          // eslint-disable-next-line no-unused-vars
-          .catch((err) => {
-            /* handle the error */
-            this.supported = false;
-          });
-      }
-    },
     record() {
       this.isRecording = true;
       this.mediaRecorder.start(this.recordingTime);
@@ -219,17 +150,17 @@ export default {
 
       // check audio level
       const audioContext = new AudioContext();
-      const analyser = audioContext.createAnalyser();
-      const microphone = audioContext.createMediaStreamSource(audioStream);
-      const javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
+      const analyser = this.audioCtx.createAnalyser();
+      const microphone = this.audioCtx.createMediaStreamSource(audioStream);
+      const scriptNode = this.audioCtx.createScriptProcessor(2048, 1, 1);
 
       analyser.smoothingTimeConstant = 0.8;
       analyser.fftSize = 1024;
 
       microphone.connect(analyser);
-      analyser.connect(javascriptNode);
-      javascriptNode.connect(audioContext.destination);
-      javascriptNode.onaudioprocess = function () {
+      analyser.connect(scriptNode);
+      scriptNode.connect(this.audioCtx.destination);
+      scriptNode.onaudioprocess = () => {
         const array = new Uint8Array(analyser.frequencyBinCount);
         analyser.getByteFrequencyData(array);
         let values = 0;
@@ -267,6 +198,36 @@ export default {
   mounted() {
     this.recording = new Audio();
     this.recording.onended = this.endPlay;
+
+    // Older browsers might not implement mediaDevices at all, so we set an empty object first
+    if (navigator.mediaDevices === undefined) {
+      navigator.mediaDevices = {};
+    }
+
+    // Some browsers partially implement mediaDevices. We can't just assign an object
+    // with getUserMedia as it would overwrite existing properties.
+    // Here, we will just add the getUserMedia property if it's missing.
+    if (navigator.mediaDevices.getUserMedia === undefined) {
+      navigator.mediaDevices.getUserMedia = (constraints) => {
+        // First get ahold of the legacy getUserMedia, if present
+        const getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia
+          || navigator.msGetUserMedia;
+
+        // Some browsers just don't implement it - return a rejected promise with an error
+        // to keep a consistent interface
+        if (!getUserMedia) {
+          return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+        }
+
+        // Otherwise, wrap the call to the old navigator.getUserMedia with a Promise
+        return new Promise(((resolve, reject) => {
+          getUserMedia.call(navigator, constraints, resolve, reject);
+        }));
+      };
+    }
+
+    // set up forked web audio context, for multiple browsers
+    // window. is needed otherwise Safari explodes
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     this.audioCtx = new AudioContext();
     if (navigator.mediaDevices.getUserMedia) {
