@@ -216,6 +216,7 @@ export default {
         // Some browsers just don't implement it - return a rejected promise with an error
         // to keep a consistent interface
         if (!getUserMedia) {
+          this.supported = false;
           return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
         }
 
