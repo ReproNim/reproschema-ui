@@ -1,10 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import _ from 'lodash';
-import { v4 as uuidv4 } from 'uuid';
 import jsonld from 'jsonld/dist/jsonld.min';
 import config from '../config';
-// eslint-disable-next-line import/first
 import axios from 'axios';
 
 window.jsonld = jsonld;
