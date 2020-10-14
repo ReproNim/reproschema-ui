@@ -1,3 +1,5 @@
+const config = require('./src/config');
+
 module.exports = {
   chainWebpack: config => {
     config.module
@@ -22,5 +24,5 @@ module.exports = {
       });
   },
   lintOnSave: process.env.NODE_ENV !== 'production',
-  publicPath: process.env.NODE_ENV === "production" ? "/schema-ui/" : "/"
+  publicPath: process.env.NODE_ENV === "production" ? config.assetsPublicPath : "/"
 };
