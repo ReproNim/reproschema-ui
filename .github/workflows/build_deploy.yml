@@ -31,7 +31,7 @@ jobs:
     - name: Run a multi-line script
       run: |
         npm install
-        npm run build
+        npm run build --fix
         touch dist/.nojekyll
 
     - name: Deploy 🚀
