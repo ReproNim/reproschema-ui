@@ -465,7 +465,7 @@ export default {
     if (this.$route.params.id) {
       this.$store.dispatch('setActivityIndex', this.$route.params.id);
     }
-    axios.get('https://raw.githubusercontent.com/ReproNim/reproschema-library /master/resources/languages.json').then((resp) => {
+    axios.get('https://raw.githubusercontent.com/ReproNim/reproschema-library/master/resources/languages.json').then((resp) => {
       this.langMap = resp.data;
     });
     this.$store.dispatch('setParticipantUUID', uuidv4()); // set participant UUID for the current user
@@ -527,15 +527,6 @@ export default {
         return langList;
       } return [];
     },
-    // getPrefLabel() {
-    //   if (!_.isEmpty(this.$store.state.schema)) {
-    //     const preferredLabel = _.filter(this.$store.state.schema['http://www.w3.org/2004/02/skos/core#prefLabel'], n => n['@language'] === this.selected_language);
-    //     console.log(508, 'get label', preferredLabel);
-    //     if (preferredLabel) {
-    //       return preferredLabel[0]['@value'];
-    //     } return this.$store.state.schema['http://www.w3.org/2004/02/skos/core#prefLabel'][0]['@value']; // return label in default language
-    //   } return '';
-    // },
     allowExport() {
       if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema['http://schema.repronim.org/allow']) {
         const allowList = _.map(this.$store.state.schema['http://schema.repronim.org/allow'],

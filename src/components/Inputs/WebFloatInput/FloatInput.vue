@@ -4,7 +4,7 @@
       <b-row>
         <b-col lg="4" class="col-4 col-md-4">
           <b-form-group>
-            <b-form-input ref="floatInput" v-model="input"
+            <b-form-input ref="floatInput" v-model="input1"
                           :class="{'is-invalid': !isValidFloat, 'is-valid': isValidFloat}">
             </b-form-input>
             <div class="invalid-feedback">
@@ -75,7 +75,7 @@ export default {
         if (this.hasUnit) { // send value + unit
           const name = { value: this.input1, unitCode: this.input2 };
           this.$emit('valueChanged', name);
-        } this.$emit('valueChanged', this.input1);
+        } else this.$emit('valueChanged', this.input1);
       }
     },
     isValid() {
@@ -86,21 +86,41 @@ export default {
       }
       return Number.isFinite(num);
     },
+    selectedLanguageLabel(unit) {
+      const activeUnitOption = _.filter(unit['http://www.w3.org/2004/02/skos/core#prefLabel'], u => u['@language'] === this.selected_language);
+      if (!Array.isArray(activeUnitOption) || !activeUnitOption.length) {
+        // array does not exist, is not an array, or empty - when selected_language string absent
+        return unit['http://www.w3.org/2004/02/skos/core#prefLabel'][0]['@value'];
+      } else {
+        return activeUnitOption[0]['@value'];
+      }
+    }
   },
   computed: {
     isValidFloat() {
       return this.isValid(this.input1);
     },
     hasUnit() {
-      if (this.constraints['http://schema.org/unitCode']) {
+      if (this.constraints['http://schema.org/unitCode'] || this.constraints["http://schema.repronim.org/unitOptions"]) {
         return true;
       } return false;
     },
     options() {
-      if (this.constraints['http://schema.org/unitCode'].length > 1) {
-        return _.map(this.constraints['http://schema.org/unitCode'], unit => unit['@value']);
-      } else if (this.constraints['http://schema.org/unitCode'].length === 1) {
-        return this.constraints['http://schema.org/unitCode'][0]['@value'];
+      if (this.constraints['http://schema.org/unitCode']) {
+        if (this.constraints['http://schema.org/unitCode'].length > 1) {
+          return _.map(this.constraints['http://schema.org/unitCode'], unit => unit['@value']);
+        } else if (this.constraints['http://schema.org/unitCode'].length === 1) {
+          return this.constraints['http://schema.org/unitCode'][0]['@value'];
+        }
+      }
+      else if (this.constraints["http://schema.repronim.org/unitOptions"]) {
+        if (this.constraints['http://schema.repronim.org/unitOptions'].length > 1) {
+          return _.map(this.constraints['http://schema.repronim.org/unitOptions'], unit => {
+            return this.selectedLanguageLabel(unit);
+          });
+        } else if (this.constraints['http://schema.repronim.org/unitOptions'].length === 1) {
+          return this.selectedLanguageLabel(this.constraints['http://schema.repronim.org/unitOptions'][0])
+        }
       } return ''; // no unit present
     },
   },
