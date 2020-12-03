@@ -63,6 +63,10 @@ const getters = {
   getAnsweredLanguage(state) {
     return state.answeredLanguage;
   },
+  // eslint-disable-next-line
+  getProtocolSchema(state) {
+    return state.schema;
+  },
 };
 
 const mutations = {

@@ -55,6 +55,9 @@ export default {
     serverUrl() {
       return config.backendServer;
     },
+    participantId() {
+      return this.$store.getters.getParticipantId;
+    },
   },
   methods: {
     finish() {
@@ -139,7 +142,7 @@ export default {
       // });
       jszip.generateAsync({ type: 'blob' })
         .then((myzipfile) => {
-          const fileName = `study-data-${uuidv4()}.zip`;
+          const fileName = `${uuidv4()}-${this.participantId}.zip`;
           const formData = new FormData();
           formData.append('file', myzipfile, fileName);
           formData.append('auth_token', `${TOKEN}`);

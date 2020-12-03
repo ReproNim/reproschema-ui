@@ -5,11 +5,6 @@
       <!-- <Loader /> -->
     </div>
     <div v-else>
-      <transition name="list" tag="div" mode="in-out">
-        <div v-if="progress === 100" class="mt-3 mb-3">
-          Thanks!
-        </div>
-      </transition>
       <!-- <b-progress :value="progress" :max="100" class="mb-3"></b-progress> -->
       <div v-if="preambleText" class="preamble-text mb-2">
         <strong> {{ preambleText }} </strong>
@@ -189,14 +184,12 @@ export default {
     },
     updateProgress() {
       let totalQ = this.context.length;
-      console.log(191, this.context.length);
       // TODO: add back branching logic to this.
       if (!_.isEmpty(this.visibility)) {
         totalQ = _.filter(this.visibility).length;
         console.log()
       }
       const progress = ((Object.keys(this.responses).length) / totalQ) * 100;
-      console.log(196, totalQ, progress);
       this.$emit('updateProgress', progress);
       if (progress === 100) {
         this.$emit('valueChanged', this.responses);
@@ -252,21 +245,47 @@ export default {
       }
       return {};
     },
-    nextQuestion(idx, skip, dontKnow) {
-      document.body.scrollTop = 0; // For Safari
-      document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+    checkAlertMessage(idx) {
+      // final setting should be a combination of all four [activity (add, override), protocol(add, override)] (if present)
+      // protocol overrides activity
+      const protocolSchema = this.$store.getters.getProtocolSchema;
+      console.log(257, protocolSchema);
+      let flag = 0;
+      if (!flag && protocolSchema['http://schema.repronim.org/overrideProperties']) { // priority 1
+        console.log(259, 'priority 1');
+      } else if (!flag && protocolSchema['http://schema.repronim.org/addProperties']) { // priority 2
+        let addP = _.filter(protocolSchema['http://schema.repronim.org/addProperties'], c => {
+          // console.log(263, c['http://schema.repronim.org/isAbout'][0]['@id'], this.context[idx]['@id']);
+          c['http://schema.repronim.org/isAbout'][0]['@id'] === this.context[idx]['@id'];
+        });
+        flag = addP.length ? 1: 0;
+        console.log(265, 'priority 2', this.context[idx]['@id'], addP, flag);
+      } if (!flag && this.activity['http://schema.repronim.org/overrideProperties']) { // priority 3
+        console.log(268, 'priority 3');
+      } else { // priority 4 - look in activity addProperties
+        let addPA = _.filter(this.activity['http://schema.repronim.org/addProperties'], c =>
+          //console.log(271, c['http://schema.repronim.org/isAbout'][0]['@id'], this.context[idx]['@id']);
+          (c['http://schema.repronim.org/isAbout'][0]['@id'] === this.context[idx]['@id']) && c['http://schema.repronim.org/message']
+        );
+        console.log(274, 'priority 4', addPA);
+      }
       if (idx === 8 && this.responses[this.context[idx]['@id']] > 0) {
         // Trigger notification for non-zero suicidal ideation
         const notification = ' <i> If this is how you feel, think about getting help. </i><br> ' +
-            'There are people who can help 24/7 <br>' +
-            'Text the Crisis Text Line at 741741 <br>' +
-            'Or<br>' +
-            'Call the National Suicide Prevention Lifeline at 1-800-273-8255';
+                'There are people who can help 24/7 <br>' +
+                'Text the Crisis Text Line at 741741 <br>' +
+                'Or<br>' +
+                'Call the National Suicide Prevention Lifeline at 1-800-273-8255';
         const options = {
           html: true,
         };
         this.$dialog.alert(notification, options);
       }
+    },
+    nextQuestion(idx, skip, dontKnow) {
+      document.body.scrollTop = 0; // For Safari
+      document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+      this.checkAlertMessage(idx);
       if (skip) {
         this.setResponse('skipped', idx);
       }
