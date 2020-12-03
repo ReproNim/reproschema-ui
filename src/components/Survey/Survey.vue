@@ -19,7 +19,7 @@
       <br>
       <b-progress :value="progress" :max="100" class="mb-3"></b-progress>
       <div v-if="preambleText" class="preamble-text">
-        <strong> {{ preambleText }} </strong>
+        <strong v-html="preambleText">{{ preambleText }}</strong>
       </div>
     </div>
 
@@ -551,8 +551,6 @@ export default {
   },
   mounted() {
       if (this.srcUrl) {
-        // eslint-disable-next-line
-        // console.log(46, this.srcUrl);
         this.getData();
       }
       const d = new Date();
