@@ -30,6 +30,7 @@
     "vuex": "^3.4.0"
   },
   "devDependencies": {
+    "@applitools/eyes.cypress": "^3.4.11",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-e2e-cypress": "^4.5.7",
     "@vue/cli-plugin-eslint": "~4.5.0",
