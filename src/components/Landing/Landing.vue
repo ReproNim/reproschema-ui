@@ -6,7 +6,7 @@
     </section>
     <Loader v-else/>
     <p class="button-para">
-      <button class="join-button" @click="doNext">{{ startButton }}</button>
+      <button class="join-button" @click="doNext">{{ $t('join-button') }}</button>
     </p>
   </div>
 </template>
@@ -20,9 +20,6 @@ import config from '../../config';
 export default {
   name: 'Landing',
   props: {
-    startButton: {
-      type: String,
-    },
     selected_language: {
       type: String,
     },
