@@ -138,7 +138,6 @@ export default {
   },
   methods: {
     setLang(event) {
-      console.log(141, event.target.value);
       i18n.locale = event.target.value;
     },
     toggleSidebar() {
@@ -480,7 +479,6 @@ export default {
     if (this.$route.query.auth_token) {
       this.$store.dispatch('setAuthToken', this.$route.query.auth_token);
     }
-    console.log(483, config.startButton);
   },
   computed: {
     getschemaType() {
