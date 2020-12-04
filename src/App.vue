@@ -2,7 +2,7 @@
   <div id="app" class="">
     <nav class="navbar sticky-top navbar-custom">
       <b-navbar-nav class="navbar-brand">
-        <b-nav-text>{{ banner }}</b-nav-text>
+        <b-nav-text>{{ $t('banner-message') }}</b-nav-text>
       </b-navbar-nav>
     </nav>
     <div class="wrapper">
@@ -40,7 +40,7 @@
         </ul>
         <div>
           <b-button v-if="allowExport" class="align-middle" @click="downloadZipData"
-                    :disabled="!isAnswered">Export</b-button>
+                    :disabled="!isAnswered">{{ $t('export-button')}}</b-button>
         </div>
       </nav>
 
@@ -59,7 +59,7 @@
             </b-navbar-nav>
 
             <b-navbar-nav class="float-right">
-              <b-nav-item :to="{name: 'Landing', query: $route.query}" exact>Home</b-nav-item>
+              <b-nav-item :to="{name: 'Landing', query: $route.query}" exact>{{ $t('home-button')}}</b-nav-item>
             </b-navbar-nav>
           </div>
         </nav>
@@ -131,8 +131,8 @@ export default {
       clientIp: '',
       reproterms2: '',
       protocolUrl: config.githubSrc,
-      banner: config.banner,
       content: {},
+      startButton: config.startButton
       // responses: [],
     };
   },
@@ -480,6 +480,7 @@ export default {
     if (this.$route.query.auth_token) {
       this.$store.dispatch('setAuthToken', this.$route.query.auth_token);
     }
+    console.log(483, config.startButton);
   },
   computed: {
     getschemaType() {
