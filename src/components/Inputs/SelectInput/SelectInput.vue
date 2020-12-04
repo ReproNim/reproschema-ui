@@ -14,7 +14,7 @@
                  :limit="5" :limit-text="limitText" :max-height="600"
                  :show-no-results="false" :hide-selected="true"
                  @input="checkNotOtherAndSendData">
-      <span slot="noResult">Oops! No elements found. Consider changing the search query.</span>
+      <span slot="noResult">{{ $t('select-invalid-query')}}</span>
     </multiselect>
     <div v-if="checkOther" id="ifOther" style="display: block;">
       <br><b-form-input v-model="otherInput" placeholder="Please describe" @change="sendData">

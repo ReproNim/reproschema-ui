@@ -4,13 +4,13 @@
       <div v-if="serverUrl">
         <p>Please save your data now.</p>
         <b-button @click="record" variant="danger">
-          Upload
+          {{ $t('upload-button')}}
         </b-button>
       </div>
       <div v-else>
         <p>You can click the "Export" button on sidebar if you wish to save your data. Click below to finish.</p>
         <b-button @click="finish" variant="danger">
-          Finish
+          {{ $t('finish-button')}}
         </b-button>
       </div>
     </div>
