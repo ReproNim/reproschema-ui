@@ -23,5 +23,7 @@
   "invalid-feedback-number": "Please enter a number",
   "input-selector-alert": "This item does not have a title defined",
   "loader": "Loading",
-  "review-and-next": "Please review your responses, then click \"Next\" below:"
+  "review-and-next": "Please review your responses, then click \"Next\" below:",
+  "save-data": "Please save your data now.",
+  "export-and-finish": "You can click the \"Export\" button on sidebar if you wish to save your data. Click below to finish."
 }

@@ -2,13 +2,13 @@
   <div class="SaveData ml-3 mr-3 pl-3 pr-3">
     <div v-if="!isUploading && !hasData">
       <div v-if="serverUrl">
-        <p>Please save your data now.</p>
+        <p>{{ $t('save-data')}}</p>
         <b-button @click="record" variant="danger">
           {{ $t('upload-button')}}
         </b-button>
       </div>
       <div v-else>
-        <p>You can click the "Export" button on sidebar if you wish to save your data. Click below to finish.</p>
+        <p>{{ $t('export-and-finish')}}</p>
         <b-button @click="finish" variant="danger">
           {{ $t('finish-button')}}
         </b-button>
