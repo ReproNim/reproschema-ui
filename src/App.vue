@@ -19,7 +19,6 @@
               {{option.text}}
             </option>
           </select>
-            <p>{{ $t('hello') }}</p>
         </div>
         <ul class="list-unstyled components">
           <!-- <p>Dummy Heading</p> -->
