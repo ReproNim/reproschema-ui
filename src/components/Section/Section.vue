@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="!listShow.length">
-      <h1 >Loading...</h1>
+      <h1 >{{ $t('loader')}}...</h1>
       <!-- <Loader /> -->
     </div>
     <div v-else>

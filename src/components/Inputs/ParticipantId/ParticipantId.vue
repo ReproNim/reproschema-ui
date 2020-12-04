@@ -5,7 +5,7 @@
         <b-form-input v-model="input">
         </b-form-input>
       </b-form-group>
-      <b-btn type="submit">Submit</b-btn>
+      <b-btn type="submit">{{ $t('submit-button')}}</b-btn>
     </b-form>
   </div>
 </template>

@@ -8,7 +8,7 @@
                           :class="{'is-invalid': !isValidInt, 'is-valid': isValidInt}">
             </b-form-input>
             <div class="invalid-feedback">
-              Please enter an integer
+              {{ $t('invalid-feedback-number')}}
             </div>
           </b-form-group>
         </b-col>
@@ -22,7 +22,7 @@
           <p class="singleUnit"> {{ options }}</p>
         </div>
       </b-row>
-      <b-btn type="submit">Submit</b-btn>
+      <b-btn type="submit">{{ $t('submit-button')}}</b-btn>
     </b-form>
   </div>
 </template>

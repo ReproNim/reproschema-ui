@@ -18,7 +18,7 @@
           <p class="singleUnit"> {{ options }}</p>
         </div>
       </b-row>
-      <b-btn type="submit">Submit</b-btn>
+      <b-btn type="submit">{{ $t('submit-button')}}</b-btn>
     </b-form>
   </div>
 </template>

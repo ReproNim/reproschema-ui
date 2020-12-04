@@ -10,7 +10,7 @@
     </div>
 
     <b-alert variant="danger" show v-else>
-      This item does not have a title defined
+      {{ $t('input-selector-alert')}}
     </b-alert>
 
     <!-- If type is radio -->

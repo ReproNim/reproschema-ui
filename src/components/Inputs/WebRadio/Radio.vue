@@ -12,7 +12,7 @@
             ref="checkboxbutton"
           ></b-form-checkbox-group>
         </b-form-group>
-        <b-btn type="submit">Submit</b-btn>
+        <b-btn type="submit">{{ $t('submit-button')}}</b-btn>
       </b-form>
     </div>
     <div v-else>

@@ -1,9 +1,9 @@
 <template>
   <div>
-    <b-alert :show="!supported">Oh no, your browser doesn't support audio</b-alert>
+    <b-alert :show="!supported">{{ $t('audio-support-msg')}}</b-alert>
     <div v-if="supported">
       <b-button v-if="!isRecording && !hasRecording" @click="record" variant="danger">
-        Start
+        {{ $t('start-button') }}
       </b-button>
       <div v-if="isRecording" class="container-fluid">
         <div class="pids-wrapper">
@@ -21,22 +21,22 @@
       </div>
 <!--      <b-button v-if="isRecording" @click="stop">stop</b-button>-->
       <div v-if="isRecording">
-        <small>{{timeRemaining}} seconds left</small>
+        <small>{{timeRemaining}} {{ $t('x-seconds-left') }}</small>
       </div>
       <b-button variant="success" v-if="hasRecording && !isPlaying" @click="play" ref="play">
-        <span> play </span>
+        <span> {{ $t('play-button') }} </span>
       </b-button>
     </div>
     <b-button variant="secondary"
                 v-if="hasRecording && isPlaying" @click="pause" ref="play">
-        <span> pause </span>
+        <span> {{ $t('pause-button') }} </span>
       </b-button>
 
     <div v-if="hasRecording" class="mt-2">
-        <a href="" @click="reset">Redo recording</a>
+        <a href="" @click="reset">{{ $t('redo-recording') }}</a>
       </div>
     <div v-if="hasRecording" class="mt-2">
-        <a href="" @click="saveAndContinue">Continue</a>
+        <a href="" @click="saveAndContinue">{{ $t('continue') }}</a>
       </div>
   </div>
 </template>

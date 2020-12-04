@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-alert :show="!supported">Oh no, your browser doesn't support audio</b-alert>
+    <b-alert :show="!supported">{{ $t('audio-support-msg')}}</b-alert>
     <div v-if="supported">
       <div v-if="mode==='audioImageRecord'" class="mb-3">
         <img class="img-fluid" :src="fieldData['http://schema.org/image'][0]['@id']" />
@@ -9,23 +9,23 @@
         <strong style="font-size:30px">{{ generateNumber }}</strong>
       </div>
       <b-button v-if="!isRecording && !hasRecording" @click="record" variant="danger">
-        record
+        {{ $t('record-button')}}
       </b-button>
-      <b-button v-if="isRecording" @click="finish">stop</b-button>
+      <b-button v-if="isRecording" @click="finish">{{ $t('stop-button') }}</b-button>
       <div v-if="isRecording">
-        <small>{{timeRemaining}} seconds left</small>
+        <small>{{timeRemaining}} {{ $t('x-seconds-left')}}</small>
       </div>
       <b-button variant="success" v-if="hasRecording && !isPlaying" @click="play" ref="play">
-        <span> play </span>
+        <span> {{ $t('play-button') }} </span>
       </b-button>
 
       <b-button variant="secondary"
       v-if="hasRecording && isPlaying" @click="pause" ref="play">
-        <span> pause </span>
+        <span> {{ $t('pause-button') }} </span>
       </b-button>
 
       <div v-if="hasRecording" class="mt-2">
-        <a href="" @click="reset">Redo recording</a>
+        <a href="" @click="reset">{{ $t('redo-recording') }}</a>
       </div>
     </div>
   </div>

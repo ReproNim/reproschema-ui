@@ -12,13 +12,14 @@
           <h4>{{ sidebarHeader }}</h4>
         </div>
         <div>
-          <select v-model="selected_language">
+          <select v-model="selected_language" @change="setLang($event)">
             <option disabled value="">Select Language</option>
             <option v-for="option in languageOptions" v-bind:value="option.value"
             :key="option.text">
               {{option.text}}
             </option>
           </select>
+            <p>{{ $t('hello') }}</p>
         </div>
         <ul class="list-unstyled components">
           <!-- <p>Dummy Heading</p> -->
@@ -99,6 +100,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import circleProgress from './components/Circle/';
 import config from './config';
+import i18n from './i18n';
 
 Vue.use(BootstrapVue);
 Vue.filter('reverse', value => value.slice().reverse());
@@ -136,6 +138,10 @@ export default {
     };
   },
   methods: {
+    setLang(event) {
+      console.log(141, event.target.value);
+      i18n.locale = event.target.value;
+    },
     toggleSidebar() {
       if (this.$refs.sidebar.className.indexOf('active') < 0) {
         this.$refs.sidebar.className = 'active';

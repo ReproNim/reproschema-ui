@@ -6,10 +6,10 @@
                       :class="{'is-invalid': !isValidEmail, 'is-valid': isValidEmail}">
         </b-form-input>
         <div class="invalid-feedback">
-          Invalid Email Address
+          {{ $t('invalid-email')}}
         </div>
       </b-form-group>
-      <b-btn type="submit">Submit</b-btn>
+      <b-btn type="submit">{{ $t('submit-button')}}</b-btn>
     </b-form>
   </div>
 </template>
