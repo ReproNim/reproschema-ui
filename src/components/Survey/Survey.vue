@@ -5,7 +5,7 @@
       <Loader />
     </div>
     <div v-else>
-      <div v-if="complete && autoAdvance">
+      <div class="text-center" v-if="complete && autoAdvance">
         <div v-if="isVis">
           <p v-if="currentActivityIndex < listShow.length">
             {{ $t('review-and-next')}}</p>

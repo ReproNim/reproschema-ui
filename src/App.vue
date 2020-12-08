@@ -473,8 +473,8 @@ export default {
       this.langMap = resp.data;
     });
     this.$store.dispatch('setParticipantUUID', uuidv4()); // set participant UUID for the current user
-    if (this.$route.query.expiry_minutes) {
-      this.$store.dispatch('setExpiryMinutes', this.$route.query.expiry_minutes);
+    if (this.$route.query.expiry_time) {
+      this.$store.dispatch('setExpiryMinutes', this.$route.query.expiry_time);
     }
     if (this.$route.query.auth_token) {
       this.$store.dispatch('setAuthToken', this.$route.query.auth_token);
@@ -632,12 +632,12 @@ export default {
 </script>
 
 <style>
-  #app {
-    font-family: 'Avenir', Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    color: #2c3e50;
-  }
+  /*#app {*/
+  /*  font-family: 'Avenir', Helvetica, Arial, sans-serif;*/
+  /*  -webkit-font-smoothing: antialiased;*/
+  /*  -moz-osx-font-smoothing: grayscale;*/
+  /*  color: #2c3e50;*/
+  /*}*/
 
   #content {
     width: 100%;
@@ -750,9 +750,10 @@ export default {
     text-decoration: none;
   }
 
-  /* fix for blue border box around checkbox and radio */
-  *, ::after, ::before {
-    outline: none;
-    box-shadow: none;
-  }
+  /*!* fix for blue border box around checkbox and radio *!*/
+  /**, ::after, ::before {*/
+  /*  outline: none;*/
+  /*  box-shadow: none;*/
+  /*}*/
+
 </style>
