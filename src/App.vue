@@ -482,7 +482,6 @@ export default {
     if (!_.isEmpty(this.$route.query)) {
         this.$store.dispatch('setQueryParameters', this.$route.query);
     }
-    console.log(482, _.isEmpty(this.$route.query));
   },
   computed: {
     getschemaType() {
@@ -539,8 +538,10 @@ export default {
       if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema['http://schema.repronim.org/allow']) {
         const allowList = _.map(this.$store.state.schema['http://schema.repronim.org/allow'],
           u => u['@id']);
+        this.$store.dispatch('setExport', allowList.includes('http://schema.repronim.org/AllowExport'));
         return allowList.includes('http://schema.repronim.org/AllowExport');
       }
+      this.$store.dispatch('setExport', false);
       return false;
     },
     schemaNameMapper() {

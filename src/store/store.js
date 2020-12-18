@@ -27,6 +27,7 @@ const state = {
   queryParams: {},
   token: null,
   landing: [],
+  hasExport: false
 };
 
 const getters = {
@@ -71,6 +72,14 @@ const getters = {
   // eslint-disable-next-line
   getQueryParameters(state) {
     return state.queryParams;
+  },
+  // eslint-disable-next-line
+  getAuthToken(state) {
+    return state.token;
+  },
+  // eslint-disable-next-line
+  getHasExport(state) {
+    return state.hasExport;
   }
 };
 
@@ -203,6 +212,10 @@ const mutations = {
     state.responses[actIndex] = {};
     state.progress[actIndex] = 0;
   },
+  // eslint-disable-next-line
+  setExport(state, value) {
+    state.hasExport = value;
+  },
 };
 
 const actions = {
@@ -254,6 +267,9 @@ const actions = {
   },
   setQueryParameters({ commit }, queryParams) {
     commit('setQueryParameters', queryParams);
+  },
+  setExport({ commit }, value) {
+    commit('setExport', value);
   }
 };
 
