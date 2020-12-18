@@ -1,14 +1,15 @@
 <template>
   <div class="SaveData ml-3 mr-3 pl-3 pr-3">
     <div v-if="!isUploading && !hasData">
-      <div v-if="serverUrl">
+      <div v-if="shouldUpload">
         <p>{{ $t('save-data')}}</p>
-        <b-button @click="record" variant="danger">
+        <b-button @click="upload" variant="danger">
           {{ $t('upload-button')}}
         </b-button>
       </div>
       <div v-else>
-        <p>{{ $t('export-and-finish')}}</p>
+        <p v-if="exportOption">{{ $t('export-and-finish')}}</p>
+        <p v-else>{{ $t('finish')}}</p>
         <b-button @click="finish" variant="danger">
           {{ $t('finish-button')}}
         </b-button>
@@ -53,19 +54,22 @@ export default {
     };
   },
   computed: {
-    serverUrl() {
-      return config.backendServer;
+    shouldUpload() {
+      return !!(config.backendServer && this.$store.getters.getAuthToken);
     },
     participantId() {
       return this.$store.getters.getParticipantId;
     },
+    exportOption() {
+      return this.$store.getters.getHasExport;
+    }
   },
   methods: {
     finish() {
       this.hasData = true;
       this.$emit('valueChanged', 'completed');
     },
-    record() {
+    upload() {
       this.isUploading = true;
       this.uploadZipData();
     },
@@ -77,7 +81,7 @@ export default {
       this.formatData(totalResponse);
     },
     formatData(data) {
-      const TOKEN = this.$store.state.token;
+      const TOKEN = this.$store.getters.getAuthToken;
       const expiryMinutes = this.$store.state.expiryMinutes;
       const jszip = new JSZip();
       // sort out blobs from JSONdata
@@ -148,9 +152,8 @@ export default {
           formData.append('file', myzipfile, fileName);
           formData.append('auth_token', `${TOKEN}`);
           formData.append('expires', `${expiryMinutes}`);
-          if (config.backendServer) {
-            console.log(148, `${config.backendServer}/submit`);
-            axios.post(`${config.backendServer}/submit`, formData, {
+            // console.log(148, `${config.backendServer}/submit`);
+          axios.post(`${config.backendServer}/submit`, formData, {
               'Content-Type': 'multipart/form-data',
             }).then((res) => {
               this.hasData = true;
@@ -158,11 +161,10 @@ export default {
               console.log('SUCCESS!!', res);
               this.$emit('valueChanged', { status: res.status });
             })
-            // eslint-disable-next-line no-unused-vars
-              .catch((e) => {
-                // console.log('FAILURE!!', e);
-              });
-          }
+          // eslint-disable-next-line no-unused-vars
+          .catch((e) => {
+            // console.log('FAILURE!!', e);
+          });
         });
     },
   },
