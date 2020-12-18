@@ -175,7 +175,10 @@ export default {
     },
     ui() {
       /* eslint-disable */
-        if (this.data['http://schema.repronim.org/inputType']) {
+        if (this.data['@type'] && this.data['@type'][0] === "http://schema.repronim.org/Activity") {
+          return 'section';
+        }
+        else if (this.data['http://schema.repronim.org/inputType']) {
           return this.data['http://schema.repronim.org/inputType'][0]['@value'];
         }
         return 'N/A';

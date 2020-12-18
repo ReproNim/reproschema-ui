@@ -479,6 +479,10 @@ export default {
     if (this.$route.query.auth_token) {
       this.$store.dispatch('setAuthToken', this.$route.query.auth_token);
     }
+    if (!_.isEmpty(this.$route.query)) {
+        this.$store.dispatch('setQueryParameters', this.$route.query);
+    }
+    console.log(482, _.isEmpty(this.$route.query));
   },
   computed: {
     getschemaType() {
