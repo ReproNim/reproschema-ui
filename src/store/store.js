@@ -24,6 +24,7 @@ const state = {
   answeredLanguage: '',
   participantUuid: '',
   expiryMinutes: null,
+  queryParams: {},
   token: null,
   landing: [],
 };
@@ -67,6 +68,10 @@ const getters = {
   getProtocolSchema(state) {
     return state.schema;
   },
+  // eslint-disable-next-line
+  getQueryParameters(state) {
+    return state.queryParams;
+  }
 };
 
 const mutations = {
@@ -139,6 +144,10 @@ const mutations = {
   // eslint-disable-next-line
   setExpiryMinutes(state, minutes) {
     state.expiryMinutes = minutes;
+  },
+  // eslint-disable-next-line
+  setQueryParameters(state, qp) {
+    state.queryParams = qp;
   },
   // eslint-disable-next-line
   saveResponse(state, { key, value }) {
@@ -243,6 +252,9 @@ const actions = {
   setExpiryMinutes({ commit }, mins) {
     commit('setExpiryMinutes', mins);
   },
+  setQueryParameters({ commit }, queryParams) {
+    commit('setQueryParameters', queryParams);
+  }
 };
 
 export default new Vuex.Store({

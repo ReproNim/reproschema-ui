@@ -354,6 +354,8 @@ export default {
       return outMapper;
     },
     getVisibility(responses) {
+      // console.log(357, this.$store.getters.getQueryParameters);
+      // todo: check for value for isVis variables from queryParameters
       const responseMapper = this.responseMapper(responses);
       if (!_.isEmpty(this.activity['http://schema.repronim.org/addProperties'])) {
         const visibilityMapper = {};

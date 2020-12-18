@@ -26,6 +26,7 @@
   "save-data": "Please save your data now.",
   "export-and-finish": "You can click the \"Export\" button on sidebar if you wish to save your data. Click below to finish.",
   "home-button": "Home",
-  "select-year": "Select year"
+  "select-year": "Select year",
+  "upload-message": "Uploading... This generally takes a few seconds for fast connections or longer depending on your connection speed"
 
 }

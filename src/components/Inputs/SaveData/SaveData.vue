@@ -15,7 +15,8 @@
       </div>
     </div>
     <div v-if="isUploading" class="loader">
-      <Loader />
+      <Loader></Loader>
+      <p>{{ $t('upload-message')}}</p>
     </div>
     <div style="width:800px; margin:0 auto;" v-bind:class="{ done: hasData}"></div>
   </div>
@@ -23,7 +24,7 @@
 
 <style>
   .done {
-    background: transparent url(/static/images/done.svg) center no-repeat;
+    background: transparent url(/src/assets/Check-Mark.svg) center no-repeat;
     background-size: contain;
     width: 1.6rem;
     height: 1.6rem;
