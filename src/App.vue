@@ -187,7 +187,10 @@ export default {
         needsVizUpdate = true;
       }
       // add protocol url to prov:used key in responseActivity
-      value[1].used.push(this.protocolUrl);
+        // eslint-disable-next-line no-prototype-builtins
+        if (value[1].hasOwnProperty('used')) {
+            value[1].used.push(this.protocolUrl);
+        }
       this.$store.dispatch('saveResponse', { key, value });
       if (needsVizUpdate) {
         this.setVisbility();
