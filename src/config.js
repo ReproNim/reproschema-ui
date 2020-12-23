@@ -11,5 +11,6 @@ module.exports = {
   },
   assetsPublicPath: '/reproschema-ui/',
   backendServer: null,
-  consent: true
+  consent: true,
+  showHelp: true
 };
