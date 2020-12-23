@@ -89,6 +89,7 @@
 import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
 import axios from 'axios';
+import Bowser from "bowser";
 import _ from 'lodash';
 import JSZip from 'jszip';
 import { v4 as uuidv4 } from 'uuid';
@@ -511,9 +512,8 @@ export default {
   },
   computed: {
       getEmailData() {
-          const helpEmailId = config.contact;
-          const subject = config.emailSubject;
-          const emailData = `${helpEmailId}?subject=${subject}&body=[Describe the issue in detail. You can copy and paste text, screen capture and/or describe the expected vs. actual result.]`;
+          const clientSpecs = JSON.stringify(Bowser.parse(window.navigator.userAgent));
+          const emailData = `${config.contact}?subject=${config.emailSubject}&body=[ Describe the issue in detail. You can copy and paste text, screen capture and/or describe the expected vs. actual result.] Browser properties: ${clientSpecs}]`;
           return window.btoa(emailData);
       },
     getschemaType() {
