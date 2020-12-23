@@ -58,7 +58,7 @@
               </button>
             </b-navbar-nav>
             <b-navbar-nav class="float-right">
-              <a v-if="showHelp" class="nav-link" href="#" data-email="dm9pY2Vfc3VydmV5QG1pdC5lZHU/c3ViamVjdD1IZWxwIHdpdGggQ292aWQxOSBzdHVkeSZib2R5PVtEZXNjcmliZSB0aGUgaXNzdWUgaW4gZGV0YWlsLiBZb3UgY2FuIGNvcHkgYW5kIHBhc3RlIHRleHQsIHNjcmVlbiBjYXB0dXJlIGFuZC9vciBkZXNjcmliZSB0aGUgZXhwZWN0ZWQgdnMuIGFjdHVhbCByZXN1bHQuXQ==">Help</a>
+              <a v-if="showHelp" class="nav-link" href="#" v-bind:data-email=getEmailData>Help</a>
               <b-nav-item :to="{name: 'Landing', query: $route.query}" exact>{{ $t('home-button')}}</b-nav-item>
             </b-navbar-nav>
           </div>
@@ -510,6 +510,12 @@ export default {
     }
   },
   computed: {
+      getEmailData() {
+          const helpEmailId = config.contact;
+          const subject = config.emailSubject;
+          const emailData = `${helpEmailId}?subject=${subject}&body=[Describe the issue in detail. You can copy and paste text, screen capture and/or describe the expected vs. actual result.]`;
+          return window.btoa(emailData);
+      },
     getschemaType() {
       return this.$store.getters.getschemaType;
     },

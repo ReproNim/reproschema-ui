@@ -12,5 +12,7 @@ module.exports = {
   assetsPublicPath: '/reproschema-ui/',
   backendServer: null,
   consent: true,
-  showHelp: true
+  showHelp: true,
+  contact: 'voice_survey@mit.edu',
+  emailSubject: 'Help with Covid19 study'
 };
