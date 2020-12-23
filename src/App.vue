@@ -57,8 +57,8 @@
                 <span class="navbar-toggler-icon"></span>
               </button>
             </b-navbar-nav>
-
             <b-navbar-nav class="float-right">
+              <a v-if="showHelp" class="nav-link" href="#" v-bind:data-email=getEmailData>Help</a>
               <b-nav-item :to="{name: 'Landing', query: $route.query}" exact>{{ $t('home-button')}}</b-nav-item>
             </b-navbar-nav>
           </div>
@@ -112,6 +112,27 @@ function getFilename(s) {
   return filename;
 }
 
+class EmailDecoder {
+    constructor(selector = '[data-email]') {
+        this.selector = selector;
+        this.initialize();
+    }
+    mailto(hash) {
+        // https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding
+        window.location.href = `mailto:${atob(hash)}`
+    }
+    bindEvents() {
+        document.querySelectorAll(this.selector).forEach(email => {
+            email.addEventListener('click', () => {
+                this.mailto(email.getAttribute('data-email'))
+            })
+        })
+    }
+    initialize() {
+        this.bindEvents();
+    }
+}
+
 export default {
   name: 'App',
   components: {
@@ -132,7 +153,8 @@ export default {
       reproterms2: '',
       protocolUrl: config.githubSrc,
       content: {},
-      startButton: config.startButton
+      startButton: config.startButton,
+      showHelp: config.showHelp
       // responses: [],
     };
   },
@@ -461,6 +483,7 @@ export default {
     // this.$store.dispatch('getBaseSchema', url);
   },
   mounted() {
+      new EmailDecoder('[data-email]');
     if (this.$route.query.lang) {
       this.selected_language = this.$route.query.lang;
     } else this.selected_language = 'en';
@@ -487,6 +510,12 @@ export default {
     }
   },
   computed: {
+      getEmailData() {
+          const helpEmailId = config.contact;
+          const subject = config.emailSubject;
+          const emailData = `${helpEmailId}?subject=${subject}&body=[Describe the issue in detail. You can copy and paste text, screen capture and/or describe the expected vs. actual result.]`;
+          return window.btoa(emailData);
+      },
     getschemaType() {
       return this.$store.getters.getschemaType;
     },
@@ -756,6 +785,10 @@ export default {
   a:not([href]):not([tabindex]) {
     color: inherit;
     text-decoration: none;
+  }
+
+  .help {
+      color: rgba(0, 0, 0, 0.5);
   }
 
   /*!* fix for blue border box around checkbox and radio *!*/
