@@ -192,7 +192,7 @@
       </b-alert>
     </div>
     <!-- you can skip this question if requiredValue is not true -->
-    <div class="row float-right" v-if="showPassOptions !== null || showItemPassOptions !== null">
+    <div v-if="showPassOptions !== null || showItemPassOptions !== null">
       <b-button class="" variant="default" v-if="(showItemPassOptions && showItemPassOptions['dontKnow']) || (showPassOptions && showPassOptions['dontKnow'])"
                 @click="dontKnow">
         Don't Know
