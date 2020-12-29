@@ -400,6 +400,7 @@ export default {
       // sort out blobs from JSONdata
       let key = 0;
       const voiceMap = {};
+      const fileName = `${uuidv4()}-${this.participantId}.zip`;
       _.map(data.response, (eachActivityList) => {
         const activityData = [];
         _.map(eachActivityList, (itemObj) => {
@@ -409,7 +410,7 @@ export default {
             if (itemObj.value instanceof Blob) {
               const keyStrings = (itemObj.isAbout.split('/items/')[1]);
               const rId = itemObj['@id'].split('uuid:')[1];
-              jszip.folder('responses').file(`${keyStrings}-${rId}.wav`, itemObj.value);
+              jszip.folder(fileName).file(`${keyStrings}-${rId}.wav`, itemObj.value);
               newObj.value = `${keyStrings}-${rId}.wav`;
               voiceMap[itemObj['@id']] = `${keyStrings}-${rId}.wav`;
             }
@@ -457,7 +458,7 @@ export default {
         });
         // write out the activity files
         if (activityData.length) { // if activity is answered then write to file
-          jszip.folder('responses').file(`activity_${key}.jsonld`, JSON.stringify(activityData, null, 4));
+          jszip.folder(fileName).file(`activity_${key}.jsonld`, JSON.stringify(activityData, null, 4));
           key += 1;
         }
       });
@@ -476,7 +477,6 @@ export default {
       // });
       jszip.generateAsync({ type: 'blob' })
         .then((myzipfile) => {
-          const fileName = `${uuidv4()}-${this.participantId}.zip`;
           saveAs(myzipfile, fileName);
         });
     },
