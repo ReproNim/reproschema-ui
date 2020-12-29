@@ -80,6 +80,10 @@ const getters = {
   // eslint-disable-next-line
   getHasExport(state) {
     return state.hasExport;
+  },
+  // eslint-disable-next-line
+  getExpiryTime(state) {
+    return state.expiryMinutes;
   }
 };
 

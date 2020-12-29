@@ -1,9 +1,26 @@
 <template>
   <div id="app" class="">
-    <nav class="navbar sticky-top navbar-custom">
-      <b-navbar-nav class="navbar-brand">
+    <nav v-if="bannerMessage || showTimer" class="navbar sticky-top navbar-custom">
+      <b-navbar-nav v-if="bannerMessage" class="navbar-brand">
         <b-nav-text>{{ $t('banner-message') }}</b-nav-text>
       </b-navbar-nav>
+      <div id="timer" class="timer" v-if="showTimer">
+        <!--  Timer Component  -->
+        <Timer
+            starttime="Dec 23, 2020 02:37:25"
+            :endtime=expiryTime
+            trans='{
+            "day":"Day",
+            "hours":"Hours",
+            "minutes":"Minutes",
+            "seconds":"Seconds",
+            "expired":"Please contact the researchers for a new submission link.",
+            "running":"Remaining...",
+            "upcoming":"Till start of study."
+            }'
+        ></Timer>
+        <!--  End! Timer Component  -->
+      </div>
     </nav>
     <div class="wrapper">
       <!-- Sidebar -->
@@ -90,6 +107,7 @@ import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
 import axios from 'axios';
 import Bowser from "bowser";
+import moment from 'moment';
 import _ from 'lodash';
 import JSZip from 'jszip';
 import { v4 as uuidv4 } from 'uuid';
@@ -99,6 +117,7 @@ import { saveAs } from 'file-saver';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import circleProgress from './components/Circle/';
+import Timer from './components/Timer/Timer';
 import config from './config';
 import i18n from './i18n';
 
@@ -138,6 +157,7 @@ export default {
   name: 'App',
   components: {
     circleProgress,
+    Timer,
   },
   data() {
     return {
@@ -155,7 +175,8 @@ export default {
       protocolUrl: config.githubSrc,
       content: {},
       startButton: config.startButton,
-      showHelp: config.showHelp
+      showHelp: config.showHelp,
+        bannerMessage: config.banner,
       // responses: [],
     };
   },
@@ -511,6 +532,15 @@ export default {
     }
   },
   computed: {
+      expiryTime() {
+        let endDate = moment(this.$store.getters.getExpiryTime)['_i'];
+        endDate = endDate.replace(' ', '+');
+        // console.log(537, endDate, new Date(endDate).toString(), new Date(endDate).getTime());
+        return new Date(endDate).getTime();
+      },
+      showTimer() {
+          return !!this.$store.getters.getExpiryTime;
+      },
       getEmailData() {
           const clientSpecs = JSON.stringify(Bowser.parse(window.navigator.userAgent));
           const emailData = `${config.contact}?subject=${config.emailSubject}&body=[ Describe the issue in detail. You can copy and paste text, screen capture and/or describe the expected vs. actual result.] Browser properties: ${clientSpecs}]`;
