@@ -87,7 +87,7 @@ export default {
       // sort out blobs from JSONdata
       let key = 0;
       const voiceMap = {};
-      const fileName = `${uuidv4()}-${this.participantId}.zip`;
+      const fileName = `${uuidv4()}-${this.participantId}`;
       _.map(data.response, (eachActivityList) => {
         const activityData = [];
         _.map(eachActivityList, (itemObj) => {
@@ -149,7 +149,7 @@ export default {
       jszip.generateAsync({ type: 'blob' })
         .then((myzipfile) => {
           const formData = new FormData();
-          formData.append('file', myzipfile, fileName);
+          formData.append('file', myzipfile, `${fileName}.zip`);
           formData.append('auth_token', `${TOKEN}`);
           formData.append('expires', `${expiryMinutes}`);
             // console.log(148, `${config.backendServer}/submit`);
