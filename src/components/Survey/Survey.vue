@@ -140,6 +140,7 @@
         }
       },
       initializeListShow() {
+        const responseMapper = this.responseMapper(this.responses);
         let i = 0;
         for (i = 0; i < this.context.length; i += 1) {
           const eachItem = (this.context)[i];
@@ -148,6 +149,9 @@
           let val = true; // true by default if not mentioned
           if (matchedObject[0]['http://schema.repronim.org/isVis']) {
             val = matchedObject[0]['http://schema.repronim.org/isVis'][0]['@value'];
+          }
+          if (_.isString(val)) {
+            val = this.evaluateString(val, responseMapper);
           }
           if (val === true) { // first visible item
             break;
@@ -334,43 +338,39 @@
         return safeEval(output);
       },
       responseMapper(responses) {
-        const keys = _.map(this.order(), c => c['@id']); // Object.keys(this.responses);
+        // const keys = _.map(this.order(), c => c['@id']); // Object.keys(this.responses);
+        let keyArr;
         // a variable map is defined! great
         if (this.activity['http://schema.repronim.org/addProperties']) {
           const vmap = this.activity['http://schema.repronim.org/addProperties'];
-          const keyArr = _.map(vmap, (v) => {
+          keyArr = _.map(vmap, (v) => {
             const key = v['http://schema.repronim.org/isAbout'][0]['@id'];
             const qId = v['http://schema.repronim.org/variableName'][0]['@value'];
             const val = responses[key];
             return { key, val, qId };
           });
-          const outMapper = {};
-          _.map(keyArr, (a) => {
-            outMapper[a.qId] = { val: a.val, ref: a.key };
-          });
-          return outMapper;
+
         }
-
-        // TODO: delete the code below once the schema is set!
-        // we keep this for compatibility until everything is fixed.
-        const keyArr = _.map(keys, (key) => {
-          const val = responses[key];
-          const filenameParts = key.split('/');
-          const filename = filenameParts[filenameParts.length - 1];
-          const qId = filename.split('.jsonld')[0];
-          return { key, val, qId };
-        });
-
+        if (this.$store.getters.getQueryParameters) {
+          const q = this.$store.getters.getQueryParameters;
+          Object.entries(q).forEach(
+                  ([key, value]) => {
+                    const qId = key;
+                    if (key === "week") {
+                      value = parseInt(value);
+                    }
+                    const val = value;
+                    keyArr.push({ key, val, qId });
+                  }
+          );
+        }
         const outMapper = {};
         _.map(keyArr, (a) => {
           outMapper[a.qId] = { val: a.val, ref: a.key };
         });
-
         return outMapper;
       },
       getVisibility(responses) {
-        // console.log(357, this.$store.getters.getQueryParameters);
-        // todo: check for value for isVis variables from queryParameters
         const responseMapper = this.responseMapper(responses);
         if (!_.isEmpty(this.activity['http://schema.repronim.org/addProperties'])) {
           const visibilityMapper = {};
@@ -488,7 +488,6 @@
           const criteria1 = this.listShow.indexOf(this.contextReverse.length - index - 1) >= 0;
           let criteria2 = true;
           if (!_.isEmpty(this.visibility)) {
-            // console.log(496, this.visibility, o);
             criteria2 = this.visibility[o['@id']];
           }
           return criteria1 && criteria2;
