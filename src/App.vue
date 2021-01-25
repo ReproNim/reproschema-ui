@@ -98,6 +98,18 @@
           />
         </b-container>
       </div>
+      <b-modal v-model="hasError" size="lg" ref="my-modal" hide-footer title="Uh-oh! Voice input needs fixing.">
+        <div v-if="notIOS">
+          <p>Please change your browser's microphone permissions in order to answer these questions.</p>
+          <br>
+          <img :src=permissionDemoPath alt="allow media permission" width="100%">
+          <br>
+          <p>If you already changed permissions you need to refresh the page.</p>
+        </div>
+        <div v-else>
+          <p>Please use Safari browser on this device.</p>
+        </div>
+      </b-modal>
     </div>
   </div>
 </template>
@@ -124,6 +136,7 @@ import i18n from './i18n';
 Vue.use(BootstrapVue);
 Vue.filter('reverse', value => value.slice().reverse());
 const safeEval = require('safe-eval');
+const MediaStreamRecorder = require('msr');
 
 function getFilename(s) {
   const folders = s.split('/');
@@ -176,11 +189,70 @@ export default {
       content: {},
       startButton: config.startButton,
       showHelp: config.showHelp,
-        bannerMessage: config.banner,
+      bannerMessage: config.banner,
+      audioConstraints: { audio: true, video: false },
+      hasError: false,
+      browserType: "",
+      clientSpecs: {}
       // responses: [],
     };
   },
   methods: {
+    initialize(audioStream) {
+      this.mediaRecorder = new MediaStreamRecorder(audioStream);
+    },
+    error() {
+      this.hasError = true;
+    },
+    checkPermission() {
+      // Older browsers might not implement mediaDevices at all, so we set an empty object first
+      if (navigator.mediaDevices === undefined) {
+        navigator.mediaDevices = {};
+      }
+
+      // Some browsers partially implement mediaDevices. We can't just assign an object
+      // with getUserMedia as it would overwrite existing properties.
+      // Here, we will just add the getUserMedia property if it's missing.
+      if (navigator.mediaDevices.getUserMedia === undefined) {
+        navigator.mediaDevices.getUserMedia = (constraints) => {
+          // First get ahold of the legacy getUserMedia, if present
+          const getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia
+                  || navigator.msGetUserMedia;
+
+          // Some browsers just don't implement it - return a rejected promise with an error
+          // to keep a consistent interface
+          if (!getUserMedia) {
+            this.supported = false;
+            return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+          }
+
+          // Otherwise, wrap the call to the old navigator.getUserMedia with a Promise
+          return new Promise(((resolve, reject) => {
+            getUserMedia.call(navigator, constraints, resolve, reject);
+          }));
+        };
+      }
+
+      if (navigator.mediaDevices.getUserMedia) {
+        this.supported = true;
+        navigator.mediaDevices.getUserMedia(this.audioConstraints).then(this.initialize, this.error);
+        // console.log('getUserMedia API supported');
+      } else {
+        this.supported = false;
+        console.log(275, 'Getusermedia API is not supported on this browser');
+      }
+
+
+      // navigator.mediaDevices.getUserMedia(constraints)
+      //         .then(function(stream) {
+      //           /* use the stream */
+      //         })
+      //         .catch(function(err) {
+      //           /* handle the error */
+      //         });
+
+
+    },
     setLang(event) {
       i18n.locale = event.target.value;
     },
@@ -505,7 +577,12 @@ export default {
     // this.$store.dispatch('getBaseSchema', url);
   },
   mounted() {
-      new EmailDecoder('[data-email]');
+    new EmailDecoder('[data-email]');
+    this.clientSpecs = JSON.stringify(Bowser.parse(window.navigator.userAgent));
+    this.browserType = Bowser.parse(window.navigator.userAgent).browser.name;
+    if (config.checkMediaPermission) {
+      this.checkPermission();
+    }
     if (this.$route.query.lang) {
       this.selected_language = this.$route.query.lang;
     } else this.selected_language = 'en';
@@ -532,6 +609,22 @@ export default {
     }
   },
   computed: {
+      notIOS() {
+        // return false;
+        return Bowser.parse(window.navigator.userAgent).os.name !== 'iOS';
+      },
+      permissionDemoPath() {
+        let path = require('./assets/audio-permission-setting-chrome.gif');
+        if (this.browserType === 'Firefox') {
+          path = require('./assets/audio-permission-setting-firefox.gif');
+          // do something - firefox image
+        }
+        else if (this.browserType === 'Safari') {
+          path = require('./assets/audio-permission-setting-safari.gif');
+        }
+        // default is the Chrome demo
+        return path;
+      },
       expiryTime() {
         let endDate = moment(this.$store.getters.getExpiryTime)['_i'];
         endDate = endDate.replace(' ', '+');
@@ -542,8 +635,7 @@ export default {
           return !!this.$store.getters.getExpiryTime;
       },
       getEmailData() {
-          const clientSpecs = JSON.stringify(Bowser.parse(window.navigator.userAgent));
-          const emailData = `${config.contact}?subject=${config.emailSubject}&body=[ Describe the issue in detail. You can copy and paste text, screen capture and/or describe the expected vs. actual result.] Browser properties: ${clientSpecs}]`;
+          const emailData = `${config.contact}?subject=${config.emailSubject}&body=[ Describe the issue in detail. You can copy and paste text, screen capture and/or describe the expected vs. actual result.] Browser properties: ${this.clientSpecs}]`;
           return window.btoa(emailData);
       },
     getschemaType() {
@@ -596,12 +688,15 @@ export default {
         return langList;
       } return [];
     },
+    shouldUpload() {
+      return !!(config.backendServer && this.$store.getters.getAuthToken);
+    },
     allowExport() {
       if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema['http://schema.repronim.org/allow']) {
         const allowList = _.map(this.$store.state.schema['http://schema.repronim.org/allow'],
           u => u['@id']);
         this.$store.dispatch('setExport', allowList.includes('http://schema.repronim.org/AllowExport'));
-        return allowList.includes('http://schema.repronim.org/AllowExport');
+        return allowList.includes('http://schema.repronim.org/AllowExport') && !this.shouldUpload;
       }
       this.$store.dispatch('setExport', false);
       return false;
@@ -826,5 +921,6 @@ export default {
   /*  outline: none;*/
   /*  box-shadow: none;*/
   /*}*/
+
 
 </style>
