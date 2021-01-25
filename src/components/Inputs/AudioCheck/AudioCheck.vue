@@ -26,18 +26,18 @@
       <b-button variant="success" v-if="hasRecording && !isPlaying" @click="play" ref="play">
         <span> {{ $t('play-button') }} </span>
       </b-button>
-    </div>
-    <b-button variant="secondary"
+      <b-button variant="secondary"
                 v-if="hasRecording && isPlaying" @click="pause" ref="play">
         <span> {{ $t('pause-button') }} </span>
       </b-button>
 
-    <div v-if="hasRecording" class="mt-2">
+      <div v-if="hasRecording" class="mt-2">
         <a href="" @click="reset">{{ $t('redo-recording') }}</a>
       </div>
-    <div v-if="hasRecording" class="mt-2">
+      <div v-if="hasRecording" class="mt-2">
         <a href="" @click="saveAndContinue">{{ $t('continue') }}</a>
       </div>
+    </div>
   </div>
 </template>
 
@@ -56,6 +56,8 @@
 
 <script>
 import _ from 'lodash';
+import Bowser from "bowser";
+
 
 const MediaStreamRecorder = require('msr');
 
@@ -86,6 +88,8 @@ export default {
       interval: {},
       timeRemaining: null,
       isPlaying: false,
+      selectedImage: null,
+      hasError: false,
     };
   },
   computed: {
@@ -186,6 +190,13 @@ export default {
       };
     },
     error() {
+      console.log(191);
+      this.hasError = true;
+      // const notification = 'Uh-oh! Voice input needs fixing.<br><br>' + '<img src="../../../assets/Check-Mark.svg" alt="Nature" class="responsive"><br>' + 'Please change your browser\'s microphone permissions in order to answer these questions.';
+      // const options = {
+      //   html: true,
+      // };
+      // this.$dialog.alert(notification, options);
     },
   },
   watch: {
@@ -254,7 +265,7 @@ export default {
       // console.log('getUserMedia API supported');
     } else {
       this.supported = false;
-      // console.log('Getusermedia API is not supported on this browser');
+      // console.log(259, 'Getusermedia API is not supported on this browser');
     }
   },
 };
