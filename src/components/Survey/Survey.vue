@@ -182,21 +182,21 @@
       nextQuestion(idx, skip, dontKnow) {
         document.body.scrollTop = 0; // For Safari
         document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
-        if (idx === 8 && (this.context[idx]['@id']).split('items/')[1] === 'phq9_9') {
-          // console.log('idx and resp contxt id', idx, this.context);
-          if (this.responses[this.context[idx]['@id']] > 0) {
-            // Trigger notification for non-zero suicidal ideation
-            const notification = ' <i> If this is how you feel, think about getting help. </i><br> ' +
-                    'There are people who can help 24/7 <br>' +
-                    'Text the Crisis Text Line at 741741 <br>' +
-                    'Or<br>' +
-                    'Call the National Suicide Prevention Lifeline at 1-800-273-8255';
-            const options = {
-              html: true,
-            };
-            this.$dialog.alert(notification, options);
-          }
-        }
+        // if (idx === 8 && (this.context[idx]['@id']).split('items/')[1] === 'phq9_9') {
+        //   // console.log('idx and resp contxt id', idx, this.context);
+        //   if (this.responses[this.context[idx]['@id']] > 0) {
+        //     // Trigger notification for non-zero suicidal ideation
+        //     const notification = ' <i> If this is how you feel, think about getting help. </i><br> ' +
+        //             'There are people who can help 24/7 <br>' +
+        //             'Text the Crisis Text Line at 741741 <br>' +
+        //             'Or<br>' +
+        //             'Call the National Suicide Prevention Lifeline at 1-800-273-8255';
+        //     const options = {
+        //       html: true,
+        //     };
+        //     this.$dialog.alert(notification, options);
+        //   }
+        // }
         if (skip) {
           this.$emit('saveResponse', this.context[idx]['@id'], 'http://schema.repronim.org/Skipped');
           this.setResponse('http://schema.repronim.org/Skipped', idx);
@@ -229,7 +229,6 @@
               break;
             }
           }
-
           if (this.$store) {
             this.$store.dispatch('updateListShow', this.listShow);
           }
@@ -393,9 +392,19 @@
       updateProgress() {
         let totalQ = this.context.length;
         if (!_.isEmpty(this.visibility)) {
-          totalQ = _.filter(this.visibility).length;
+          totalQ = 0;
+          // console.log(398, 'visibility-- ', this.visibility);
+          // todo: check visibility of items present in order list and find the total visible questions
+          _.map(this.context, eachItem => {
+            // console.log(eachItem['@id']);
+            if (eachItem['@id'] in this.visibility && this.visibility[eachItem['@id']]) {
+              totalQ+= 1;
+            }
+          });
+          // totalQ = _.filter(this.visibility).length;
         }
         const progress = ((Object.keys(this.responses).length) / totalQ) * 100;
+        // console.log(401, 'updateProgress------ ', Object.keys(this.responses).length, totalQ, this.context, this.context.length, progress)
         this.$emit('updateProgress', progress);
       },
       order() {
@@ -485,11 +494,14 @@
       },
       shouldShow() {
         return _.map(this.contextReverse, (o, index) => {
+          // console.log(490, o, index);
           const criteria1 = this.listShow.indexOf(this.contextReverse.length - index - 1) >= 0;
           let criteria2 = true;
           if (!_.isEmpty(this.visibility)) {
+            // console.log(494, this.visibility)
             criteria2 = this.visibility[o['@id']];
           }
+          // console.log(495, criteria1, criteria2);
           return criteria1 && criteria2;
         });
       },
@@ -497,7 +509,7 @@
         /* eslint-disable */
         if (this.activity['http://schema.repronim.org/order']) {
           const keys = this.order();
-          // console.log(461, this.participantId, keys); // make invisible pid item
+          // make invisible pid item
           // if (!_.isEmpty(this.visibility)) {
           //   return _.filter(keys, k => this.visibility[k['@id']]);
           // }

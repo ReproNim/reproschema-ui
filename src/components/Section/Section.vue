@@ -140,14 +140,31 @@ export default {
       return {};
     },
     responseMapper(responses) {
+      let keyArr;
       // a variable map is defined! great
-      const vmap = this.activity['http://schema.repronim.org/addProperties'];
-      const keyArr = _.map(vmap, (v) => {
-        const key = v[`${this.reprotermsUrl}isAbout`][0]['@id'];
-        const qId = v[`${this.reprotermsUrl}variableName`][0]['@value'];
-        const val = responses[key];
-        return { key, val, qId };
-      });
+      if (this.activity['http://schema.repronim.org/addProperties']) {
+        const vmap = this.activity['http://schema.repronim.org/addProperties'];
+        keyArr = _.map(vmap, (v) => {
+          const key = v['http://schema.repronim.org/isAbout'][0]['@id'];
+          const qId = v['http://schema.repronim.org/variableName'][0]['@value'];
+          const val = responses[key];
+          return { key, val, qId };
+        });
+
+      }
+      if (this.$store.getters.getQueryParameters) {
+        const q = this.$store.getters.getQueryParameters;
+        Object.entries(q).forEach(
+                ([key, value]) => {
+                  const qId = key;
+                  if (key === "week") {
+                    value = parseInt(value);
+                  }
+                  const val = value;
+                  keyArr.push({ key, val, qId });
+                }
+        );
+      }
       const outMapper = {};
       _.map(keyArr, (a) => {
         outMapper[a.qId] = { val: a.val, ref: a.key };
@@ -192,6 +209,7 @@ export default {
       const progress = ((Object.keys(this.responses).length) / totalQ) * 100;
       this.$emit('updateProgress', progress);
       if (progress === 100) {
+        console.log(212, 'section complete--send responses: ', this.responses);
         this.$emit('valueChanged', this.responses);
       }
     },
@@ -249,25 +267,24 @@ export default {
       // final setting should be a combination of all four [activity (add, override), protocol(add, override)] (if present)
       // protocol overrides activity
       const protocolSchema = this.$store.getters.getProtocolSchema;
-      console.log(257, protocolSchema);
       let flag = 0;
       if (!flag && protocolSchema['http://schema.repronim.org/overrideProperties']) { // priority 1
-        console.log(259, 'priority 1');
+        // console.log(259, 'priority 1');
       } else if (!flag && protocolSchema['http://schema.repronim.org/addProperties']) { // priority 2
         let addP = _.filter(protocolSchema['http://schema.repronim.org/addProperties'], c => {
           // console.log(263, c['http://schema.repronim.org/isAbout'][0]['@id'], this.context[idx]['@id']);
           c['http://schema.repronim.org/isAbout'][0]['@id'] === this.context[idx]['@id'];
         });
         flag = addP.length ? 1: 0;
-        console.log(265, 'priority 2', this.context[idx]['@id'], addP, flag);
+        // console.log(265, 'priority 2', this.context[idx]['@id'], addP, flag);
       } if (!flag && this.activity['http://schema.repronim.org/overrideProperties']) { // priority 3
-        console.log(268, 'priority 3');
+        // console.log(268, 'priority 3');
       } else { // priority 4 - look in activity addProperties
         let addPA = _.filter(this.activity['http://schema.repronim.org/addProperties'], c =>
           //console.log(271, c['http://schema.repronim.org/isAbout'][0]['@id'], this.context[idx]['@id']);
           (c['http://schema.repronim.org/isAbout'][0]['@id'] === this.context[idx]['@id']) && c['http://schema.repronim.org/message']
         );
-        console.log(274, 'priority 4', addPA);
+        // console.log(274, 'priority 4', addPA);
       }
       if (idx === 8 && this.responses[this.context[idx]['@id']] > 0) {
         // Trigger notification for non-zero suicidal ideation
