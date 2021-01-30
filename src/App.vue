@@ -24,7 +24,7 @@
     </nav>
     <div class="wrapper">
       <!-- Sidebar -->
-      <nav id="sidebar" v-bind:class="{'active':checkDisableBack}" ref="sidebar">
+      <nav id="sidebar" ref="sidebar">
         <div class="sidebar-header">
           <h4>{{ sidebarHeader }}</h4>
         </div>
@@ -794,49 +794,20 @@ export default {
 </script>
 
 <style>
-  /*#app {*/
-  /*  font-family: 'Avenir', Helvetica, Arial, sans-serif;*/
-  /*  -webkit-font-smoothing: antialiased;*/
-  /*  -moz-osx-font-smoothing: grayscale;*/
-  /*  color: #2c3e50;*/
-  /*}*/
-
-  #content {
-    width: 100%;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-
   .wrapper {
     display: flex;
     width: 100%;
-    align-items: stretch;
   }
 
   #sidebar {
     min-width: 250px;
     max-width: 250px;
     text-align: center;
+    transition: all 0.3s;
   }
 
   #sidebar.active {
     margin-left: -250px;
-  }
-
-  @media (max-width: 768px) {
-    #sidebar {
-      margin-left: -250px;
-    }
-    /*#sidebar.active {*/
-    /*  margin-left: 0;*/
-    /*}*/
-  }
-
-  #sidebar {
-    /* don't forget to add all the previously mentioned styles here too */
-    transition: all 0.3s;
   }
 
   #sidebar .sidebar-header {
@@ -878,6 +849,18 @@ export default {
 
   }
 
+  #content {
+    width: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  #content.active {
+    width: 100%;
+  }
+
   select > .placeholder {
     display: none;
   }
@@ -916,11 +899,22 @@ export default {
       color: rgba(0, 0, 0, 0.5);
   }
 
-  /*!* fix for blue border box around checkbox and radio *!*/
-  /**, ::after, ::before {*/
-  /*  outline: none;*/
-  /*  box-shadow: none;*/
-  /*}*/
+  @media (max-width: 768px) {
+    #sidebar {
+      margin-left: -250px;
+    }
+    #sidebar.active {
+      margin-left: 0px;
+    }
+    #content {
+      width: 100%;
+    }
+    #content.active {
+      width: calc(100% - 250px);
+    }
+  }
 
 
 </style>
+
+
