@@ -480,9 +480,9 @@ export default {
           if (itemObj['@type'] === 'reproschema:Response') {
             // const voiceMap = {};
             if (itemObj.value instanceof Blob) {
-              const keyStrings = (itemObj.isAbout.split('/items/')[1]);
+              const keyStrings = (itemObj.isAbout.split('/'));
               const rId = itemObj['@id'].split('uuid:')[1];
-              jszip.folder(fileName).file(`${keyStrings}-${rId}.wav`, itemObj.value);
+              jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.wav`, itemObj.value);
               newObj.value = `${keyStrings}-${rId}.wav`;
               voiceMap[itemObj['@id']] = `${keyStrings}-${rId}.wav`;
             }

@@ -209,7 +209,7 @@ export default {
       const progress = ((Object.keys(this.responses).length) / totalQ) * 100;
       this.$emit('updateProgress', progress);
       if (progress === 100) {
-        console.log(212, 'section complete--send responses: ', this.responses);
+        // console.log(212, 'section complete--send responses: ', this.responses);
         this.$emit('valueChanged', this.responses);
       }
     },

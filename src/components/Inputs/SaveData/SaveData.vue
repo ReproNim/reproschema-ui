@@ -96,9 +96,9 @@ export default {
             // console.log(294, value, key1);
             if (itemObj.value instanceof Blob) {
               // fileUploadData[key1] = value;
-              const keyStrings = (itemObj.isAbout.split('/items/')[1]);
+              const keyStrings = (itemObj.isAbout.split('/')[1]);
               const rId = itemObj['@id'].split('uuid:')[1];
-              jszip.folder(fileName).file(`${keyStrings}-${rId}.wav`, itemObj.value);
+              jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.wav`, itemObj.value);
               newObj.value = `${keyStrings}-${rId}.wav`;
               // eslint-disable-next-line no-param-reassign
               voiceMap[itemObj['@id']] = `${keyStrings}-${rId}.wav`;
