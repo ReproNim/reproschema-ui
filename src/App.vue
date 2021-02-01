@@ -590,7 +590,9 @@ export default {
     if (this.$route.query.uid) {
       // console.log(407, this.$route.query.uid);
       this.$store.dispatch('saveParticipantId', this.$route.query.uid);
-    } else this.$store.dispatch('saveParticipantId', uuidv4());
+    } else if (config.generateRandomUid) {
+      this.$store.dispatch('saveParticipantId', uuidv4());
+    }
     if (this.$route.params.id) {
       this.$store.dispatch('setActivityIndex', this.$route.params.id);
     }
