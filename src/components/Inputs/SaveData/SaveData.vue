@@ -103,6 +103,26 @@ export default {
               // eslint-disable-next-line no-param-reassign
               voiceMap[itemObj['@id']] = `${keyStrings}-${rId}.wav`;
             }
+            // filter out sub-activities only, the criteria inside if needs to be changed
+            else if (itemObj.value.constructor === Object && !itemObj.value.hasOwnProperty('unitCode')) {
+              _.map(itemObj.value, (valueList, fieldKey) => {
+                const subActivityFieldData = [];
+                _.map(valueList, eachItem => {
+                  const newItem = { ...eachItem };
+                  if (eachItem && eachItem['@type'] === 'reproschema:Response') {
+                    if (eachItem.value instanceof Blob) {
+                      const keyStrings = (eachItem.isAbout.split('/'));
+                      const rId = eachItem['@id'].split('uuid:')[1];
+                      jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.wav`, eachItem.value);
+                      newItem.value = `${keyStrings[keyStrings.length-1]}-${rId}.wav`;
+                      voiceMap[eachItem['@id']] = `${keyStrings[keyStrings.length-1]}-${rId}.wav`;
+                    }
+                  }
+                  subActivityFieldData.push(newItem);
+                });
+                itemObj.value[fieldKey] = subActivityFieldData;
+              })
+            }
             // todo: check if sections are present, they are no longer object but lists
             // else if (_.isObject(value)) {
             //   // make sure there aren't any Blobs here.
