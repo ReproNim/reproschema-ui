@@ -2,7 +2,7 @@
   <div>
     <div v-if="!listShow.length">
       <h1 >{{ $t('loader')}}...</h1>
-      <!-- <Loader /> -->
+       <Loader />
     </div>
     <div v-else>
       <!-- <b-progress :value="progress" :max="100" class="mb-3"></b-progress> -->
@@ -50,6 +50,7 @@ import VuejsDialog from 'vuejs-dialog';
 import 'vuejs-dialog/dist/vuejs-dialog.min.css';
 import _ from 'lodash';
 import Loader from '../Loader/';
+import { v4 as uuidv4 } from 'uuid';
 
 Vue.use(VuejsDialog);
 
@@ -172,12 +173,16 @@ export default {
       return outMapper;
     },
     evaluateString(string, responseMapper) {
+      // console.log(176, string, responseMapper);
       const keys = Object.keys(responseMapper);
       let output = string;
       _.map(keys, (k) => {
         // grab the value of the key from responseMapper
         let val = responseMapper[k].val;
-        if (val !== 'skipped' && val !== 'dontknow') {
+        if (Array.isArray(responseMapper[k].val)) {
+          val = responseMapper[k].val[0];
+        }
+        if (val !== 'http://schema.repronim.org/Skipped' && val !== 'http://schema.repronim.org/DontKnow') {
           if (_.isString(val)) {
             val = `'${val}'`; // put the string in quotes
           }
@@ -204,26 +209,65 @@ export default {
       // TODO: add back branching logic to this.
       if (!_.isEmpty(this.visibility)) {
         totalQ = _.filter(this.visibility).length;
-        console.log()
       }
       const progress = ((Object.keys(this.responses).length) / totalQ) * 100;
       this.$emit('updateProgress', progress);
       if (progress === 100) {
-        console.log(212, 'section complete--send responses: ', this.responses);
+        // console.log(212, 'section complete--send responses: ', this.responses);
         this.$emit('valueChanged', this.responses);
       }
     },
     setResponse(val, index) {
+      const itemUrl = this.context[index]['@id'];
+      const d2 = new Date();
+      const t1 = d2.toISOString();
       // const t1 = performance.now();
-      // console.log(202, 'end of a section-question', index, 'is', t1);
-      // const respData = { startedAt: this.t0 / 1000,
-      //   recordedAt: t1 / 1000,
-      //   value: val };
-      // console.log(207, 'section resp obj', respData);
-      this.$emit('saveResponse', this.context[index]['@id'], val);
+      let uiUrl = `${window.location.origin}`;
+      if (window.location.pathname) {
+        uiUrl = `${uiUrl}${window.location.pathname}`;
+      }
+      const respActivityUuid = uuidv4();
+      const responseUuid = uuidv4();
+      const responseActivity = {
+        '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/1.0.0-rc2/contexts/generic',
+        '@type': 'reproschema:ResponseActivity',
+        '@id': `uuid:${respActivityUuid}`,
+        used: [`${itemUrl}`,
+          `${this.srcUrl}`,
+        ],
+        inLanguage: this.getAnsweredLanguage,
+        startedAtTime: this.t0,
+        endedAtTime: t1,
+        wasAssociatedWith: {
+          version: '0.0.1',
+          url: uiUrl,
+          '@id': 'https://github.com/ReproNim/reproschema-ui',
+        },
+        generated: `uuid:${responseUuid}`,
+      };
+      const respData = {
+        '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/1.0.0-rc2/contexts/generic',
+        '@type': 'reproschema:Response',
+        '@id': `uuid:${responseUuid}`,
+        wasAttributedTo: {
+          '@id': this.$store.state.participantUuid,
+        },
+        isAbout: itemUrl,
+        value: val,
+      };
+      if (this.participantId) {
+        respData.wasAttributedTo.subject_id = this.participantId;
+      }
+      const valueAndDataExport = [val, responseActivity, respData];
+      // console.log(259, 'section set response: id: val ', this.context[index]['@id'], valueAndDataExport);
+      this.$emit('saveResponse', this.context[index]['@id'], valueAndDataExport);
+      this.t0 = t1;
       const currResponses = { ...this.responses };
-      // console.log(204, 'cur resp', currResponses, this.context[index]['@id'], val);
-      currResponses[this.context[index]['@id']] = val;
+      if (val instanceof Object) {
+        currResponses[this.context[index]['@id']] = respData.value;
+      } else {
+        currResponses[this.context[index]['@id']] = val;
+      }
       // TODO: add back branching logic
       this.visibility = this.getVisibility(currResponses);
 

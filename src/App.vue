@@ -239,7 +239,7 @@ export default {
         // console.log('getUserMedia API supported');
       } else {
         this.supported = false;
-        console.log(275, 'Getusermedia API is not supported on this browser');
+        // console.log(275, 'Getusermedia API is not supported on this browser');
       }
 
 
@@ -476,15 +476,35 @@ export default {
       _.map(data.response, (eachActivityList) => {
         const activityData = [];
         _.map(eachActivityList, (itemObj) => {
-          const newObj = { ...itemObj };
+          const newObj = { ...itemObj }; // what does this do?
           if (itemObj['@type'] === 'reproschema:Response') {
             // const voiceMap = {};
             if (itemObj.value instanceof Blob) {
-              const keyStrings = (itemObj.isAbout.split('/items/')[1]);
+              const keyStrings = (itemObj.isAbout.split('/'));
               const rId = itemObj['@id'].split('uuid:')[1];
-              jszip.folder(fileName).file(`${keyStrings}-${rId}.wav`, itemObj.value);
-              newObj.value = `${keyStrings}-${rId}.wav`;
-              voiceMap[itemObj['@id']] = `${keyStrings}-${rId}.wav`;
+              jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.wav`, itemObj.value);
+              newObj.value = `${keyStrings[keyStrings.length-1]}-${rId}.wav`;
+              voiceMap[itemObj['@id']] = `${keyStrings[keyStrings.length-1]}-${rId}.wav`;
+            }
+            // filter out sub-activities only, the criteria inside if needs to be changed
+            else if (itemObj.value.constructor === Object && !itemObj.value.hasOwnProperty('unitCode')) {
+              _.map(itemObj.value, (valueList, fieldKey) => {
+                const subActivityFieldData = [];
+                _.map(valueList, eachItem => {
+                  const newItem = { ...eachItem };
+                  if (eachItem && eachItem['@type'] === 'reproschema:Response') {
+                    if (eachItem.value instanceof Blob) {
+                      const keyStrings = (eachItem.isAbout.split('/'));
+                      const rId = eachItem['@id'].split('uuid:')[1];
+                      jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.wav`, eachItem.value);
+                      newItem.value = `${keyStrings[keyStrings.length-1]}-${rId}.wav`;
+                      voiceMap[eachItem['@id']] = `${keyStrings[keyStrings.length-1]}-${rId}.wav`;
+                    }
+                  }
+                  subActivityFieldData.push(newItem);
+                });
+                itemObj.value[fieldKey] = subActivityFieldData;
+              })
             }
             // eslint-disable-next-line no-unused-vars
             // _.map(itemObj, (value, key1) => {

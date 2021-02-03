@@ -370,7 +370,6 @@
         this.$emit('setScores', scoreObj, this.index);
       },
       setMPResponse(index, value) {
-        // console.log('setting response of multipart item', index, value);
         this.mp_responses[index] = value;
       },
       clearMPResponses() {
