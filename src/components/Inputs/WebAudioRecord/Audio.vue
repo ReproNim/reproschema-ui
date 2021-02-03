@@ -43,7 +43,7 @@ export default {
   name: 'audioRecord',
   props: {
     init: {
-      type: [String, Blob],
+      type: [String, Blob, Array],
     },
     mode: {
       type: String,
@@ -125,6 +125,7 @@ export default {
         const blobURL = URL.createObjectURL(e);
         self.recording.src = blobURL;
         self.recording.blob = e;
+        console.log(128, this.recording.blob);
         this.$emit('valueChanged', this.recording.blob);
         self.finish();
       };
