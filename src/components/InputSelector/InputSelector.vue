@@ -195,11 +195,11 @@
     <div v-if="showPassOptions !== null || showItemPassOptions !== null">
       <b-button class="" variant="default" v-if="(showItemPassOptions && showItemPassOptions['dontKnow']) || (showPassOptions && showPassOptions['dontKnow'])"
                 @click="dontKnow">
-        Don't Know
+        {{ $t('dont-know') }}
       </b-button>
       <b-button class="" variant="default" v-if="(showItemPassOptions && showItemPassOptions['skip']) || (showPassOptions && showPassOptions['skip'])"
                 @click="skip">
-        Skip
+        {{ $t('skip') }}
       </b-button>
     </div>
 
