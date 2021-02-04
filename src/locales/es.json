@@ -16,6 +16,7 @@
     "restart-button": "Reiniciar",
     "dont-know": "No sé",
     "skip": "Saltear",
+    "unit": "unit_es",
     "audio-support-msg": "Uy! Su navegador no puede grabar audio!",
     "invalid-email": "Email incorrecto",
     "select-invalid-query": "Uy! Ningún elemento se encontró. Considere cambiar la búsqueda.",
@@ -27,6 +28,10 @@
     "export-and-finish": "Puede hacer click en el botón Descargar en el menú si desea guardar sus respuestas. Para terminar, haga click en Enviar.",
     "finish": "Para terminar, haga click en Enviar.",
     "home-button": "Inicio",
+    "help-button": "Ayuda",
     "select-year": "Seleccione el año",
-    "upload-message": "Enviando... Esto generalmente demora un par de segundos para conexiones veloces o más dependiendo de su velocidad de conexión"
+    "upload-message": "Enviando... Esto generalmente demora un par de segundos para conexiones veloces o más dependiendo de su velocidad de conexión",
+    "safari-notification": "Micrófono no funciona con Chrome. Por favor copie el enlace del mail y péguelo en Safari",
+    "permission-refresh": "If you already changed permissions you need to refresh the page.",
+    "permission-change-notification": "Please change your browser's microphone permissions in order to answer these questions."
 }

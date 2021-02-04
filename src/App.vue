@@ -75,7 +75,7 @@
               </button>
             </b-navbar-nav>
             <b-navbar-nav class="float-right">
-              <a v-if="showHelp" class="nav-link" href="#" v-bind:data-email=getEmailData>Help</a>
+              <a v-if="showHelp" class="nav-link" href="#" v-bind:data-email=getEmailData>{{ $t('help-button') }}</a>
               <b-nav-item :to="{name: 'Landing', query: $route.query}" exact>{{ $t('home-button')}}</b-nav-item>
             </b-navbar-nav>
           </div>
@@ -100,14 +100,14 @@
       </div>
       <b-modal v-model="hasError" size="lg" ref="my-modal" hide-footer title="Uh-oh! Voice input needs fixing.">
         <div v-if="notIOS">
-          <p>Please change your browser's microphone permissions in order to answer these questions.</p>
+          <p>{{ $t('permission-change-notification')}}</p>
           <br>
           <img :src=permissionDemoPath alt="allow media permission" width="100%">
           <br>
-          <p>If you already changed permissions you need to refresh the page.</p>
+          <p>{{ $t('permission-refresh') }}</p>
         </div>
         <div v-else>
-          <p>Please use Safari browser on this device.</p>
+          <p>{{ $t('safari-notification') }}</p>
         </div>
       </b-modal>
     </div>
@@ -605,6 +605,7 @@ export default {
     }
     if (this.$route.query.lang) {
       this.selected_language = this.$route.query.lang;
+      i18n.locale = this.selected_language;
     } else this.selected_language = 'en';
 
     if (this.$route.query.uid) {
