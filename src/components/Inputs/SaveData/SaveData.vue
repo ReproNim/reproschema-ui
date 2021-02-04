@@ -96,7 +96,7 @@ export default {
             // console.log(294, value, key1);
             if (itemObj.value instanceof Blob) {
               // fileUploadData[key1] = value;
-              const keyStrings = (itemObj.isAbout.split('/')[1]);
+              const keyStrings = (itemObj.isAbout.split('/'));
               const rId = itemObj['@id'].split('uuid:')[1];
               jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.wav`, itemObj.value);
               newObj.value = `${keyStrings}-${rId}.wav`;
