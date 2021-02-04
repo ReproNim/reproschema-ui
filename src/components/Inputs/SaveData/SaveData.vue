@@ -96,12 +96,12 @@ export default {
             // console.log(294, value, key1);
             if (itemObj.value instanceof Blob) {
               // fileUploadData[key1] = value;
-              const keyStrings = (itemObj.isAbout.split('/')[1]);
+              const keyStrings = (itemObj.isAbout.split('/'));
               const rId = itemObj['@id'].split('uuid:')[1];
               jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.wav`, itemObj.value);
-              newObj.value = `${keyStrings}-${rId}.wav`;
+              newObj.value = `${keyStrings[keyStrings.length-1]}-${rId}.wav`;
               // eslint-disable-next-line no-param-reassign
-              voiceMap[itemObj['@id']] = `${keyStrings}-${rId}.wav`;
+              voiceMap[itemObj['@id']] = `${keyStrings[keyStrings.length-1]}-${rId}.wav`;
             }
             // filter out sub-activities only, the criteria inside if needs to be changed
             else if (itemObj.value.constructor === Object && !itemObj.value.hasOwnProperty('unitCode')) {
