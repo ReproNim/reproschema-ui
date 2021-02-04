@@ -718,7 +718,7 @@ export default {
         const allowList = _.map(this.$store.state.schema['http://schema.repronim.org/allow'],
           u => u['@id']);
         this.$store.dispatch('setExport', allowList.includes('http://schema.repronim.org/AllowExport'));
-        return allowList.includes('http://schema.repronim.org/AllowExport') && !this.shouldUpload;
+        return allowList.includes('http://schema.repronim.org/AllowExport');
       }
       this.$store.dispatch('setExport', false);
       return false;
