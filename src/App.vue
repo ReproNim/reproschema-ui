@@ -81,6 +81,13 @@
           </div>
         </nav>
         <b-container>
+          <b-modal v-model="invalidToken" ref="invalid-token-modal" ok-only title="Access denied!"
+                   no-close-on-esc no-close-on-backdrop hide-header-close hide-footer header-class="justify-content-center">
+            <img :src=accessDeniedPath alt="HTTP 403 Forbidden" width="100%">
+            <br>
+            <br>
+            <p class="contact">Please contact us at <a :href=contact target="_blank">{{contact}}</a></p>
+          </b-modal>
           <router-view
             :reprotermsUrl="reprotermsUrl"
             :srcUrl="srcUrl" :responses="responses[activityIndex]"
@@ -190,10 +197,12 @@ export default {
       startButton: config.startButton,
       showHelp: config.showHelp,
       bannerMessage: config.banner,
+      contact: config.contact,
       audioConstraints: { audio: true, video: false },
       hasError: false,
       browserType: "",
-      clientSpecs: {}
+      clientSpecs: {},
+      invalidToken: false
       // responses: [],
     };
   },
@@ -203,6 +212,7 @@ export default {
     },
     error() {
       this.hasError = true;
+      this.supported = false;
     },
     checkPermission() {
       // Older browsers might not implement mediaDevices at all, so we set an empty object first
@@ -630,8 +640,29 @@ export default {
     if (!_.isEmpty(this.$route.query)) {
         this.$store.dispatch('setQueryParameters', this.$route.query);
     }
+
+    const formData = new FormData();
+    const TOKEN = this.$store.getters.getAuthToken;
+    if (TOKEN) {
+      formData.append('file', null);
+      formData.append('auth_token', `${TOKEN}`);
+      axios.post(`${config.backendServer}/submit`, formData, {
+        'Content-Type': 'multipart/form-data',
+      }).then((res) => {
+        // console.log('SUCCESS!!', res.status);
+      })
+      .catch((e) => {
+                if (e.response.status === 403) {
+                  this.invalidToken = true;
+                }
+              });
+    }
   },
   computed: {
+    accessDeniedPath() {
+      let path = require('./assets/403-Access-Forbidden-HTML-Template.gif');
+      return path;
+    },
       notIOS() {
         // return false;
         return Bowser.parse(window.navigator.userAgent).os.name !== 'iOS';
