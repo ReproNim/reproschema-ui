@@ -10,7 +10,7 @@
           <p v-if="currentActivityIndex < listShow.length">
             {{ $t('review-and-next')}}</p>
           <!--<div class="mt-3 mb-3">Please review your responses, then click "Next" below:</div>-->
-          <b-button v-if="nextActivity[activityUrl]" @click="nextActivity1">{{ $t('next-button')}}</b-button>
+          <b-button v-if="nextActivity[activityUrl]" variant="danger" @click="nextActivity1">{{ $t('next-button')}}</b-button>
         </div>
         <div v-else>
           <p>Thank you for participating. Not eligible at this time!</p>
@@ -247,6 +247,17 @@
       },
       setResponse(val, index) {
         const itemUrl = this.context[index]['@id'];
+        let exportVal = val;
+        let usedList = [];
+        let isAboutUrl = itemUrl;
+        if (val.constructor === Object && !val.hasOwnProperty('unitCode')) { // to find sub-activities; condition might need to be changed
+          const sectionItemKey = Object.keys(val)[0];
+          const sectionItemValue = Object.values(val)[0];
+          exportVal = sectionItemValue;
+          usedList.push(sectionItemKey);
+          isAboutUrl = sectionItemKey;
+        }
+        usedList.push(`${itemUrl}`, `${this.srcUrl}`);
         const d2 = new Date();
         const t1 = d2.toISOString();
         // const t1 = performance.now();
@@ -260,9 +271,7 @@
           '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/1.0.0-rc2/contexts/generic',
           '@type': 'reproschema:ResponseActivity',
           '@id': `uuid:${respActivityUuid}`,
-          used: [`${itemUrl}`,
-            `${this.srcUrl}`,
-          ],
+          used: usedList,
           inLanguage: this.getAnsweredLanguage,
           startedAtTime: this.t0,
           endedAtTime: t1,
@@ -280,8 +289,8 @@
           wasAttributedTo: {
             '@id': this.$store.state.participantUuid,
           },
-          isAbout: itemUrl,
-          value: val,
+          isAbout: isAboutUrl,
+          value: exportVal,
         };
         if (this.participantId) {
           respData.wasAttributedTo.subject_id = this.participantId;
