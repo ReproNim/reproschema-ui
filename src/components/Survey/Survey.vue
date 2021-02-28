@@ -10,7 +10,7 @@
           <p v-if="currentActivityIndex < listShow.length">
             {{ $t('review-and-next')}}</p>
           <!--<div class="mt-3 mb-3">Please review your responses, then click "Next" below:</div>-->
-          <b-button v-if="nextActivity[activityUrl]" @click="nextActivity1">{{ $t('next-button')}}</b-button>
+          <b-button v-if="nextActivity[activityUrl]" variant="danger" @click="nextActivity1">{{ $t('next-button')}}</b-button>
         </div>
         <div v-else>
           <p>Thank you for participating. Not eligible at this time!</p>
