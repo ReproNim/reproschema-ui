@@ -476,85 +476,19 @@ export default {
     },
     formatData(data) {
       const jszip = new JSZip();
-      // const fileUploadData = {};
-      // const JSONdata = {};
-      // const JSONscores = {};
-      // sort out blobs from JSONdata
       let key = 0;
-      const voiceMap = {};
       const fileName = `${uuidv4()}-${this.participantId}`;
       _.map(data.response, (eachActivityList) => {
         const activityData = [];
         _.map(eachActivityList, (itemObj) => {
-          const newObj = { ...itemObj }; // what does this do?
+          const newObj = { ...itemObj };
           if (itemObj['@type'] === 'reproschema:Response') {
-            // const voiceMap = {};
             if (itemObj.value instanceof Blob) {
               const keyStrings = (itemObj.isAbout.split('/'));
               const rId = itemObj['@id'].split('uuid:')[1];
               jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.wav`, itemObj.value);
               newObj.value = `${keyStrings[keyStrings.length-1]}-${rId}.wav`;
-              voiceMap[itemObj['@id']] = `${keyStrings[keyStrings.length-1]}-${rId}.wav`;
             }
-            // filter out sub-activities only, the criteria inside if needs to be changed
-            else if (itemObj.value.constructor === Object && !itemObj.value.hasOwnProperty('unitCode')) {
-              _.map(itemObj.value, (valueList, fieldKey) => {
-                const subActivityFieldData = [];
-                _.map(valueList, eachItem => {
-                  const newItem = { ...eachItem };
-                  if (eachItem && eachItem['@type'] === 'reproschema:Response') {
-                    if (eachItem.value instanceof Blob) {
-                      const keyStrings = (eachItem.isAbout.split('/'));
-                      const rId = eachItem['@id'].split('uuid:')[1];
-                      jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.wav`, eachItem.value);
-                      newItem.value = `${keyStrings[keyStrings.length-1]}-${rId}.wav`;
-                      voiceMap[eachItem['@id']] = `${keyStrings[keyStrings.length-1]}-${rId}.wav`;
-                    }
-                  }
-                  subActivityFieldData.push(newItem);
-                });
-                itemObj.value[fieldKey] = subActivityFieldData;
-              })
-            }
-            // eslint-disable-next-line no-unused-vars
-            // _.map(itemObj, (value, key1) => {
-            //   if (value instanceof Blob) {
-            //     const keyStrings = (itemObj.isAbout.split('/items/')[1]);
-            //     const rId = itemObj['@id'].split('uuid:')[1];
-            //     jszip.folder('responses').file(`${keyStrings}-${rId}.wav`, value);
-            //     // eslint-disable-next-line no-param-reassign
-            //     voiceMap[itemObj['@id']] = `${keyStrings}-${rId}.wav`;
-            //   }
-            //   // todo: check if sections are present, they are no longer object but lists
-            //   // else if (_.isObject(value)) {
-            //   //   // make sure there aren't any Blobs here.
-            //   //   // if there are, add them to fileUploadData
-            //   //   _.map(value, (val2, key2) => {
-            //   //     if (val2 instanceof Blob) {
-            //   //       // console.log(322, val, key2, val2);
-            //   //       fileUploadData[`${key2}`] = val2;
-            //   //     }
-            //   //     else {
-            //   //       // refill the object.
-            //   //       if (!JSONdata[key]) {
-            //   //         JSONdata[key] = {};
-            //   //       }
-            //   //       JSONdata[key][key2] = val2;
-            //   //     }
-            //   //   });
-            //   // }
-            //   // else {
-            //   //   JSONdata[key] = val;
-            //   // }
-            // });
-            // console.log(316, voiceMap);
-            // _.map(voiceMap, (v, ky) => {
-            //   if (ky in itemObj) {
-            //     const newObj = itemObj;
-            //     // console.log(327, itemObj);
-            //     newObj[ky] = v;
-            //   }
-            // });
           }
           activityData.push(newObj);
         });
@@ -750,7 +684,7 @@ export default {
         const allowList = _.map(this.$store.state.schema['http://schema.repronim.org/allow'],
           u => u['@id']);
         this.$store.dispatch('setExport', allowList.includes('http://schema.repronim.org/AllowExport'));
-        return allowList.includes('http://schema.repronim.org/AllowExport') && !this.shouldUpload;
+        return allowList.includes('http://schema.repronim.org/AllowExport') || !this.shouldUpload;
       }
       this.$store.dispatch('setExport', false);
       return false;

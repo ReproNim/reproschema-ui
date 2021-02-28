@@ -212,13 +212,17 @@ export default {
       }
       const progress = ((Object.keys(this.responses).length) / totalQ) * 100;
       this.$emit('updateProgress', progress);
+      console.log(215, this.responses);
       if (progress === 100) {
         // console.log(212, 'section complete--send responses: ', this.responses);
-        this.$emit('valueChanged', this.responses);
+        // this.$emit('valueChanged', this.responses);
+        this.$emit('next');
       }
     },
     setResponse(val, index) {
       const itemUrl = this.context[index]['@id'];
+      console.log(225, itemUrl, val);
+      // console.log(226, this.responses);
       const d2 = new Date();
       const t1 = d2.toISOString();
       // const t1 = performance.now();
@@ -258,9 +262,11 @@ export default {
       if (this.participantId) {
         respData.wasAttributedTo.subject_id = this.participantId;
       }
-      const valueAndDataExport = [val, responseActivity, respData];
-      // console.log(259, 'section set response: id: val ', this.context[index]['@id'], valueAndDataExport);
-      this.$emit('saveResponse', this.context[index]['@id'], valueAndDataExport);
+      //const valueAndDataExport = [responseActivity, respData];
+      this.$emit('saveResponse', this.context[index]['@id'], val);
+      let answeredObj = {};
+      answeredObj[this.context[index]['@id']] = val;
+      this.$emit('valueChanged', answeredObj);
       this.t0 = t1;
       const currResponses = { ...this.responses };
       if (val instanceof Object) {
@@ -286,18 +292,14 @@ export default {
       this.$forceUpdate();
     },
     getScoring(responses) {
-      // console.log(225, 'responses', responses);
       const responseMapper = this.responseMapper(responses);
-      // console.log(227, 'response mapper', responseMapper);
       if (!_.isEmpty(this.activity['http://schema.repronim.org/compute'])) {
         const scoreMapper = {};
         _.map(this.activity['http://schema.repronim.org/compute'], (a) => {
-          // console.log(231, 'logic a', a);
           let scoreFormula = a[`${this.reprotermsUrl}jsExpression`][0]['@value'];
           const scoreVariableName = a[`${this.reprotermsUrl}variableName`][0]['@value'];
           if (_.isString(scoreFormula)) {
             scoreFormula = this.evaluateString(scoreFormula, responseMapper);
-            // console.log(235, 'a.val', val);
           }
           if (responseMapper[scoreVariableName]) {
             scoreMapper[responseMapper[scoreVariableName].ref] = scoreFormula;
@@ -348,10 +350,10 @@ export default {
       document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
       this.checkAlertMessage(idx);
       if (skip) {
-        this.setResponse('skipped', idx);
+        this.setResponse('http://schema.repronim.org/Skipped', idx);
       }
       if (dontKnow) {
-        this.setResponse('dontKnow', idx);
+        this.setResponse('http://schema.repronim.org/DontKnow', idx);
       }
 
       this.$forceUpdate();

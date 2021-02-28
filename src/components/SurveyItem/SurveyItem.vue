@@ -55,7 +55,7 @@
                      v-on:skip="sendSkip"
                      v-on:dontKnow="sendDontKnow"
                      v-on:next="sendNext"
-                     v-on:valueChanged="sendDataAndGoNext"
+                     v-on:valueChanged="sendData"
                      v-on:saveResponse="setMPResponse"
                      v-on:saveScores="setScore"
                      v-on:updateProgress="setMPProgress"

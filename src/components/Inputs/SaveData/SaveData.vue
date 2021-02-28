@@ -113,66 +113,19 @@ export default {
       const TOKEN = this.$store.getters.getAuthToken;
       const expiryMinutes = this.$store.state.expiryMinutes;
       const jszip = new JSZip();
-      // sort out blobs from JSONdata
       let key = 0;
-      const voiceMap = {};
       const fileName = `${uuidv4()}-${this.participantId}`;
       _.map(data.response, (eachActivityList) => {
         const activityData = [];
         _.map(eachActivityList, (itemObj) => {
           const newObj = { ...itemObj };
           if (itemObj['@type'] === 'reproschema:Response') {
-            // console.log(294, value, key1);
             if (itemObj.value instanceof Blob) {
-              // fileUploadData[key1] = value;
               const keyStrings = (itemObj.isAbout.split('/'));
               const rId = itemObj['@id'].split('uuid:')[1];
               jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.wav`, itemObj.value);
               newObj.value = `${keyStrings[keyStrings.length-1]}-${rId}.wav`;
-              // eslint-disable-next-line no-param-reassign
-              voiceMap[itemObj['@id']] = `${keyStrings[keyStrings.length-1]}-${rId}.wav`;
             }
-            // filter out sub-activities only, the criteria inside if needs to be changed
-            else if (itemObj.value.constructor === Object && !itemObj.value.hasOwnProperty('unitCode')) {
-              _.map(itemObj.value, (valueList, fieldKey) => {
-                const subActivityFieldData = [];
-                _.map(valueList, eachItem => {
-                  const newItem = { ...eachItem };
-                  if (eachItem && eachItem['@type'] === 'reproschema:Response') {
-                    if (eachItem.value instanceof Blob) {
-                      const keyStrings = (eachItem.isAbout.split('/'));
-                      const rId = eachItem['@id'].split('uuid:')[1];
-                      jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.wav`, eachItem.value);
-                      newItem.value = `${keyStrings[keyStrings.length-1]}-${rId}.wav`;
-                      voiceMap[eachItem['@id']] = `${keyStrings[keyStrings.length-1]}-${rId}.wav`;
-                    }
-                  }
-                  subActivityFieldData.push(newItem);
-                });
-                itemObj.value[fieldKey] = subActivityFieldData;
-              })
-            }
-            // todo: check if sections are present, they are no longer object but lists
-            // else if (_.isObject(value)) {
-            //   // make sure there aren't any Blobs here.
-            //   // if there are, add them to fileUploadData
-            //   _.map(value, (val2, key2) => {
-            //     if (val2 instanceof Blob) {
-            //       // console.log(322, val, key2, val2);
-            //       fileUploadData[`${key2}`] = val2;
-            //     }
-            //     else {
-            //       // refill the object.
-            //       if (!JSONdata[key]) {
-            //         JSONdata[key] = {};
-            //       }
-            //       JSONdata[key][key2] = val2;
-            //     }
-            //   });
-            // }
-            // else {
-            //   JSONdata[key] = val;
-            // }
           }
           activityData.push(newObj);
         });
@@ -182,19 +135,6 @@ export default {
           key += 1;
         }
       });
-
-      // _.map(data.scores, (val, key) => { // todo: check if score object not null?
-      //   if (!_.isEmpty(val)) {
-      //     JSONscores[key] = val;
-      //   }
-      // });
-      // _.map(JSONdata, (val, key) => {
-      //   // console.log(342, (key));
-      // jszip.folder('responses').file(`activity_${key}.json`, JSON.stringify(val, null, 4));
-      // });
-      // _.map(JSONscores, (val, key) => {
-      // jszip.folder('scores').file(`activity_${key}_score.json`, JSON.stringify(val, null, 4));
-      // });
       jszip.generateAsync({ type: 'blob' })
         .then((myzipfile) => {
           if (this.downloadAndSubmit) {
@@ -204,18 +144,17 @@ export default {
           formData.append('file', myzipfile, `${fileName}.zip`);
           formData.append('auth_token', `${TOKEN}`);
           formData.append('expires', `${expiryMinutes}`);
-          // console.log(179, `${config.backendServer}/submit`);
           const config1 = {
             onUploadProgress: function(progressEvent) {
               this.percentCompleted = parseInt(Math.round( (progressEvent.loaded * 100) / progressEvent.total ));
             }.bind(this),
             'Content-Type': 'multipart/form-data',
-            timeout: 120000
+            timeout: 3000
           };
           axios.post(`${config.backendServer}/submit`, formData, config1).then((res) => {
               this.hasData = true;
               this.isUploading = false;
-              console.log('SUCCESS!!', res.status);
+              // console.log('SUCCESS!!', res.status);
               this.$emit('valueChanged', { status: res.status });
             })
           .catch((e) => {

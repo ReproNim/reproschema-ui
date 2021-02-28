@@ -247,6 +247,17 @@
       },
       setResponse(val, index) {
         const itemUrl = this.context[index]['@id'];
+        let exportVal = val;
+        let usedList = [];
+        let isAboutUrl = itemUrl;
+        if (val.constructor === Object && !val.hasOwnProperty('unitCode')) { // to find sub-activities; condition might need to be changed
+          const sectionItemKey = Object.keys(val)[0];
+          const sectionItemValue = Object.values(val)[0];
+          exportVal = sectionItemValue;
+          usedList.push(sectionItemKey);
+          isAboutUrl = sectionItemKey;
+        }
+        usedList.push(`${itemUrl}`, `${this.srcUrl}`);
         const d2 = new Date();
         const t1 = d2.toISOString();
         // const t1 = performance.now();
@@ -260,9 +271,7 @@
           '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/1.0.0-rc2/contexts/generic',
           '@type': 'reproschema:ResponseActivity',
           '@id': `uuid:${respActivityUuid}`,
-          used: [`${itemUrl}`,
-            `${this.srcUrl}`,
-          ],
+          used: usedList,
           inLanguage: this.getAnsweredLanguage,
           startedAtTime: this.t0,
           endedAtTime: t1,
@@ -280,8 +289,8 @@
           wasAttributedTo: {
             '@id': this.$store.state.participantUuid,
           },
-          isAbout: itemUrl,
-          value: val,
+          isAbout: isAboutUrl,
+          value: exportVal,
         };
         if (this.participantId) {
           respData.wasAttributedTo.subject_id = this.participantId;
