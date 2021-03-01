@@ -29,7 +29,7 @@
     </div>
     <b-modal v-model="timeout" ref="timeout-modal" ok-title="Done" ok-only title="Uh-oh! Upload unsuccessful!" @ok="timeoutOK"
              no-close-on-esc no-close-on-backdrop hide-header-close>
-      <p>Please submit your locally exported zip file here: <a href="https://www.dropbox.com/request/KnfdziEjey8iGUPeocd3" target="_blank">Dropbox</a></p>
+      <p>Please submit your locally exported zip file <a :href=dataUploadPath target="_blank">here</a></p>
     </b-modal>
     <div style="width:800px; margin:0 auto;" v-bind:class="{ done: hasData}"></div>
   </div>
@@ -70,6 +70,7 @@ export default {
       showProgressBar: true,
       invalidToken: false,
       downloadAndSubmit: config.downloadAndSubmit,
+      dataUploadPath: config.dataUploadPath,
       contact: config.contact
     };
   },
