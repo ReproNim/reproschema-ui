@@ -22,6 +22,7 @@
     "invalid-email": "Email incorrecto",
     "select-invalid-query": "Uy! Ningún elemento se encontró. Considere cambiar la búsqueda.",
     "invalid-feedback-number": "Por favor ingrese un número",
+    "timeout-message": "Por favor contacte a los investigadores para un nuevo enlace escribiendo un email a",
     "input-selector-alert": "Este ítem no tiene título",
     "loader": "Cargando",
     "review-and-next": "Por favor revise sus respuestas, luego haga click en Siguiente abajo",

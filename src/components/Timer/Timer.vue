@@ -24,6 +24,7 @@
 </template>
 
 <script>
+    import config from '../../config';
     export default {
         name: 'Timer',
         props: ['starttime','endtime','trans'] ,
@@ -49,27 +50,28 @@
         mounted(){
             this.start = new Date(this.starttime).getTime();
             this.end = new Date(this.endtime).getTime();
-            // this.end = this.endtime;
-            // console.log(51, this.endtime);
-            // console.log(52, 'timer ', this.start, this.end);
             // Update the count down every 1 second
             this.timerCount(this.start,this.end);
             this.interval = setInterval(() => {
                 this.timerCount(this.start,this.end);
             }, 1000);
         },
+        computed: {
+            timeoutMessage() {
+                return this.$t('timeout-message');
+            },
+        },
         methods: {
             timerCount(start,end){
                 // Get todays date and time
                 var now = new Date().getTime();
-                // console.log(61, 'today', new Date(), now);
-                // console.log(62, 'start', start);
                 // Find the distance between now an the count down date
                 var distance = start - now;
                 var passTime =  end - now;
                 // console.log(69, distance, end, passTime);
                 if(distance < 0 && passTime < 0){
-                    this.message = this.wordString.expired;
+                    // this.message = this.wordString.expired;
+                    this.message = `${this.timeoutMessage} ${config.contact}`;
                     this.statusType = "expired";
                     // this.statusText = this.wordString.status.expired;
                     clearInterval(this.interval);
