@@ -337,7 +337,9 @@
           if (val !== 'http://schema.repronim.org/Skipped' && val !== 'http://schema.repronim.org/DontKnow') {
             if (_.isString(val)) {
               val = `'${val}'`; // put the string in quotes
-            }
+            } else if (_.isArray(val)) {
+              val = `[${val}]`; // enclose val in []
+             }
             output = output.replace(new RegExp(`\\b${k}\\b`), val);
           } else {
             output = output.replace(new RegExp(`\\b${k}\\b`), 0);
