@@ -150,7 +150,7 @@ export default {
               this.percentCompleted = parseInt(Math.round( (progressEvent.loaded * 100) / progressEvent.total ));
             }.bind(this),
             'Content-Type': 'multipart/form-data',
-            timeout: 120000
+            timeout: 420000
           };
           axios.post(`${config.backendServer}/submit`, formData, config1).then((res) => {
               this.hasData = true;
