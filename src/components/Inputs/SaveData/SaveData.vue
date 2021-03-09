@@ -1,5 +1,5 @@
 <template>
-  <div class="SaveD`ata ml-3 mr-3 pl-3 pr-3">
+  <div class="SaveData ml-3 mr-3 pl-3 pr-3">
     <div v-if="!isUploading && !hasData && !hasTimedOut">
       <div v-if="shouldUpload">
         <p>{{ $t('save-data')}}</p>
@@ -19,17 +19,19 @@
       </div>
     </div>
     <div v-if="isUploading && percentCompleted >0 && showProgressBar" class="loader">
+      <p>{{ $t('upload-message')}}</p>
       <b-progress :max="100" :striped="hasStripe">
         <b-progress-bar :value="percentCompleted" :label="`${((percentCompleted / 100) * 100)}%`" animated></b-progress-bar>
       </b-progress>
     </div>
     <div v-else-if="isUploading && percentCompleted === 0">
-        <p>{{ $t('upload-message')}}</p>
+        <p>{{ $t('prepare-upload')}}</p>
         <Loader></Loader>
     </div>
     <b-modal v-model="timeout" ref="timeout-modal" ok-title="Done" ok-only title="Uh-oh! Upload unsuccessful!" @ok="timeoutOK"
              no-close-on-esc no-close-on-backdrop hide-header-close>
-      <p>Please submit your locally exported zip file here: <a href="https://www.dropbox.com/request/KnfdziEjey8iGUPeocd3" target="_blank">Dropbox</a></p>
+      <p v-if="dataUploadPath">Please submit your locally exported zip file <a :href=dataUploadPath target="_blank">here</a></p>
+      <p v-else>Let researchers know with the <b>Help</b> button or by email to {{ contact }}</p>
     </b-modal>
     <div style="width:800px; margin:0 auto;" v-bind:class="{ done: hasData}"></div>
   </div>
@@ -70,6 +72,7 @@ export default {
       showProgressBar: true,
       invalidToken: false,
       downloadAndSubmit: config.downloadAndSubmit,
+      dataUploadPath: config.dataUploadPath,
       contact: config.contact
     };
   },
@@ -149,12 +152,12 @@ export default {
               this.percentCompleted = parseInt(Math.round( (progressEvent.loaded * 100) / progressEvent.total ));
             }.bind(this),
             'Content-Type': 'multipart/form-data',
-            timeout: 3000
+            timeout: 420000
           };
           axios.post(`${config.backendServer}/submit`, formData, config1).then((res) => {
               this.hasData = true;
               this.isUploading = false;
-              // console.log('SUCCESS!!', res.status);
+              console.log('SUCCESS!!', res.status);
               this.$emit('valueChanged', { status: res.status });
             })
           .catch((e) => {
