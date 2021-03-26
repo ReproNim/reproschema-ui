@@ -1,18 +1,35 @@
 <template>
   <div id="app" class="">
-    <nav class="navbar sticky-top navbar-custom">
-      <b-navbar-nav class="navbar-brand">
-        <b-nav-text>{{ banner }}</b-nav-text>
+    <nav v-if="bannerMessage || showTimer" class="navbar sticky-top navbar-custom">
+      <b-navbar-nav v-if="bannerMessage" class="navbar-brand">
+        <b-nav-text>{{ $t('banner-message') }}</b-nav-text>
       </b-navbar-nav>
+      <div id="timer" class="timer" v-if="showTimer">
+        <!--  Timer Component  -->
+        <Timer
+            starttime="Dec 23, 2020 02:37:25"
+            :endtime=expiryTime
+            trans='{
+            "day":"Day",
+            "hours":"Hours",
+            "minutes":"Minutes",
+            "seconds":"Seconds",
+            "expired":"Please contact the researchers for a new submission link.",
+            "running":"Remaining...",
+            "upcoming":"Till start of study."
+            }'
+        ></Timer>
+        <!--  End! Timer Component  -->
+      </div>
     </nav>
     <div class="wrapper">
       <!-- Sidebar -->
-      <nav id="sidebar" v-bind:class="{'active':checkDisableBack}" ref="sidebar">
+      <nav id="sidebar" ref="sidebar">
         <div class="sidebar-header">
           <h4>{{ sidebarHeader }}</h4>
         </div>
         <div>
-          <select v-model="selected_language">
+          <select v-model="selected_language" @change="setLang($event)">
             <option disabled value="">Select Language</option>
             <option v-for="option in languageOptions" v-bind:value="option.value"
             :key="option.text">
@@ -40,7 +57,7 @@
         </ul>
         <div>
           <b-button v-if="allowExport" class="align-middle" @click="downloadZipData"
-                    :disabled="!isAnswered">Export</b-button>
+                    :disabled="!isAnswered">{{ $t('export-button')}}</b-button>
         </div>
       </nav>
 
@@ -57,13 +74,20 @@
                 <span class="navbar-toggler-icon"></span>
               </button>
             </b-navbar-nav>
-
             <b-navbar-nav class="float-right">
-              <b-nav-item :to="{name: 'Landing', query: $route.query}" exact>Home</b-nav-item>
+              <a v-if="showHelp" class="nav-link" href="#" v-bind:data-email=getEmailData>{{ $t('help-button') }}</a>
+              <b-nav-item :to="{name: 'Landing', query: $route.query}" exact>{{ $t('home-button')}}</b-nav-item>
             </b-navbar-nav>
           </div>
         </nav>
         <b-container>
+          <b-modal v-model="invalidToken" ref="invalid-token-modal" ok-only title="Access denied!"
+                   no-close-on-esc no-close-on-backdrop hide-header-close hide-footer header-class="justify-content-center">
+            <img :src=accessDeniedPath alt="HTTP 403 Forbidden" width="100%">
+            <br>
+            <br>
+            <p class="contact">Please contact us at <a :href=contact target="_blank">{{contact}}</a></p>
+          </b-modal>
           <router-view
             :reprotermsUrl="reprotermsUrl"
             :srcUrl="srcUrl" :responses="responses[activityIndex]"
@@ -81,6 +105,18 @@
           />
         </b-container>
       </div>
+      <b-modal v-model="hasError" size="lg" ref="my-modal" hide-footer title="Uh-oh! Voice input needs fixing.">
+        <div v-if="notIOS">
+          <p>{{ $t('permission-change-notification')}}</p>
+          <br>
+          <img :src=permissionDemoPath alt="allow media permission" width="100%">
+          <br>
+          <p>{{ $t('permission-refresh') }}</p>
+        </div>
+        <div v-else>
+          <p>{{ $t('safari-notification') }}</p>
+        </div>
+      </b-modal>
     </div>
   </div>
 </template>
@@ -89,6 +125,8 @@
 import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
 import axios from 'axios';
+import Bowser from "bowser";
+import moment from 'moment';
 import _ from 'lodash';
 import JSZip from 'jszip';
 import { v4 as uuidv4 } from 'uuid';
@@ -98,11 +136,14 @@ import { saveAs } from 'file-saver';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import circleProgress from './components/Circle/';
+import Timer from './components/Timer/Timer';
 import config from './config';
+import i18n from './i18n';
 
 Vue.use(BootstrapVue);
 Vue.filter('reverse', value => value.slice().reverse());
 const safeEval = require('safe-eval');
+const MediaStreamRecorder = require('msr');
 
 function getFilename(s) {
   const folders = s.split('/');
@@ -111,10 +152,32 @@ function getFilename(s) {
   return filename;
 }
 
+class EmailDecoder {
+    constructor(selector = '[data-email]') {
+        this.selector = selector;
+        this.initialize();
+    }
+    mailto(hash) {
+        // https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding
+        window.location.href = `mailto:${atob(hash)}`
+    }
+    bindEvents() {
+        document.querySelectorAll(this.selector).forEach(email => {
+            email.addEventListener('click', () => {
+                this.mailto(email.getAttribute('data-email'))
+            })
+        })
+    }
+    initialize() {
+        this.bindEvents();
+    }
+}
+
 export default {
   name: 'App',
   components: {
     circleProgress,
+    Timer,
   },
   data() {
     return {
@@ -130,12 +193,79 @@ export default {
       clientIp: '',
       reproterms2: '',
       protocolUrl: config.githubSrc,
-      banner: config.banner,
       content: {},
+      startButton: config.startButton,
+      showHelp: config.showHelp,
+      bannerMessage: config.banner,
+      contact: config.contact,
+      audioConstraints: { audio: true, video: false },
+      hasError: false,
+      browserType: "",
+      clientSpecs: {},
+      invalidToken: false
       // responses: [],
     };
   },
   methods: {
+    initialize(audioStream) {
+      this.mediaRecorder = new MediaStreamRecorder(audioStream);
+    },
+    error() {
+      this.hasError = true;
+      this.supported = false;
+    },
+    checkPermission() {
+      // Older browsers might not implement mediaDevices at all, so we set an empty object first
+      if (navigator.mediaDevices === undefined) {
+        navigator.mediaDevices = {};
+      }
+
+      // Some browsers partially implement mediaDevices. We can't just assign an object
+      // with getUserMedia as it would overwrite existing properties.
+      // Here, we will just add the getUserMedia property if it's missing.
+      if (navigator.mediaDevices.getUserMedia === undefined) {
+        navigator.mediaDevices.getUserMedia = (constraints) => {
+          // First get ahold of the legacy getUserMedia, if present
+          const getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia
+                  || navigator.msGetUserMedia;
+
+          // Some browsers just don't implement it - return a rejected promise with an error
+          // to keep a consistent interface
+          if (!getUserMedia) {
+            this.supported = false;
+            return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+          }
+
+          // Otherwise, wrap the call to the old navigator.getUserMedia with a Promise
+          return new Promise(((resolve, reject) => {
+            getUserMedia.call(navigator, constraints, resolve, reject);
+          }));
+        };
+      }
+
+      if (navigator.mediaDevices.getUserMedia) {
+        this.supported = true;
+        navigator.mediaDevices.getUserMedia(this.audioConstraints).then(this.initialize, this.error);
+        // console.log('getUserMedia API supported');
+      } else {
+        this.supported = false;
+        // console.log(275, 'Getusermedia API is not supported on this browser');
+      }
+
+
+      // navigator.mediaDevices.getUserMedia(constraints)
+      //         .then(function(stream) {
+      //           /* use the stream */
+      //         })
+      //         .catch(function(err) {
+      //           /* handle the error */
+      //         });
+
+
+    },
+    setLang(event) {
+      i18n.locale = event.target.value;
+    },
     toggleSidebar() {
       if (this.$refs.sidebar.className.indexOf('active') < 0) {
         this.$refs.sidebar.className = 'active';
@@ -183,7 +313,10 @@ export default {
         needsVizUpdate = true;
       }
       // add protocol url to prov:used key in responseActivity
-      value[1].used.push(this.protocolUrl);
+        // eslint-disable-next-line no-prototype-builtins
+        if (value[1].hasOwnProperty('used')) {
+            value[1].used.push(this.protocolUrl);
+        }
       this.$store.dispatch('saveResponse', { key, value });
       if (needsVizUpdate) {
         this.setVisbility();
@@ -343,70 +476,25 @@ export default {
     },
     formatData(data) {
       const jszip = new JSZip();
-      // const fileUploadData = {};
-      // const JSONdata = {};
-      // const JSONscores = {};
-      // sort out blobs from JSONdata
       let key = 0;
-      const voiceMap = {};
+      const fileName = `${uuidv4()}-${this.participantId}`;
       _.map(data.response, (eachActivityList) => {
         const activityData = [];
         _.map(eachActivityList, (itemObj) => {
           const newObj = { ...itemObj };
           if (itemObj['@type'] === 'reproschema:Response') {
-            // const voiceMap = {};
             if (itemObj.value instanceof Blob) {
-              const keyStrings = (itemObj.isAbout.split('/items/')[1]);
+              const keyStrings = (itemObj.isAbout.split('/'));
               const rId = itemObj['@id'].split('uuid:')[1];
-              jszip.folder('responses').file(`${keyStrings}-${rId}.wav`, itemObj.value);
-              newObj.value = `${keyStrings}-${rId}.wav`;
-              voiceMap[itemObj['@id']] = `${keyStrings}-${rId}.wav`;
+              jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.wav`, itemObj.value);
+              newObj.value = `${keyStrings[keyStrings.length-1]}-${rId}.wav`;
             }
-            // eslint-disable-next-line no-unused-vars
-            // _.map(itemObj, (value, key1) => {
-            //   if (value instanceof Blob) {
-            //     const keyStrings = (itemObj.isAbout.split('/items/')[1]);
-            //     const rId = itemObj['@id'].split('uuid:')[1];
-            //     jszip.folder('responses').file(`${keyStrings}-${rId}.wav`, value);
-            //     // eslint-disable-next-line no-param-reassign
-            //     voiceMap[itemObj['@id']] = `${keyStrings}-${rId}.wav`;
-            //   }
-            //   // todo: check if sections are present, they are no longer object but lists
-            //   // else if (_.isObject(value)) {
-            //   //   // make sure there aren't any Blobs here.
-            //   //   // if there are, add them to fileUploadData
-            //   //   _.map(value, (val2, key2) => {
-            //   //     if (val2 instanceof Blob) {
-            //   //       // console.log(322, val, key2, val2);
-            //   //       fileUploadData[`${key2}`] = val2;
-            //   //     }
-            //   //     else {
-            //   //       // refill the object.
-            //   //       if (!JSONdata[key]) {
-            //   //         JSONdata[key] = {};
-            //   //       }
-            //   //       JSONdata[key][key2] = val2;
-            //   //     }
-            //   //   });
-            //   // }
-            //   // else {
-            //   //   JSONdata[key] = val;
-            //   // }
-            // });
-            // console.log(316, voiceMap);
-            // _.map(voiceMap, (v, ky) => {
-            //   if (ky in itemObj) {
-            //     const newObj = itemObj;
-            //     // console.log(327, itemObj);
-            //     newObj[ky] = v;
-            //   }
-            // });
           }
           activityData.push(newObj);
         });
         // write out the activity files
         if (activityData.length) { // if activity is answered then write to file
-          jszip.folder('responses').file(`activity_${key}.jsonld`, JSON.stringify(activityData, null, 4));
+          jszip.folder(fileName).file(`activity_${key}.jsonld`, JSON.stringify(activityData, null, 4));
           key += 1;
         }
       });
@@ -425,8 +513,7 @@ export default {
       // });
       jszip.generateAsync({ type: 'blob' })
         .then((myzipfile) => {
-          const fileName = `${uuidv4()}-${this.participantId}.zip`;
-          saveAs(myzipfile, fileName);
+          saveAs(myzipfile, `${fileName}.zip`);
         });
     },
   },
@@ -454,14 +541,23 @@ export default {
     // this.$store.dispatch('getBaseSchema', url);
   },
   mounted() {
+    new EmailDecoder('[data-email]');
+    this.clientSpecs = JSON.stringify(Bowser.parse(window.navigator.userAgent));
+    this.browserType = Bowser.parse(window.navigator.userAgent).browser.name;
+    if (config.checkMediaPermission) {
+      this.checkPermission();
+    }
     if (this.$route.query.lang) {
       this.selected_language = this.$route.query.lang;
+      i18n.locale = this.selected_language;
     } else this.selected_language = 'en';
 
     if (this.$route.query.uid) {
       // console.log(407, this.$route.query.uid);
       this.$store.dispatch('saveParticipantId', this.$route.query.uid);
-    } else this.$store.dispatch('saveParticipantId', uuidv4());
+    } else if (config.generateRandomUid) {
+      this.$store.dispatch('saveParticipantId', uuidv4());
+    }
     if (this.$route.params.id) {
       this.$store.dispatch('setActivityIndex', this.$route.params.id);
     }
@@ -469,14 +565,67 @@ export default {
       this.langMap = resp.data;
     });
     this.$store.dispatch('setParticipantUUID', uuidv4()); // set participant UUID for the current user
-    if (this.$route.query.expiry_minutes) {
-      this.$store.dispatch('setExpiryMinutes', this.$route.query.expiry_minutes);
+    if (this.$route.query.expiry_time) {
+      this.$store.dispatch('setExpiryMinutes', this.$route.query.expiry_time);
     }
     if (this.$route.query.auth_token) {
       this.$store.dispatch('setAuthToken', this.$route.query.auth_token);
     }
+    if (!_.isEmpty(this.$route.query)) {
+        this.$store.dispatch('setQueryParameters', this.$route.query);
+    }
+
+    const formData = new FormData();
+    const TOKEN = this.$store.getters.getAuthToken;
+    if (TOKEN) {
+      formData.append('file', null);
+      formData.append('auth_token', `${TOKEN}`);
+      axios.post(`${config.backendServer}/submit`, formData, {
+        'Content-Type': 'multipart/form-data',
+      }).then((res) => {
+        // console.log('SUCCESS!!', res.status);
+      })
+      .catch((e) => {
+                if (e.response.status === 403) {
+                  this.invalidToken = true;
+                }
+              });
+    }
   },
   computed: {
+    accessDeniedPath() {
+      let path = require('./assets/403-Access-Forbidden-HTML-Template.gif');
+      return path;
+    },
+      notIOS() {
+        // return false;
+        return Bowser.parse(window.navigator.userAgent).os.name !== 'iOS';
+      },
+      permissionDemoPath() {
+        let path = require('./assets/audio-permission-setting-chrome.gif');
+        if (this.browserType === 'Firefox') {
+          path = require('./assets/audio-permission-setting-firefox.gif');
+          // do something - firefox image
+        }
+        else if (this.browserType === 'Safari') {
+          path = require('./assets/audio-permission-setting-safari.gif');
+        }
+        // default is the Chrome demo
+        return path;
+      },
+      expiryTime() {
+        let endDate = moment(this.$store.getters.getExpiryTime)['_i'];
+        endDate = endDate.replace(' ', '+');
+        // console.log(537, endDate, new Date(endDate).toString(), new Date(endDate).getTime());
+        return new Date(endDate).getTime();
+      },
+      showTimer() {
+          return !!this.$store.getters.getExpiryTime;
+      },
+      getEmailData() {
+          const emailData = `${config.contact}?subject=${config.emailSubject}&body=[ Describe the issue in detail. You can copy and paste text, screen capture and/or describe the expected vs. actual result.] Browser properties: ${this.clientSpecs}]`;
+          return window.btoa(emailData);
+      },
     getschemaType() {
       return this.$store.getters.getschemaType;
     },
@@ -527,12 +676,17 @@ export default {
         return langList;
       } return [];
     },
+    shouldUpload() {
+      return !!(config.backendServer && this.$store.getters.getAuthToken);
+    },
     allowExport() {
       if (!_.isEmpty(this.$store.state.schema) && this.$store.state.schema['http://schema.repronim.org/allow']) {
         const allowList = _.map(this.$store.state.schema['http://schema.repronim.org/allow'],
           u => u['@id']);
-        return allowList.includes('http://schema.repronim.org/AllowExport');
+        this.$store.dispatch('setExport', allowList.includes('http://schema.repronim.org/AllowExport'));
+        return allowList.includes('http://schema.repronim.org/AllowExport') || !this.shouldUpload;
       }
+      this.$store.dispatch('setExport', false);
       return false;
     },
     schemaNameMapper() {
@@ -628,49 +782,20 @@ export default {
 </script>
 
 <style>
-  #app {
-    font-family: 'Avenir', Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    color: #2c3e50;
-  }
-
-  #content {
-    width: 100%;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-
   .wrapper {
     display: flex;
     width: 100%;
-    align-items: stretch;
   }
 
   #sidebar {
     min-width: 250px;
     max-width: 250px;
     text-align: center;
+    transition: all 0.3s;
   }
 
   #sidebar.active {
     margin-left: -250px;
-  }
-
-  @media (max-width: 768px) {
-    #sidebar {
-      margin-left: -250px;
-    }
-    /*#sidebar.active {*/
-    /*  margin-left: 0;*/
-    /*}*/
-  }
-
-  #sidebar {
-    /* don't forget to add all the previously mentioned styles here too */
-    transition: all 0.3s;
   }
 
   #sidebar .sidebar-header {
@@ -712,6 +837,18 @@ export default {
 
   }
 
+  #content {
+    width: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  #content.active {
+    width: 100%;
+  }
+
   select > .placeholder {
     display: none;
   }
@@ -746,9 +883,26 @@ export default {
     text-decoration: none;
   }
 
-  /* fix for blue border box around checkbox and radio */
-  *, ::after, ::before {
-    outline: none;
-    box-shadow: none;
+  .help {
+      color: rgba(0, 0, 0, 0.5);
   }
+
+  @media (max-width: 768px) {
+    #sidebar {
+      margin-left: -250px;
+    }
+    #sidebar.active {
+      margin-left: 0px;
+    }
+    #content {
+      width: 100%;
+    }
+    #content.active {
+      width: calc(100% - 250px);
+    }
+  }
+
+
 </style>
+
+

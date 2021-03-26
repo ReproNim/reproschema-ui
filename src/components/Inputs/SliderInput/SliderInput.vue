@@ -50,30 +50,35 @@ export default {
   },
   computed: {
     interval() {
-      return _.map(this.constraints['http://schema.org/itemListElement'], (v) => {
-        console.log(54, v);
-        const activeValueChoices = _.filter(v['http://schema.org/name'], ac => ac['@language'] === this.selected_language);
-        console.log(55, activeValueChoices);
-        return activeValueChoices['@value'];
+      return _.map(this.constraints['http://schema.repronim.org/choices'], (v) => {
+        // const activeValueChoices = _.filter(v['http://schema.org/name'], ac => ac['@language'] === this.selected_language);
+        // console.log(55, activeValueChoices);
+        // return activeValueChoices['@value'];
+        return v['http://schema.repronim.org/value'][0]['@value'];
       });
     },
     getMinLabel() {
-      const activeMinLabel = _.filter(this.constraints['http://schema.org/minValue'], labels => labels['@language'] === this.selected_language);
-      return activeMinLabel[0]['@value'];
+      if (this.constraints['http://schema.repronim.org/choices']) {
+        const activeMinLabel = _.filter(this.constraints['http://schema.repronim.org/choices'][0]['http://schema.org/name'], labels => labels['@language'] === this.selected_language);
+        return activeMinLabel[0]['@value'];
+      } return 'no min label';
     },
     getMaxLabel() {
-      const activeMaxLabel = _.filter(this.constraints['http://schema.org/maxValue'], labels => labels['@language'] === this.selected_language);
-      return activeMaxLabel[0]['@value'];
+      if (this.constraints['http://schema.repronim.org/choices']) {
+        const choicesLength = (this.constraints['http://schema.repronim.org/choices']).length;
+        const activeMaxLabel = _.filter(this.constraints['http://schema.repronim.org/choices'][choicesLength-1]['http://schema.org/name'], labels => labels['@language'] === this.selected_language);
+        return activeMaxLabel[0]['@value'];
+      } return 'no max label';
     },
     getMinImageLabel() {
-      const vcList = this.constraints['http://schema.org/itemListElement'];
+      const vcList = this.constraints['http://schema.repronim.org/choices'];
       if (vcList[0]['http://schema.org/image']) {
         return vcList[0]['http://schema.org/image'][0]['@value'];
       }
       return false;
     },
     getMaxImageLabel() {
-      const vcList = this.constraints['http://schema.org/itemListElement'];
+      const vcList = this.constraints['http://schema.repronim.org/choices'];
       const N = vcList.length;
       if (vcList[N - 1]['http://schema.org/image']) {
         return vcList[N - 1]['http://schema.org/image'][0]['@value'];

@@ -23,6 +23,16 @@ module.exports = {
         return options;
       });
   },
+
   lintOnSave: process.env.NODE_ENV !== 'production',
-  publicPath: process.env.NODE_ENV === "production" ? config.assetsPublicPath : "/"
+  publicPath: process.env.NODE_ENV === "production" ? config.assetsPublicPath : "/",
+
+  pluginOptions: {
+    i18n: {
+      locale: 'en',
+      fallbackLocale: 'en',
+      localeDir: 'locales',
+      enableInSFC: true
+    }
+  }
 };

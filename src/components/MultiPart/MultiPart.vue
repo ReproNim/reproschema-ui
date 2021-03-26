@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="!listShow.length">
-      <h1 >Loading...</h1>
+      <h1 >{{ $t('loader')}}...</h1>
       <!-- <Loader /> -->
     </div>
     <div v-else>
@@ -28,11 +28,11 @@
 
     <div class="text-right mt-3" v-if="showPassOptions !== null ">
       <b-button variant="default"
-                @click="restart">Restart</b-button>
+                @click="restart">{{ $t('restart-button')}}</b-button>
       <b-button variant="default" v-if="showPassOptions['dontKnow']"
-                @click="dontKnow">Don't Know</b-button>
+                @click="dontKnow">{{ $t('dont-know')}}</b-button>
       <b-button variant="default" v-if="showPassOptions['skip']"
-                @click="skip">Skip</b-button>
+                @click="skip">{{ $t('skip')}}</b-button>
     </div>
   </div>
 </template>

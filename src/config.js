@@ -1,9 +1,14 @@
 module.exports = {
   /* eslint-disable */
   githubSrc: 'https://raw.githubusercontent.com/ReproNim/demo-protocol/master/VoicePilot/VoicePilot_schema',
-  banner: 'This service is a demonstration for the ReproNim project.',
-  startButton: 'Join',
+  startButton: {
+    "en": 'Join',
+    "es": 'Participar'
+  },
   assetsPublicPath: '/reproschema-ui/',
   backendServer: null,
-  consent: true
+  consent: true,
+  showHelp: true,
+  contact: 'voice_survey@mit.edu',
+  emailSubject: 'Help with Covid19 study'
 };

@@ -5,11 +5,11 @@
         <b-col lg="4" class="col-4 col-md-4">
           <b-form-group>
             <b-form-input ref="floatInput" v-model="input1"
-                          :class="{'is-invalid': !isValidFloat, 'is-valid': isValidFloat}">
+                          :class="{'is-valid': isValidFloat}">
             </b-form-input>
-            <div class="invalid-feedback">
-              Please enter a number
-            </div>
+<!--            <div class="invalid-feedback">-->
+<!--              {{ $t('invalid-feedback-number')}}-->
+<!--            </div>-->
           </b-form-group>
         </b-col>
         <b-col lg="4" v-if="hasUnit && Array.isArray(options)">
@@ -22,7 +22,7 @@
           <p class="singleUnit"> {{ options }}</p>
         </div>
       </b-row>
-      <b-btn type="submit">Submit</b-btn>
+      <b-btn type="submit">{{ $t('submit-button')}}</b-btn>
     </b-form>
   </div>
 </template>

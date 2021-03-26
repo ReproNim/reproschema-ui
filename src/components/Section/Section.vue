@@ -1,8 +1,8 @@
 <template>
   <div>
     <div v-if="!listShow.length">
-      <h1 >Loading...</h1>
-      <!-- <Loader /> -->
+      <h1 >{{ $t('loader')}}...</h1>
+       <Loader />
     </div>
     <div v-else>
       <!-- <b-progress :value="progress" :max="100" class="mb-3"></b-progress> -->
@@ -50,6 +50,7 @@ import VuejsDialog from 'vuejs-dialog';
 import 'vuejs-dialog/dist/vuejs-dialog.min.css';
 import _ from 'lodash';
 import Loader from '../Loader/';
+import { v4 as uuidv4 } from 'uuid';
 
 Vue.use(VuejsDialog);
 
@@ -140,14 +141,31 @@ export default {
       return {};
     },
     responseMapper(responses) {
+      let keyArr;
       // a variable map is defined! great
-      const vmap = this.activity['http://schema.repronim.org/addProperties'];
-      const keyArr = _.map(vmap, (v) => {
-        const key = v[`${this.reprotermsUrl}isAbout`][0]['@id'];
-        const qId = v[`${this.reprotermsUrl}variableName`][0]['@value'];
-        const val = responses[key];
-        return { key, val, qId };
-      });
+      if (this.activity['http://schema.repronim.org/addProperties']) {
+        const vmap = this.activity['http://schema.repronim.org/addProperties'];
+        keyArr = _.map(vmap, (v) => {
+          const key = v['http://schema.repronim.org/isAbout'][0]['@id'];
+          const qId = v['http://schema.repronim.org/variableName'][0]['@value'];
+          const val = responses[key];
+          return { key, val, qId };
+        });
+
+      }
+      if (this.$store.getters.getQueryParameters) {
+        const q = this.$store.getters.getQueryParameters;
+        Object.entries(q).forEach(
+                ([key, value]) => {
+                  const qId = key;
+                  if (key === "week") {
+                    value = parseInt(value);
+                  }
+                  const val = value;
+                  keyArr.push({ key, val, qId });
+                }
+        );
+      }
       const outMapper = {};
       _.map(keyArr, (a) => {
         outMapper[a.qId] = { val: a.val, ref: a.key };
@@ -155,12 +173,16 @@ export default {
       return outMapper;
     },
     evaluateString(string, responseMapper) {
+      // console.log(176, string, responseMapper);
       const keys = Object.keys(responseMapper);
       let output = string;
       _.map(keys, (k) => {
         // grab the value of the key from responseMapper
         let val = responseMapper[k].val;
-        if (val !== 'skipped' && val !== 'dontknow') {
+        if (Array.isArray(responseMapper[k].val)) {
+          val = responseMapper[k].val[0];
+        }
+        if (val !== 'http://schema.repronim.org/Skipped' && val !== 'http://schema.repronim.org/DontKnow') {
           if (_.isString(val)) {
             val = `'${val}'`; // put the string in quotes
           }
@@ -187,25 +209,71 @@ export default {
       // TODO: add back branching logic to this.
       if (!_.isEmpty(this.visibility)) {
         totalQ = _.filter(this.visibility).length;
-        console.log()
       }
       const progress = ((Object.keys(this.responses).length) / totalQ) * 100;
       this.$emit('updateProgress', progress);
+      console.log(215, this.responses);
       if (progress === 100) {
-        this.$emit('valueChanged', this.responses);
+        // console.log(212, 'section complete--send responses: ', this.responses);
+        // this.$emit('valueChanged', this.responses);
+        this.$emit('next');
       }
     },
     setResponse(val, index) {
+      const itemUrl = this.context[index]['@id'];
+      console.log(225, itemUrl, val);
+      // console.log(226, this.responses);
+      const d2 = new Date();
+      const t1 = d2.toISOString();
       // const t1 = performance.now();
-      // console.log(202, 'end of a section-question', index, 'is', t1);
-      // const respData = { startedAt: this.t0 / 1000,
-      //   recordedAt: t1 / 1000,
-      //   value: val };
-      // console.log(207, 'section resp obj', respData);
+      let uiUrl = `${window.location.origin}`;
+      if (window.location.pathname) {
+        uiUrl = `${uiUrl}${window.location.pathname}`;
+      }
+      const respActivityUuid = uuidv4();
+      const responseUuid = uuidv4();
+      const responseActivity = {
+        '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/1.0.0-rc2/contexts/generic',
+        '@type': 'reproschema:ResponseActivity',
+        '@id': `uuid:${respActivityUuid}`,
+        used: [`${itemUrl}`,
+          `${this.srcUrl}`,
+        ],
+        inLanguage: this.getAnsweredLanguage,
+        startedAtTime: this.t0,
+        endedAtTime: t1,
+        wasAssociatedWith: {
+          version: '0.0.1',
+          url: uiUrl,
+          '@id': 'https://github.com/ReproNim/reproschema-ui',
+        },
+        generated: `uuid:${responseUuid}`,
+      };
+      const respData = {
+        '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/1.0.0-rc2/contexts/generic',
+        '@type': 'reproschema:Response',
+        '@id': `uuid:${responseUuid}`,
+        wasAttributedTo: {
+          '@id': this.$store.state.participantUuid,
+        },
+        isAbout: itemUrl,
+        value: val,
+      };
+      if (this.participantId) {
+        respData.wasAttributedTo.subject_id = this.participantId;
+      }
+      //const valueAndDataExport = [responseActivity, respData];
       this.$emit('saveResponse', this.context[index]['@id'], val);
+      let answeredObj = {};
+      answeredObj[this.context[index]['@id']] = val;
+      this.$emit('valueChanged', answeredObj);
+      this.t0 = t1;
       const currResponses = { ...this.responses };
-      // console.log(204, 'cur resp', currResponses, this.context[index]['@id'], val);
-      currResponses[this.context[index]['@id']] = val;
+      if (val instanceof Object) {
+        currResponses[this.context[index]['@id']] = respData.value;
+      } else {
+        currResponses[this.context[index]['@id']] = val;
+      }
       // TODO: add back branching logic
       this.visibility = this.getVisibility(currResponses);
 
@@ -224,18 +292,14 @@ export default {
       this.$forceUpdate();
     },
     getScoring(responses) {
-      // console.log(225, 'responses', responses);
       const responseMapper = this.responseMapper(responses);
-      // console.log(227, 'response mapper', responseMapper);
       if (!_.isEmpty(this.activity['http://schema.repronim.org/compute'])) {
         const scoreMapper = {};
         _.map(this.activity['http://schema.repronim.org/compute'], (a) => {
-          // console.log(231, 'logic a', a);
           let scoreFormula = a[`${this.reprotermsUrl}jsExpression`][0]['@value'];
           const scoreVariableName = a[`${this.reprotermsUrl}variableName`][0]['@value'];
           if (_.isString(scoreFormula)) {
             scoreFormula = this.evaluateString(scoreFormula, responseMapper);
-            // console.log(235, 'a.val', val);
           }
           if (responseMapper[scoreVariableName]) {
             scoreMapper[responseMapper[scoreVariableName].ref] = scoreFormula;
@@ -249,25 +313,24 @@ export default {
       // final setting should be a combination of all four [activity (add, override), protocol(add, override)] (if present)
       // protocol overrides activity
       const protocolSchema = this.$store.getters.getProtocolSchema;
-      console.log(257, protocolSchema);
       let flag = 0;
       if (!flag && protocolSchema['http://schema.repronim.org/overrideProperties']) { // priority 1
-        console.log(259, 'priority 1');
+        // console.log(259, 'priority 1');
       } else if (!flag && protocolSchema['http://schema.repronim.org/addProperties']) { // priority 2
         let addP = _.filter(protocolSchema['http://schema.repronim.org/addProperties'], c => {
           // console.log(263, c['http://schema.repronim.org/isAbout'][0]['@id'], this.context[idx]['@id']);
           c['http://schema.repronim.org/isAbout'][0]['@id'] === this.context[idx]['@id'];
         });
         flag = addP.length ? 1: 0;
-        console.log(265, 'priority 2', this.context[idx]['@id'], addP, flag);
+        // console.log(265, 'priority 2', this.context[idx]['@id'], addP, flag);
       } if (!flag && this.activity['http://schema.repronim.org/overrideProperties']) { // priority 3
-        console.log(268, 'priority 3');
+        // console.log(268, 'priority 3');
       } else { // priority 4 - look in activity addProperties
         let addPA = _.filter(this.activity['http://schema.repronim.org/addProperties'], c =>
           //console.log(271, c['http://schema.repronim.org/isAbout'][0]['@id'], this.context[idx]['@id']);
           (c['http://schema.repronim.org/isAbout'][0]['@id'] === this.context[idx]['@id']) && c['http://schema.repronim.org/message']
         );
-        console.log(274, 'priority 4', addPA);
+        // console.log(274, 'priority 4', addPA);
       }
       if (idx === 8 && this.responses[this.context[idx]['@id']] > 0) {
         // Trigger notification for non-zero suicidal ideation
@@ -287,10 +350,10 @@ export default {
       document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
       this.checkAlertMessage(idx);
       if (skip) {
-        this.setResponse('skipped', idx);
+        this.setResponse('http://schema.repronim.org/Skipped', idx);
       }
       if (dontKnow) {
-        this.setResponse('dontKnow', idx);
+        this.setResponse('http://schema.repronim.org/DontKnow', idx);
       }
 
       this.$forceUpdate();

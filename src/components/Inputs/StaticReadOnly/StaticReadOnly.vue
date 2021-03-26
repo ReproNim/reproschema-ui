@@ -1,6 +1,15 @@
 <template>
   <div class="staticReadOnly">
-    <b-btn @click="onSubmit"> {{ input }} </b-btn>
+    <div v-if="input">
+      <h4> {{ input }}</h4>
+      <br>
+      <b-btn @click="onSubmit"> Done </b-btn>
+    </div>
+    <div v-else>
+      <b-alert show>
+        Parameter could not be retrieved at this time. Please contact "{{ contact }}" for further assistance.
+      </b-alert>
+    </div>
   </div>
 </template>
 
@@ -8,25 +17,33 @@
 </style>
 
 <script>
+import config from '../../../config';
 export default {
   name: 'StaticReadOnly',
   props: ['constraints', 'init', 'result', 'selected_language'],
   methods: {
     onSubmit(e) {
       e.preventDefault();
-      if (this.result) {
-        this.$emit('valueChanged', this.result);
-        this.input = 'Success';
-      } else this.input = 'Fail';
-      // this.$emit('valueChanged', this.input);
+      if (this.input) {
+        this.$emit('valueChanged', this.input);
+      }
     },
   },
   data() {
     return {
-      input: 'show result',
+      contact: config.contact,
+      input: '',
     };
   },
+  computed: {
+    getPId() {
+      return this.$store.getters.getParticipantId;
+    },
+  },
   mounted() {
+    if (this.getPId) {
+      this.input = this.getPId;
+    }
     if (this.init) {
       this.input = this.init;
     }

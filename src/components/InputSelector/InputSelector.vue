@@ -10,7 +10,7 @@
     </div>
 
     <b-alert variant="danger" show v-else>
-      This item does not have a title defined
+      {{ $t('input-selector-alert')}}
     </b-alert>
 
     <!-- If type is radio -->
@@ -61,6 +61,16 @@
         :selected_language="selected_language"
         :init="init" v-on:valueChanged="sendData"
         mode="audioRecordNumberTask" />
+    </div>
+
+    <!-- If type is audioRecordAudioTask -->
+    <div v-else-if="inputType === 'audioRecordAudioTask'">
+      <AudioRecord
+        :constraints="valueConstraints"
+        :selected_language="selected_language"
+        :init="init" v-on:valueChanged="sendData"
+        :fieldData="fieldData"
+        mode="audioRecordAudioTask" />
     </div>
 
     <!-- If type is text -->
@@ -191,15 +201,15 @@
         no input type UI built for "{{inputType}}" yet!
       </b-alert>
     </div>
-
     <!-- you can skip this question if requiredValue is not true -->
-    <div class="row float-right" v-if="showPassOptions !== null ">
-      <b-button class="" variant="default" v-if="showPassOptions['dontKnow']"
+    <div v-if="showPassOptions !== null || showItemPassOptions !== null">
+      <b-button class="" variant="default" v-if="(showItemPassOptions && showItemPassOptions['dontKnow']) || (showPassOptions && showPassOptions['dontKnow'])"
                 @click="dontKnow">
-        Don't Know
+        {{ $t('dont-know') }}
       </b-button>
-      <b-button class="" variant="default" v-if="showPassOptions['skip']" @click="skip">
-        Skip
+      <b-button class="" variant="default" v-if="(showItemPassOptions && showItemPassOptions['skip']) || (showPassOptions && showPassOptions['skip'])"
+                @click="skip">
+        {{ $t('skip') }}
       </b-button>
     </div>
 
@@ -255,6 +265,9 @@ export default {
       type: String,
     },
     showPassOptions: {
+      type: Object,
+    },
+    showItemPassOptions: {
       type: Object,
     },
     preamble: {

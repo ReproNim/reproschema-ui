@@ -12,7 +12,7 @@
             ref="checkboxbutton"
           ></b-form-checkbox-group>
         </b-form-group>
-        <b-btn type="submit">Submit</b-btn>
+        <b-btn type="submit">{{ $t('submit-button')}}</b-btn>
       </b-form>
     </div>
     <div v-else>
@@ -102,16 +102,16 @@ export default {
     },
   },
   watch: {
-    init: {
-      handler() {
-        if (this.init != null) {
-          this.selected = this.init.value;
-        } else {
-          this.selected = false;
-        }
-      },
-      deep: true, // this watches all of the changes within an object. init: {value: 1}  not init: 1
-    },
+    // init: {
+    //   handler() {
+    //     if (this.init != null) {
+    //       this.selected = this.init.value;
+    //     } else {
+    //       this.selected = false;
+    //     }
+    //   },
+    //   deep: true, // this watches all of the changes within an object. init: {value: 1}  not init: 1
+    // },
     // selectedImages() {
     //   if (this.selectedImages) {
     //     this.$set(this.$refs.imageSelect.singleSelected, this.selectedImage[0]);

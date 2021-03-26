@@ -1,7 +1,7 @@
 <template>
   <div class="DocumentUpload">
     <input type="file" @change="onFileSelected">
-    <button @click="onSubmit">Upload</button>
+    <button @click="onSubmit">{{ $t('upload-button')}}</button>
 
   </div>
 </template>

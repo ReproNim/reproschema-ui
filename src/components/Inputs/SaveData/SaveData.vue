@@ -1,29 +1,45 @@
 <template>
   <div class="SaveData ml-3 mr-3 pl-3 pr-3">
-    <div v-if="!isUploading && !hasData">
-      <div v-if="serverUrl">
-        <p>Please save your data now.</p>
-        <b-button @click="record" variant="danger">
-          Upload
+    <div v-if="!isUploading && !hasData && !hasTimedOut">
+      <div v-if="shouldUpload">
+        <p>{{ $t('save-data')}}</p>
+        <b-button v-if="downloadAndSubmit" @click="upload" variant="danger" ref="upload">
+          {{ $t('download-and-submit-button')}}
+        </b-button>
+        <b-button v-else @click="upload" variant="danger" ref="upload">
+          {{ $t('upload-button')}}
         </b-button>
       </div>
       <div v-else>
-        <p>You can click the "Export" button on sidebar if you wish to save your data. Click below to finish.</p>
+        <p v-if="exportOption">{{ $t('export-and-finish')}}</p>
+        <p v-else>{{ $t('finish')}}</p>
         <b-button @click="finish" variant="danger">
-          Finish
+          {{ $t('finish-button')}}
         </b-button>
       </div>
     </div>
-    <div v-if="isUploading" class="loader">
-      <Loader />
+    <div v-if="isUploading && percentCompleted >0 && showProgressBar" class="loader">
+      <p>{{ $t('upload-message')}}</p>
+      <b-progress :max="100" :striped="hasStripe">
+        <b-progress-bar :value="percentCompleted" :label="`${((percentCompleted / 100) * 100)}%`" animated></b-progress-bar>
+      </b-progress>
     </div>
+    <div v-else-if="isUploading && percentCompleted === 0">
+        <p>{{ $t('prepare-upload')}}</p>
+        <Loader></Loader>
+    </div>
+    <b-modal v-model="timeout" ref="timeout-modal" ok-title="Done" ok-only title="Uh-oh! Upload unsuccessful!" @ok="timeoutOK"
+             no-close-on-esc no-close-on-backdrop hide-header-close>
+      <p v-if="dataUploadPath">Please submit your locally exported zip file <a :href=dataUploadPath target="_blank">here</a></p>
+      <p v-else>Let researchers know with the <b>Help</b> button or by email to {{ contact }}</p>
+    </b-modal>
     <div style="width:800px; margin:0 auto;" v-bind:class="{ done: hasData}"></div>
   </div>
 </template>
 
 <style>
   .done {
-    background: transparent url(/static/images/done.svg) center no-repeat;
+    background: transparent url(../../../assets/Check-Mark.svg) center no-repeat;
     background-size: contain;
     width: 1.6rem;
     height: 1.6rem;
@@ -37,6 +53,7 @@ import axios from 'axios';
 import Loader from '../../Loader';
 import config from '../../../config';
 import { v4 as uuidv4 } from 'uuid';
+import {saveAs} from "file-saver";
 
 export default {
   name: 'SaveData',
@@ -49,14 +66,31 @@ export default {
       recording: {},
       isUploading: false,
       hasData: false,
+      percentCompleted: 0,
+      timeout: false,
+      uploadFailed: false,
+      showProgressBar: true,
+      invalidToken: false,
+      downloadAndSubmit: config.downloadAndSubmit,
+      dataUploadPath: config.dataUploadPath,
+      contact: config.contact
     };
   },
   computed: {
-    serverUrl() {
-      return config.backendServer;
+    shouldUpload() {
+      return !!(config.backendServer && this.$store.getters.getAuthToken);
     },
     participantId() {
       return this.$store.getters.getParticipantId;
+    },
+    exportOption() {
+      return this.$store.getters.getHasExport;
+    },
+    hasStripe() {
+      return !(this.percentCompleted === 100);
+    },
+    hasTimedOut() {
+      return this.timeout;
     },
   },
   methods: {
@@ -64,7 +98,10 @@ export default {
       this.hasData = true;
       this.$emit('valueChanged', 'completed');
     },
-    record() {
+    timeoutOK() {
+        this.$emit('valueChanged', 'timeout');
+    },
+    upload() {
       this.isUploading = true;
       this.uploadZipData();
     },
@@ -76,92 +113,59 @@ export default {
       this.formatData(totalResponse);
     },
     formatData(data) {
-      const TOKEN = this.$store.state.token;
+      const TOKEN = this.$store.getters.getAuthToken;
       const expiryMinutes = this.$store.state.expiryMinutes;
       const jszip = new JSZip();
-      // sort out blobs from JSONdata
       let key = 0;
-      const voiceMap = {};
+      const fileName = `${uuidv4()}-${this.participantId}`;
       _.map(data.response, (eachActivityList) => {
         const activityData = [];
         _.map(eachActivityList, (itemObj) => {
           const newObj = { ...itemObj };
           if (itemObj['@type'] === 'reproschema:Response') {
-            // console.log(294, value, key1);
             if (itemObj.value instanceof Blob) {
-              // fileUploadData[key1] = value;
-              const keyStrings = (itemObj.isAbout.split('/items/')[1]);
+              const keyStrings = (itemObj.isAbout.split('/'));
               const rId = itemObj['@id'].split('uuid:')[1];
-              jszip.folder('responses').file(`${keyStrings}-${rId}.wav`, itemObj.value);
-              newObj.value = `${keyStrings}-${rId}.wav`;
-              // eslint-disable-next-line no-param-reassign
-              voiceMap[itemObj['@id']] = `${keyStrings}-${rId}.wav`;
+              jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.wav`, itemObj.value);
+              newObj.value = `${keyStrings[keyStrings.length-1]}-${rId}.wav`;
             }
-            // todo: check if sections are present, they are no longer object but lists
-            // else if (_.isObject(value)) {
-            //   // make sure there aren't any Blobs here.
-            //   // if there are, add them to fileUploadData
-            //   _.map(value, (val2, key2) => {
-            //     if (val2 instanceof Blob) {
-            //       // console.log(322, val, key2, val2);
-            //       fileUploadData[`${key2}`] = val2;
-            //     }
-            //     else {
-            //       // refill the object.
-            //       if (!JSONdata[key]) {
-            //         JSONdata[key] = {};
-            //       }
-            //       JSONdata[key][key2] = val2;
-            //     }
-            //   });
-            // }
-            // else {
-            //   JSONdata[key] = val;
-            // }
           }
           activityData.push(newObj);
         });
         // write out the activity files
         if (activityData.length) { // if activity is answered then write to file
-          jszip.folder('responses').file(`activity_${key}.jsonld`, JSON.stringify(activityData, null, 4));
+          jszip.folder(fileName).file(`activity_${key}.jsonld`, JSON.stringify(activityData, null, 4));
           key += 1;
         }
       });
-
-      // _.map(data.scores, (val, key) => { // todo: check if score object not null?
-      //   if (!_.isEmpty(val)) {
-      //     JSONscores[key] = val;
-      //   }
-      // });
-      // _.map(JSONdata, (val, key) => {
-      //   // console.log(342, (key));
-      // jszip.folder('responses').file(`activity_${key}.json`, JSON.stringify(val, null, 4));
-      // });
-      // _.map(JSONscores, (val, key) => {
-      // jszip.folder('scores').file(`activity_${key}_score.json`, JSON.stringify(val, null, 4));
-      // });
       jszip.generateAsync({ type: 'blob' })
         .then((myzipfile) => {
-          const fileName = `${uuidv4()}-${this.participantId}.zip`;
+          if (this.downloadAndSubmit) {
+            saveAs(myzipfile, `${fileName}.zip`);
+          }
           const formData = new FormData();
-          formData.append('file', myzipfile, fileName);
+          formData.append('file', myzipfile, `${fileName}.zip`);
           formData.append('auth_token', `${TOKEN}`);
           formData.append('expires', `${expiryMinutes}`);
-          if (config.backendServer) {
-            console.log(148, `${config.backendServer}/submit`);
-            axios.post(`${config.backendServer}/submit`, formData, {
-              'Content-Type': 'multipart/form-data',
-            }).then((res) => {
+          const config1 = {
+            onUploadProgress: function(progressEvent) {
+              this.percentCompleted = parseInt(Math.round( (progressEvent.loaded * 100) / progressEvent.total ));
+            }.bind(this),
+            'Content-Type': 'multipart/form-data',
+            timeout: 420000
+          };
+          axios.post(`${config.backendServer}/submit`, formData, config1).then((res) => {
               this.hasData = true;
               this.isUploading = false;
-              console.log('SUCCESS!!', res);
+              console.log('SUCCESS!!', res.status);
               this.$emit('valueChanged', { status: res.status });
             })
-            // eslint-disable-next-line no-unused-vars
-              .catch((e) => {
-                // console.log('FAILURE!!', e);
-              });
-          }
+          .catch((e) => {
+            if(e.code && e.code === 'ECONNABORTED') {
+              this.timeout = true;
+              this.showProgressBar = false;
+            }
+          });
         });
     },
   },

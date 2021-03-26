@@ -24,8 +24,10 @@ const state = {
   answeredLanguage: '',
   participantUuid: '',
   expiryMinutes: null,
+  queryParams: {},
   token: null,
   landing: [],
+  hasExport: false
 };
 
 const getters = {
@@ -67,6 +69,22 @@ const getters = {
   getProtocolSchema(state) {
     return state.schema;
   },
+  // eslint-disable-next-line
+  getQueryParameters(state) {
+    return state.queryParams;
+  },
+  // eslint-disable-next-line
+  getAuthToken(state) {
+    return state.token;
+  },
+  // eslint-disable-next-line
+  getHasExport(state) {
+    return state.hasExport;
+  },
+  // eslint-disable-next-line
+  getExpiryTime(state) {
+    return state.expiryMinutes;
+  }
 };
 
 const mutations = {
@@ -141,6 +159,10 @@ const mutations = {
     state.expiryMinutes = minutes;
   },
   // eslint-disable-next-line
+  setQueryParameters(state, qp) {
+    state.queryParams = qp;
+  },
+  // eslint-disable-next-line
   saveResponse(state, { key, value }) {
     // console.log(50, state.activityIndex, key, value);
     const val = value[0]; // response value
@@ -194,6 +216,10 @@ const mutations = {
     state.responses[actIndex] = {};
     state.progress[actIndex] = 0;
   },
+  // eslint-disable-next-line
+  setExport(state, value) {
+    state.hasExport = value;
+  },
 };
 
 const actions = {
@@ -243,6 +269,12 @@ const actions = {
   setExpiryMinutes({ commit }, mins) {
     commit('setExpiryMinutes', mins);
   },
+  setQueryParameters({ commit }, queryParams) {
+    commit('setQueryParameters', queryParams);
+  },
+  setExport({ commit }, value) {
+    commit('setExport', value);
+  }
 };
 
 export default new Vuex.Store({
