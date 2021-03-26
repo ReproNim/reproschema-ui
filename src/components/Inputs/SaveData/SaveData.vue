@@ -1,5 +1,6 @@
 <template>
   <div class="SaveData ml-3 mr-3 pl-3 pr-3">
+    <input type='file' id='input' @change="testUpload">
     <div v-if="!isUploading && !hasData && !hasTimedOut">
       <div v-if="shouldUpload">
         <p>{{ $t('save-data')}}</p>
@@ -54,6 +55,8 @@ import Loader from '../../Loader';
 import config from '../../../config';
 import { v4 as uuidv4 } from 'uuid';
 import {saveAs} from "file-saver";
+import fs from 'fs';
+// import splitFile from 'split-file';
 
 export default {
   name: 'SaveData',
@@ -94,8 +97,92 @@ export default {
     },
   },
   methods: {
+    testUpload() {
+      const TOKEN = this.$store.getters.getAuthToken;
+      const expiryMinutes = this.$store.state.expiryMinutes;
+      const file = document.getElementById('input').files[0];
+
+        (async () => {
+          console.log(17, 'in async !!!!');
+          // .text() transforms the file into a stream and then into a string
+          // const fileContent = await file;
+          console.log(18, file.size);
+          // logs "File content!"
+
+          // .stream() returns a ReadableStream
+          // const fileContentStream = await file.stream();
+          // console.log(22, await streamToText(fileContentStream));
+          // logs "File content!"
+
+          // const buffer = await file.arrayBuffer();
+          // console.log(26, bufferToText(buffer))
+          // logs "File content!"
+
+          // .slice() allows you to get slices of the file here we take a slice of the entire file
+          if (file.slice(0, file.size/4)) {
+            console.log(121);
+          } else {
+            console.log(122);
+          }
+           console.log(125, 'hi sanu');
+          const fileSliceBlob1 = file.slice(0, file.size/4);
+          const fileSliceBlob2 = file.slice(file.size/4, file.size/2);
+          const fileSliceBlob3 = file.slice(file.size/2, file.size);
+          // we convert to blob to a stream
+          const fileSliceBlobStream1 = await fileSliceBlob1.arrayBuffer();
+          console.log(33, fileSliceBlob1, await bufferToText(fileSliceBlobStream1));
+          const fileSliceBlobStream2 = await fileSliceBlob2.arrayBuffer();
+          console.log(34, fileSliceBlob2, await bufferToText(fileSliceBlobStream2));
+          const fileSliceBlobStream3 = await fileSliceBlob3.arrayBuffer();
+          console.log(35, fileSliceBlob3, await bufferToText(fileSliceBlobStream3));
+          fileSliceBlobStream1.type = 'Blob';
+          const formData = new FormData();
+          formData.append('file', fileSliceBlobStream1, `test1-part1.zip`);
+          formData.append('auth_token', `${TOKEN}`);
+          formData.append('expires', `${expiryMinutes}`);
+          const config1 = {
+            // onUploadProgress: function(progressEvent) {
+            //   this.percentCompleted = parseInt(Math.round( (progressEvent.loaded * 100) / progressEvent.total ));
+            // }.bind(this),
+            'Content-Type': 'multipart/form-data'
+            // timeout: 420000
+          };
+          axios.post(`${config.backendServer}/submit`, formData, config1).then((res) => {
+            this.hasData = true;
+            this.isUploading = false;
+            console.log('SUCCESS!!', res.status);
+            this.$emit('valueChanged', { status: res.status });
+          }).catch((e) => {
+            if(e.code && e.code === 'ECONNABORTED') {
+              this.timeout = true;
+              this.showProgressBar = false;
+            }
+          });
+
+        })();
+
+        // We just use this function to convert streams to text
+        // const streamToText = async (blob) => {
+        //   console.log(143);
+        //   const readableStream = await blob.getReader();
+        //   const chunk = await readableStream.read();
+        //   console.log(135, chunk, chunk.value);
+        //   return new TextDecoder('utf-8').decode(chunk.value);
+        // }
+
+        // Not the best way to get text from a file!
+        const bufferToText = (buffer) => {
+          const bufferByteLength = buffer.byteLength;
+          const bufferUint8Array = new Uint8Array(buffer, 0, bufferByteLength);
+          return new TextDecoder().decode(bufferUint8Array);
+        }
+
+    },
     finish() {
       this.hasData = true;
+      const zip = JSZip();
+      zip.folder("sub").file("file.txt", "content");
+      console.log(109, zip);
       this.$emit('valueChanged', 'completed');
     },
     timeoutOK() {
@@ -115,11 +202,12 @@ export default {
     formatData(data) {
       const TOKEN = this.$store.getters.getAuthToken;
       const expiryMinutes = this.$store.state.expiryMinutes;
-      const jszip = new JSZip();
+      // const jszip = new JSZip();
       let key = 0;
       const fileName = `${uuidv4()}-${this.participantId}`;
       _.map(data.response, (eachActivityList) => {
         const activityData = [];
+        const jszip = new JSZip();
         _.map(eachActivityList, (itemObj) => {
           const newObj = { ...itemObj };
           if (itemObj['@type'] === 'reproschema:Response') {
