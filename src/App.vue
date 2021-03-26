@@ -380,10 +380,11 @@ export default {
       return safeEval(output);
     },
     responseMapper(index, responses) {
+      let keyArr;
       // a variable map is defined! great
       if (this.schema['http://schema.repronim.org/addProperties']) {
         const vmap = this.schema['http://schema.repronim.org/addProperties'];
-        const keyArr = _.map(vmap, (v) => {
+        keyArr = _.map(vmap, (v) => {
           const key = v['http://schema.repronim.org/isAbout'][0]['@id'];
           const qId = v['http://schema.repronim.org/variableName'][0]['@value'];
           const rp = _.filter(responses, r => key in r);
@@ -393,6 +394,20 @@ export default {
           }
           return { key, val, qId };
         });
+        if (this.$store.getters.getQueryParameters) {
+          const q = this.$store.getters.getQueryParameters;
+          Object.entries(q).forEach(
+                  ([key, value]) => {
+                    const qId = key;
+                    if (key === "week") {
+                      value = parseInt(value);
+                    }
+                    const val = value;
+                    keyArr.push({ key, val, qId });
+                  }
+          );
+        }
+
         const outMapper = {};
         _.map(keyArr, (a) => {
           outMapper[a.qId] = { val: a.val, ref: a.key };
