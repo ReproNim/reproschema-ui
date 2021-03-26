@@ -23,9 +23,12 @@ export default {
     selected_language: {
       type: String,
     },
-    contents: {
-      type: Object,
+    nextActivity: {
+      type: Object
     },
+    actVisibility: {
+      type: Array
+    }
   },
   components: {
     VueMarkdown,
@@ -48,6 +51,9 @@ export default {
       }
       return landingC[0];
     },
+    activityUrl() {
+      return this.srcUrl;
+    },
   },
   methods: {
     doBack() {
@@ -56,11 +62,15 @@ export default {
       }
     },
     doNext() {
-      if (this.consent) {
-        // console.log(50, this.consent);
-        // integrate docusign here
+      const currentIndex = parseInt(this.$store.state.activityIndex);
+      // eslint-disable-next-line consistent-return
+      const visibleAct = _.map(this.actVisibility, (ac, key) => (ac === true ? key : '')).filter(String);
+      const nextIndex = visibleAct[visibleAct.indexOf(currentIndex) + 1];
+      if (this.$route.query.url) {
+        this.$router.push(`/activities/${nextIndex}?url=${this.$route.query.url}`);
+      } else {
+        this.$router.push(`/activities/${nextIndex}`);
       }
-      this.$router.push('/activities/0');
     },
   },
 };
