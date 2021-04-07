@@ -1,6 +1,6 @@
 module.exports = {
   /* eslint-disable */
-  githubSrc: 'https://raw.githubusercontent.com/ReproNim/demo-protocol/master/VoicePilot/VoicePilot_schema',
+  githubSrc: 'https://raw.githubusercontent.com/ReproNim/demo-protocol/master/DemoProtocol/DemoProtocol_schema',
   startButton: {
     "en": 'Join',
     "es": 'Participar'
