@@ -1,6 +1,6 @@
 <template>
   <div class="SaveData ml-3 mr-3 pl-3 pr-3">
-    <input type='file' id='input' @change="testUpload">
+<!--    <input type='file' id='input' @change="upload">-->
     <div v-if="!isUploading && !hasData && !hasTimedOut">
       <div v-if="shouldUpload">
         <p>{{ $t('save-data')}}</p>
@@ -14,7 +14,7 @@
       <div v-else>
         <p v-if="exportOption">{{ $t('export-and-finish')}}</p>
         <p v-else>{{ $t('finish')}}</p>
-        <b-button @click="finish" variant="danger">
+        <b-button @click="upload" variant="danger">
           {{ $t('finish-button')}}
         </b-button>
       </div>
@@ -22,7 +22,7 @@
     <div v-if="isUploading && percentCompleted >0 && showProgressBar" class="loader">
       <p>{{ $t('upload-message')}}</p>
       <b-progress :max="100" :striped="hasStripe">
-        <b-progress-bar :value="percentCompleted" :label="`${((percentCompleted / 100) * 100)}%`" animated></b-progress-bar>
+        <b-progress-bar :value="percentCompleted*100" :label="`${(percentCompleted * 100)}%`" animated></b-progress-bar>
       </b-progress>
     </div>
     <div v-else-if="isUploading && percentCompleted === 0">
@@ -54,9 +54,10 @@ import axios from 'axios';
 import Loader from '../../Loader';
 import config from '../../../config';
 import { v4 as uuidv4 } from 'uuid';
-import {saveAs} from "file-saver";
-import fs from 'fs';
-// import splitFile from 'split-file';
+
+let slicedArray = [];
+let zippedDataSize;
+let sentPartCount = 0;
 
 export default {
   name: 'SaveData',
@@ -69,6 +70,7 @@ export default {
       recording: {},
       isUploading: false,
       hasData: false,
+      completed: false,
       percentCompleted: 0,
       timeout: false,
       uploadFailed: false,
@@ -95,89 +97,9 @@ export default {
     hasTimedOut() {
       return this.timeout;
     },
+
   },
   methods: {
-    testUpload() {
-      const TOKEN = this.$store.getters.getAuthToken;
-      const expiryMinutes = this.$store.state.expiryMinutes;
-      const file = document.getElementById('input').files[0];
-
-        (async () => {
-          console.log(17, 'in async !!!!');
-          // .text() transforms the file into a stream and then into a string
-          // const fileContent = await file;
-          console.log(18, file.size);
-          // logs "File content!"
-
-          // .stream() returns a ReadableStream
-          // const fileContentStream = await file.stream();
-          // console.log(22, await streamToText(fileContentStream));
-          // logs "File content!"
-
-          // const buffer = await file.arrayBuffer();
-          // console.log(26, bufferToText(buffer))
-          // logs "File content!"
-
-          // .slice() allows you to get slices of the file here we take a slice of the entire file
-          if (file.slice(0, file.size/4)) {
-            console.log(121);
-          } else {
-            console.log(122);
-          }
-           console.log(125, 'hi sanu');
-          const fileSliceBlob1 = file.slice(0, file.size/4);
-          const fileSliceBlob2 = file.slice(file.size/4, file.size/2);
-          const fileSliceBlob3 = file.slice(file.size/2, file.size);
-          // we convert to blob to a stream
-          const fileSliceBlobStream1 = await fileSliceBlob1.arrayBuffer();
-          console.log(33, fileSliceBlob1, await bufferToText(fileSliceBlobStream1));
-          const fileSliceBlobStream2 = await fileSliceBlob2.arrayBuffer();
-          console.log(34, fileSliceBlob2, await bufferToText(fileSliceBlobStream2));
-          const fileSliceBlobStream3 = await fileSliceBlob3.arrayBuffer();
-          console.log(35, fileSliceBlob3, await bufferToText(fileSliceBlobStream3));
-          fileSliceBlobStream1.type = 'Blob';
-          const formData = new FormData();
-          formData.append('file', fileSliceBlobStream1, `test1-part1.zip`);
-          formData.append('auth_token', `${TOKEN}`);
-          formData.append('expires', `${expiryMinutes}`);
-          const config1 = {
-            // onUploadProgress: function(progressEvent) {
-            //   this.percentCompleted = parseInt(Math.round( (progressEvent.loaded * 100) / progressEvent.total ));
-            // }.bind(this),
-            'Content-Type': 'multipart/form-data'
-            // timeout: 420000
-          };
-          axios.post(`${config.backendServer}/submit`, formData, config1).then((res) => {
-            this.hasData = true;
-            this.isUploading = false;
-            console.log('SUCCESS!!', res.status);
-            this.$emit('valueChanged', { status: res.status });
-          }).catch((e) => {
-            if(e.code && e.code === 'ECONNABORTED') {
-              this.timeout = true;
-              this.showProgressBar = false;
-            }
-          });
-
-        })();
-
-        // We just use this function to convert streams to text
-        // const streamToText = async (blob) => {
-        //   console.log(143);
-        //   const readableStream = await blob.getReader();
-        //   const chunk = await readableStream.read();
-        //   console.log(135, chunk, chunk.value);
-        //   return new TextDecoder('utf-8').decode(chunk.value);
-        // }
-
-        // Not the best way to get text from a file!
-        const bufferToText = (buffer) => {
-          const bufferByteLength = buffer.byteLength;
-          const bufferUint8Array = new Uint8Array(buffer, 0, bufferByteLength);
-          return new TextDecoder().decode(bufferUint8Array);
-        }
-
-    },
     finish() {
       this.hasData = true;
       const zip = JSZip();
@@ -194,6 +116,7 @@ export default {
     },
     uploadZipData() {
       const Response = this.$store.state.exportResponses;
+
       const totalScores = this.$store.state.scores;
       const uId = this.$store.state.participantId;
       const totalResponse = { response: Response, scores: totalScores, participantId: uId };
@@ -202,12 +125,11 @@ export default {
     formatData(data) {
       const TOKEN = this.$store.getters.getAuthToken;
       const expiryMinutes = this.$store.state.expiryMinutes;
-      // const jszip = new JSZip();
+      const jszip = new JSZip();
       let key = 0;
       const fileName = `${uuidv4()}-${this.participantId}`;
       _.map(data.response, (eachActivityList) => {
         const activityData = [];
-        const jszip = new JSZip();
         _.map(eachActivityList, (itemObj) => {
           const newObj = { ...itemObj };
           if (itemObj['@type'] === 'reproschema:Response') {
@@ -228,34 +150,90 @@ export default {
       });
       jszip.generateAsync({ type: 'blob' })
         .then((myzipfile) => {
-          if (this.downloadAndSubmit) {
-            saveAs(myzipfile, `${fileName}.zip`);
-          }
-          const formData = new FormData();
-          formData.append('file', myzipfile, `${fileName}.zip`);
-          formData.append('auth_token', `${TOKEN}`);
-          formData.append('expires', `${expiryMinutes}`);
-          const config1 = {
-            onUploadProgress: function(progressEvent) {
-              this.percentCompleted = parseInt(Math.round( (progressEvent.loaded * 100) / progressEvent.total ));
-            }.bind(this),
-            'Content-Type': 'multipart/form-data',
-            timeout: 420000
-          };
-          axios.post(`${config.backendServer}/submit`, formData, config1).then((res) => {
-              this.hasData = true;
-              this.isUploading = false;
-              console.log('SUCCESS!!', res.status);
-              this.$emit('valueChanged', { status: res.status });
-            })
-          .catch((e) => {
-            if(e.code && e.code === 'ECONNABORTED') {
-              this.timeout = true;
-              this.showProgressBar = false;
+
+          // chunking zipped file
+          const chunk_size = 10000000;
+          const file_size = myzipfile.size;
+          let start = 0;
+          let next_slice = start + chunk_size;
+          let c = 1;
+          let each_slice;
+          while(start < file_size) {
+            if (next_slice > file_size) {
+              //next_slice = file_size;
+              // console.log(269, 'GREATER!!!!!', next_slice - file_size);
+              each_slice = myzipfile.slice(start, file_size + 1 , 'Blob');
+            } else {
+              each_slice = myzipfile.slice(start, next_slice , 'Blob');
             }
+            slicedArray.push(each_slice);
+
+            c = c+1;
+            start = next_slice;
+            next_slice = start + chunk_size;
+          }
+          zippedDataSize = slicedArray.length;
+          let allRequests = [];
+          for (let index = 0; index < slicedArray.length; index++) {
+            // console.log(300, 'sliced Array initial length: ', slicedArray);
+            const formData = new FormData();
+            formData.append('file', slicedArray[index], `f3-test.zip.00${index}`);
+            formData.append('auth_token', `${TOKEN}`);
+            formData.append('expires', `${expiryMinutes}`);
+            allRequests.push(this.sendRetry(`${config.backendServer}/submit`, formData, index));
+            if (this.timeout) {
+              // console.log(303, 'breaking from loop');
+              break;
+            }
+          }
+
+          Promise.all(allRequests).then((res) => {
+            // console.log(259, 'completed promise ::: ', res);
+            this.isUploading = false;
+            this.hasData = true;
+              this.$emit('valueChanged', { status: res });
           });
+
+
         });
     },
+    sendRetry(url, formData, index, retries = 3, backoff = 10000) {
+      const config1 = {
+        // onUploadProgress: function(progressEvent) {
+        //   this.percentCompleted = parseInt(Math.round( (progressEvent.loaded * 100) / progressEvent.total ));
+        // }.bind(this),
+        'Content-Type': 'multipart/form-data'
+      };
+        return axios.post(`${config.backendServer}/submit`, formData, config1).then((res) => {
+          // console.log(322, 'SUCCESS!!', `f3-test.zip.00${index}`, res.status);
+          slicedArray.splice(index, 1); // remove successfully POSTed slice
+          sentPartCount++;
+          const completedPercent = sentPartCount/zippedDataSize;
+          this.percentCompleted = completedPercent.toFixed(2);
+          return res.status;
+          // console.log(326, 'success - array length: ', slicedArray)
+        })
+          .catch((e) => {
+            // console.log(256, 'in catch --- failed: ', `f3-test.zip.00${index}`, slicedArray);
+
+            if (retries > 0) {
+              // console.log(284, 'retrying : slice number: --', retries-1, `f3-test.zip.00${index}`);
+              setTimeout(() => {
+                return this.sendRetry(url, formData, index, retries-1, backoff * 2);
+              }, backoff)
+            }
+            else {
+              this.timeout = true;
+              this.showProgressBar = false;
+              // console.log(258, this.timeout, this.showProgressBar, `f3-test.zip.00${index}`, e);
+              return e.response.status;
+            }
+          });
+      // }
+
+
+
+    }
   },
 };
 </script>
