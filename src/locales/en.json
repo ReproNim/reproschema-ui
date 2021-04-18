@@ -22,7 +22,7 @@
   "invalid-email": "Invalid Email Address",
   "select-invalid-query": "Oops! No elements found. Consider changing the search query.",
   "invalid-feedback-number": "Please enter a number",
-  "timeout-message": "Sanu, Please contact the researchers for a new submission link with an email to",
+  "timeout-message": "Please contact the researchers for a new submission link with an email to",
   "input-selector-alert": "This item does not have a title defined",
   "loader": "Loading",
   "review-and-next": "Please review your responses, then click \"Next\" below:",
