@@ -14,7 +14,7 @@
       <div v-else>
         <p v-if="exportOption">{{ $t('export-and-finish')}}</p>
         <p v-else>{{ $t('finish')}}</p>
-        <b-button @click="upload" variant="danger">
+        <b-button @click="finish" variant="danger">
           {{ $t('finish-button')}}
         </b-button>
       </div>
@@ -54,6 +54,7 @@ import axios from 'axios';
 import Loader from '../../Loader';
 import config from '../../../config';
 import { v4 as uuidv4 } from 'uuid';
+import {saveAs} from "file-saver";
 
 let slicedArray = [];
 let zippedDataSize;
@@ -70,7 +71,6 @@ export default {
       recording: {},
       isUploading: false,
       hasData: false,
-      completed: false,
       percentCompleted: 0,
       timeout: false,
       uploadFailed: false,
@@ -102,9 +102,6 @@ export default {
   methods: {
     finish() {
       this.hasData = true;
-      const zip = JSZip();
-      zip.folder("sub").file("file.txt", "content");
-      console.log(109, zip);
       this.$emit('valueChanged', 'completed');
     },
     timeoutOK() {
@@ -123,12 +120,12 @@ export default {
       this.formatData(totalResponse);
     },
     formatData(data) {
-      const TOKEN = this.$store.getters.getAuthToken;
-      const expiryMinutes = this.$store.state.expiryMinutes;
-      const jszip = new JSZip();
-      let key = 0;
-      const fileName = `${uuidv4()}-${this.participantId}`;
-      _.map(data.response, (eachActivityList) => {
+        const TOKEN = this.$store.getters.getAuthToken;
+        const expiryMinutes = this.$store.state.expiryMinutes;
+        const jszip = new JSZip();
+        let key = 0;
+        const fileName = `${uuidv4()}-${this.participantId}`;
+        _.map(data.response, (eachActivityList) => {
         const activityData = [];
         _.map(eachActivityList, (itemObj) => {
           const newObj = { ...itemObj };
@@ -147,18 +144,20 @@ export default {
           jszip.folder(fileName).file(`activity_${key}.jsonld`, JSON.stringify(activityData, null, 4));
           key += 1;
         }
-      });
-      jszip.generateAsync({ type: 'blob' })
+        });
+        jszip.generateAsync({ type: 'blob' })
         .then((myzipfile) => {
-
-          // chunking zipped file
-          const chunk_size = 10000000;
-          const file_size = myzipfile.size;
-          let start = 0;
-          let next_slice = start + chunk_size;
-          let c = 1;
-          let each_slice;
-          while(start < file_size) {
+            if (this.downloadAndSubmit) {
+                saveAs(myzipfile, `${fileName}.zip`);
+            }
+            // chunking zipped file
+            const chunk_size = 10000000;
+            const file_size = myzipfile.size;
+            let start = 0;
+            let next_slice = start + chunk_size;
+            let c = 1;
+            let each_slice;
+            while(start < file_size) {
             if (next_slice > file_size) {
               //next_slice = file_size;
               // console.log(269, 'GREATER!!!!!', next_slice - file_size);
@@ -171,13 +170,13 @@ export default {
             c = c+1;
             start = next_slice;
             next_slice = start + chunk_size;
-          }
-          zippedDataSize = slicedArray.length;
-          let allRequests = [];
-          for (let index = 0; index < slicedArray.length; index++) {
+            }
+            zippedDataSize = slicedArray.length;
+            let allRequests = [];
+            for (let index = 0; index < slicedArray.length; index++) {
             // console.log(300, 'sliced Array initial length: ', slicedArray);
             const formData = new FormData();
-            formData.append('file', slicedArray[index], `f3-test.zip.00${index}`);
+            formData.append('file', slicedArray[index], `${fileName}.zip.00${index}`);
             formData.append('auth_token', `${TOKEN}`);
             formData.append('expires', `${expiryMinutes}`);
             allRequests.push(this.sendRetry(`${config.backendServer}/submit`, formData, index));
@@ -185,27 +184,22 @@ export default {
               // console.log(303, 'breaking from loop');
               break;
             }
-          }
+            }
 
-          Promise.all(allRequests).then((res) => {
+            Promise.all(allRequests).then((res) => {
             // console.log(259, 'completed promise ::: ', res);
             this.isUploading = false;
             this.hasData = true;
               this.$emit('valueChanged', { status: res });
-          });
-
-
+            });
         });
     },
     sendRetry(url, formData, index, retries = 3, backoff = 10000) {
-      const config1 = {
-        // onUploadProgress: function(progressEvent) {
-        //   this.percentCompleted = parseInt(Math.round( (progressEvent.loaded * 100) / progressEvent.total ));
-        // }.bind(this),
+        const config1 = {
         'Content-Type': 'multipart/form-data'
-      };
+        };
         return axios.post(`${config.backendServer}/submit`, formData, config1).then((res) => {
-          // console.log(322, 'SUCCESS!!', `f3-test.zip.00${index}`, res.status);
+          // console.log(322, 'SUCCESS!!', `${fileName}.zip.00${index}`, res.status);
           slicedArray.splice(index, 1); // remove successfully POSTed slice
           sentPartCount++;
           const completedPercent = sentPartCount/zippedDataSize;
@@ -214,10 +208,9 @@ export default {
           // console.log(326, 'success - array length: ', slicedArray)
         })
           .catch((e) => {
-            // console.log(256, 'in catch --- failed: ', `f3-test.zip.00${index}`, slicedArray);
-
+            // console.log(256, 'in catch --- failed: ', `${fileName}.zip.00${index}`, slicedArray);
             if (retries > 0) {
-              // console.log(284, 'retrying : slice number: --', retries-1, `f3-test.zip.00${index}`);
+              // console.log(284, 'retrying : slice number: --', retries-1, `${fileName}.zip.00${index}`);
               setTimeout(() => {
                 return this.sendRetry(url, formData, index, retries-1, backoff * 2);
               }, backoff)
@@ -225,14 +218,10 @@ export default {
             else {
               this.timeout = true;
               this.showProgressBar = false;
-              // console.log(258, this.timeout, this.showProgressBar, `f3-test.zip.00${index}`, e);
+              // console.log(258, this.timeout, this.showProgressBar, `${fileName}.zip.00${index}`, e);
               return e.response.status;
             }
           });
-      // }
-
-
-
     }
   },
 };
