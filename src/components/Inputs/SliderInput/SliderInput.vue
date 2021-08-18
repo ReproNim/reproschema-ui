@@ -1,7 +1,7 @@
 <template>
   <div class="SliderInput ml-3 mr-3 pl-3 pr-3">
     <vue-slider v-model="input" :lazy="true" :data="interval"
-                :marks="true" @change="sendData"></vue-slider>
+                :marks="true" ></vue-slider>
     <b-row class="mt-3 pt-3 pl-0 pr-0">
       <div class="col text-left pr-0 pl-0">
         <span v-if="getMinImageLabel">
@@ -16,6 +16,9 @@
         <p>{{ getMaxLabel }}</p>
       </div>
     </b-row>
+    <b-form @submit="sendData">
+      <b-btn type="submit">{{ $t('submit-button')}}</b-btn>
+    </b-form>
   </div>
 </template>
 
@@ -37,23 +40,15 @@ export default {
   components: {
     VueSlider,
   },
-  watch: {
-    input() {
-      // if there is a change, emit it.
-      this.$emit('valueChanged', this.input);
-    },
-  },
   methods: {
-    sendData(val) {
-      this.$emit('valueChanged', val);
+    sendData(e) {
+      e.preventDefault();
+      this.$emit('valueChanged', this.input);
     },
   },
   computed: {
     interval() {
       return _.map(this.constraints['http://schema.repronim.org/choices'], (v) => {
-        // const activeValueChoices = _.filter(v['http://schema.org/name'], ac => ac['@language'] === this.selected_language);
-        // console.log(55, activeValueChoices);
-        // return activeValueChoices['@value'];
         return v['http://schema.repronim.org/value'][0]['@value'];
       });
     },
@@ -88,12 +83,14 @@ export default {
   },
   data() {
     return {
-      input: 0,
+      input: null,
     };
   },
   mounted() {
     if (this.init) {
       this.input = this.init;
+    } else {
+      this.input = this.interval[0]; // get the first value from choices
     }
   },
 };

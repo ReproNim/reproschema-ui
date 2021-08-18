@@ -590,22 +590,22 @@ export default {
         this.$store.dispatch('setQueryParameters', this.$route.query);
     }
 
-    const formData = new FormData();
-    const TOKEN = this.$store.getters.getAuthToken;
-    if (TOKEN) {
-      formData.append('file', null);
-      formData.append('auth_token', `${TOKEN}`);
-      axios.post(`${config.backendServer}/submit`, formData, {
-        'Content-Type': 'multipart/form-data',
-      }).then((res) => {
-        // console.log('SUCCESS!!', res.status);
-      })
-      .catch((e) => {
-                if (e.response.status === 403) {
-                  this.invalidToken = true;
-                }
-              });
-    }
+    // const formData = new FormData();
+    // const TOKEN = this.$store.getters.getAuthToken;
+    // if (TOKEN) {
+    //   formData.append('file', null);
+    //   formData.append('auth_token', `${TOKEN}`);
+    //   axios.post(`${config.backendServer}/submit`, formData, {
+    //     'Content-Type': 'multipart/form-data',
+    //   }).then((res) => {
+    //     // console.log('SUCCESS!!', res.status);
+    //   })
+    //   .catch((e) => {
+    //             if (e.response.status === 403) {
+    //               this.invalidToken = true;
+    //             }
+    //           });
+    // }
   },
   computed: {
     accessDeniedPath() {

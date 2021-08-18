@@ -1,0 +1,67 @@
+<body>
+<input type='file' id='input'>
+<progress value="0" max="100" id="progress-bar"></progress>
+<div id="status"></div>
+<script>
+
+    //
+    document.getElementById('input').addEventListener('change', (e) => {
+        const file = document.getElementById('input').files[0];
+        if (file) {
+            console.log(11, file);
+            // .slice() allows you to get slices of the file here we take a slice of the entire file
+            const fileSliceBlob = file.slice(0, file.length);
+            console.log(14, fileSliceBlob);
+            var arrayBuffer;
+            var fileReader = new FileReader();
+            fileReader.onload = function(event) {
+                arrayBuffer = event.target.result;
+            };
+            fileReader.readAsArrayBuffer(fileSliceBlob);
+            processFile(file);
+        }
+    })
+
+    const processFile = (file) => {
+        // we define fr as a new instance of FileReader
+        const fr = new FileReader();
+
+        fr.readAsDataURL(file);
+        // Handle progress, success, and errors
+        // fr.onprogress = updateProgress;
+        fr.onerror = errorHandler;
+        fr.onabort = () => changeStatus('Start Loading');
+        fr.onloadstart =   () => changeStatus('Start Loading');
+        fr.onload = ()=> {changeStatus('Loaded')};
+        fr.onloadend = () => loaded;
+        // Here you can perform some operations on the data asynchronously
+        fr.onprogress = setProgress;
+    }
+
+    // Updates the value of the progress bar
+    const setProgress = (e) => {
+        // The target is the file reader
+        const fr = e.target;
+        const loadingPercentage =  100 * e.loaded / e.total;
+        document.getElementById('progress-bar').value = loadingPercentage;
+    }
+
+    const changeStatus = (status) => {
+        document.getElementById('status').innerHTML = status
+    }
+
+    const loaded = (e) => {
+        const fr = e.target
+        var result = fr.result;
+        console.log('result:')
+        console.log(result)
+        changeStatus('Load ended!');
+        // Here we can send the result to a server for example
+    }
+
+    const errorHandler = (e) => {
+        changeStatus("Error: " + e.target.error.name)
+    }
+
+</script>
+</body>
