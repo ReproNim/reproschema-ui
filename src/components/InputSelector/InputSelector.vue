@@ -63,6 +63,16 @@
         mode="audioRecordNumberTask" />
     </div>
 
+    <!-- If type is audioRecordAudioTask -->
+    <div v-else-if="inputType === 'audioRecordAudioTask'">
+      <AudioRecord
+        :constraints="valueConstraints"
+        :selected_language="selected_language"
+        :init="init" v-on:valueChanged="sendData"
+        :fieldData="fieldData"
+        mode="audioRecordAudioTask" />
+    </div>
+
     <!-- If type is text -->
     <div v-else-if="inputType === 'text'">
       <TextInput
