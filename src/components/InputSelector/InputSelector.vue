@@ -82,6 +82,15 @@
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
+    <!-- If type is textarea-->
+    <div v-else-if="inputType === 'textarea'">
+      <TextArea
+              :constraints="valueConstraints"
+              :inputType="inputType"
+              :selected_language="selected_language"
+              :init="init" v-on:valueChanged="sendData"/>
+    </div>
+
     <!-- If type is pid -->
     <div v-else-if="inputType === 'pid'">
       <ParticipantId
@@ -220,6 +229,7 @@
 import Radio from '../Inputs/WebRadio/';
 import AudioRecord from '../Inputs/WebAudioRecord/';
 import TextInput from '../Inputs/WebTextInput/';
+import TextArea from '../Inputs/TextArea/';
 import IntegerInput from '../Inputs/WebIntegerInput/';
 import FloatInput from '../Inputs/WebFloatInput/';
 import DateInput from '../Inputs/YearInput/';
@@ -284,6 +294,7 @@ export default {
     Radio,
     AudioRecord,
     TextInput,
+    TextArea,
     EmailInput,
     IntegerInput,
     FloatInput,
