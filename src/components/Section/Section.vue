@@ -29,7 +29,7 @@
           />
         </transition>
         <b-modal v-model="showModal" ref="invalid-token-modal" ok-only title="Helpline!"
-                 no-close-on-esc no-close-on-backdrop hide-header-close hide-footer header-class="justify-content-center">
+                 hide-footer header-class="justify-content-center">
           <p class="contact">If you're thinking about suicide, are worried about a friend or loved one, or would like emotional support, there are resources available 24/7. Your call or text is confidential and free.</p>
 
           <p>Call the Suicide Prevention Lifeline in the United States:</p>
@@ -69,8 +69,6 @@ import { v4 as uuidv4 } from 'uuid';
 Vue.use(VuejsDialog);
 
 const safeEval = require('safe-eval');
-
-// const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
 
 export default {
   name: 'Section',
@@ -227,7 +225,6 @@ export default {
       }
       const progress = ((Object.keys(this.responses).length) / totalQ) * 100;
       this.$emit('updateProgress', progress);
-      console.log(215, this.responses);
       if (progress === 100) {
         // console.log(212, 'section complete--send responses: ', this.responses);
         // this.$emit('valueChanged', this.responses);
@@ -236,7 +233,6 @@ export default {
     },
     setResponse(val, index) {
       const itemUrl = this.context[index]['@id'];
-      console.log(225, itemUrl, val);
       // console.log(226, this.responses);
       const d2 = new Date();
       const t1 = d2.toISOString();
@@ -347,18 +343,9 @@ export default {
         );
         // console.log(274, 'priority 4', addPA);
       }
-      if (idx === 8 && this.responses[this.context[idx]['@id']] > 0) {
+      const key_name = this.context[idx]['@id'].split('/');
+      if (idx === 8 && key_name[key_name.length - 1] === 'phq9_9' && this.responses[this.context[idx]['@id']] > 0) {
         this.showModal = true;
-        // Trigger notification for non-zero suicidal ideation
-        // const notification = ' <i> If this is how you feel, think about getting help. </i><br> ' +
-        //         'There are people who can help 24/7 <br>' +
-        //         'Text the Crisis Text Line at 741741 <br>' +
-        //         'Or<br>' +
-        //         'Call the National Suicide Prevention Lifeline at 1-800-273-8255';
-        // const options = {
-        //   html: true,
-        // };
-        // this.$dialog.alert(notification, options);
       }
     },
     nextQuestion(idx, skip, dontKnow) {
