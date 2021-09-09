@@ -28,6 +28,20 @@
             :reprotermsUrl="reprotermsUrl"
           />
         </transition>
+        <b-modal v-model="showModal" ref="invalid-token-modal" ok-only title="Helpline!"
+                 no-close-on-esc no-close-on-backdrop hide-header-close hide-footer header-class="justify-content-center">
+          <p class="contact">If you're thinking about suicide, are worried about a friend or loved one, or would like emotional support, there are resources available 24/7. Your call or text is confidential and free.</p>
+
+          <p>Call the Suicide Prevention Lifeline in the United States:</p>
+          <p>English: 1-800-273-8255</p>
+          <p>Español: 1-888-628-9454</p>
+          <br>
+          <p>Text the Crisis TextLine through SMS:</p>
+          <p>US or Canada: 741741</p>
+          <p class="contact"><a href="https://www.messenger.com/login.php?next=https%3A%2F%2Fwww.messenger.com%2Ft%2F204427966369963%2F%3Fmessaging_source%3Dsource%253Apages%253Amessage_shortlink" target="_blank">Facebook Messenger</a>
+          <p>For other countries:</p>
+          <p class="contact"><a href="https://www.befrienders.org" target="_blank">www.befrienders.org</a></p>
+        </b-modal>
       </div>
     </transition-group>
 
@@ -89,6 +103,7 @@ export default {
       visibility: {},
       scores: {},
       currentIndex: 0,
+      showModal: false
     };
   },
   components: {
@@ -333,16 +348,17 @@ export default {
         // console.log(274, 'priority 4', addPA);
       }
       if (idx === 8 && this.responses[this.context[idx]['@id']] > 0) {
+        this.showModal = true;
         // Trigger notification for non-zero suicidal ideation
-        const notification = ' <i> If this is how you feel, think about getting help. </i><br> ' +
-                'There are people who can help 24/7 <br>' +
-                'Text the Crisis Text Line at 741741 <br>' +
-                'Or<br>' +
-                'Call the National Suicide Prevention Lifeline at 1-800-273-8255';
-        const options = {
-          html: true,
-        };
-        this.$dialog.alert(notification, options);
+        // const notification = ' <i> If this is how you feel, think about getting help. </i><br> ' +
+        //         'There are people who can help 24/7 <br>' +
+        //         'Text the Crisis Text Line at 741741 <br>' +
+        //         'Or<br>' +
+        //         'Call the National Suicide Prevention Lifeline at 1-800-273-8255';
+        // const options = {
+        //   html: true,
+        // };
+        // this.$dialog.alert(notification, options);
       }
     },
     nextQuestion(idx, skip, dontKnow) {
