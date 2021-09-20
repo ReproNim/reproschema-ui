@@ -337,14 +337,20 @@
           if (val !== 'http://schema.repronim.org/Skipped' && val !== 'http://schema.repronim.org/DontKnow') {
             if (_.isString(val)) {
               val = `'${val}'`; // put the string in quotes
-            } else if (_.isArray(val)) {
+            }
+            else if (_.isArray(val)) {
+
               val = `[${val}]`; // enclose val in []
-             }
+            }
+            else if (!val && string.includes('includes')) { // if val is undefined and is supposed to be a list
+              val = `[]`;
+            }
             output = output.replace(new RegExp(`\\b${k}\\b`), val);
           } else {
             output = output.replace(new RegExp(`\\b${k}\\b`), 0);
           }
         });
+        // console.log(356, output);
         return safeEval(output);
       },
       responseMapper(responses) {
