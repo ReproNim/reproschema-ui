@@ -7,9 +7,8 @@
     <div v-else>
       <div class="text-center" v-if="complete && autoAdvance">
         <div v-if="isVis">
-          <p v-if="currentActivityIndex < listShow.length">
+          <p v-if="complete">
             {{ $t('review-and-next')}}</p>
-          <!--<div class="mt-3 mb-3">Please review your responses, then click "Next" below:</div>-->
           <b-button v-if="nextActivity[activityUrl]" variant="danger" @click="nextActivity1">{{ $t('next-button')}}</b-button>
         </div>
         <div v-else>
@@ -492,7 +491,7 @@
     },
     computed: {
       complete() {
-        return this.progress === 100;
+        return this.progress >= 100;
       },
       getAnsweredLanguage() {
         return this.$store.getters.getAnsweredLanguage;
