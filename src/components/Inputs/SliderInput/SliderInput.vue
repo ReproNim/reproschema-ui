@@ -1,7 +1,7 @@
 <template>
   <div class="SliderInput ml-3 mr-3 pl-3 pr-3">
     <vue-slider v-model="input" :lazy="true" :data="interval"
-                :marks="true" ></vue-slider>
+                :marks="true" :process="false"></vue-slider>
     <b-row class="mt-3 pt-3 pl-0 pr-0">
       <div class="col text-left pr-0 pl-0">
         <span v-if="getMinImageLabel">
@@ -10,14 +10,14 @@
         <p>{{ getMinLabel }}</p>
       </div>
       <div class="col text-right pr-0 pl-0">
-        <span v-if="getMinImageLabel">
+        <span v-if="getMaxImageLabel">
           <img class="imgLabel" :src="getMaxImageLabel" />
         </span>
         <p>{{ getMaxLabel }}</p>
       </div>
     </b-row>
     <b-form @submit="sendData">
-      <b-btn type="submit">{{ $t('submit-button')}}</b-btn>
+      <b-button type="submit" :disabled="!isAnswered">{{ $t('submit-button')}}</b-button>
     </b-form>
   </div>
 </template>
@@ -49,8 +49,12 @@ export default {
   computed: {
     interval() {
       return _.map(this.constraints['http://schema.repronim.org/choices'], (v) => {
+        // console.log(52, v['http://schema.repronim.org/value'][0]['@value']);
         return v['http://schema.repronim.org/value'][0]['@value'];
       });
+      // const diff = choices[1]-choices[0];
+      // console.log(55, choices, diff, choices.unshift(choices[0] - diff));
+      // return choices;
     },
     getMinLabel() {
       if (this.constraints['http://schema.repronim.org/choices']) {
@@ -80,17 +84,21 @@ export default {
       }
       return false;
     },
+    isAnswered() {
+      return !!this.input;
+    }
   },
   data() {
     return {
-      input: null,
+      input: null
     };
   },
   mounted() {
     if (this.init) {
       this.input = this.init;
+
     } else {
-      this.input = this.interval[0]; // get the first value from choices
+      this.input = Math.round(this.interval[this.interval.length - 1]/2); // get the mid value from choices
     }
   },
 };
