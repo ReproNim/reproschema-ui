@@ -78,13 +78,13 @@
   import _ from 'lodash';
   import SurveyItem from '../SurveyItem/';
   import Loader from '../Loader/';
-
-  // const jsonld = require('jsonld');
+  import JSZip from "jszip";
+  import {saveAs} from "file-saver";
+  import config from "../../config";
+  import axios from "axios";
 
   Vue.component('survey-item', SurveyItem);
   const safeEval = require('safe-eval');
-
-  // const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
 
   export default {
     name: 'Survey',
@@ -100,6 +100,7 @@
         isDontKnow: false,
         isVis: false,
         individualPassList: [],
+        downloadAndSubmit: config.downloadAndSubmit,
       };
     },
     components: {
@@ -427,19 +428,15 @@
         if (this.activity['http://schema.repronim.org/shuffle']) {
           if (this.activity['http://schema.repronim.org/shuffle'][0]['@value']) { // when shuffle is true
             const orderList = this.activity['http://schema.repronim.org/order'][0]['@list'];
-            // const listToShuffle = orderList.slice(1, orderList.length - 3);
             const newList = _.shuffle(orderList); // shuffle entire list
-            // newList.unshift(orderList[0]);
-            // newList.push(orderList[orderList.length - 3],
-            //         orderList[orderList.length - 2], orderList[orderList.length - 1]);
-            // console.log(433, newList);
             return newList;
           }
         } return this.activity['http://schema.repronim.org/order'][0]['@list'];
       },
       nextActivity1() {
+        // upload current activity responses asynchronously
+        this.uploadZipData();
         const currentIndex = parseInt(this.$store.state.activityIndex);
-        // eslint-disable-next-line consistent-return
         const visibleAct = _.map(this.actVisibility, (ac, key) => (ac === true ? key : '')).filter(String);
         const nextIndex = visibleAct[visibleAct.indexOf(currentIndex) + 1];
         if (this.$route.query.url) {
@@ -448,6 +445,68 @@
           this.$router.push(`/activities/${nextIndex}`);
         }
       },
+      uploadZipData() {
+        const Response = this.$store.state.exportResponses;
+
+        const totalScores = this.$store.state.scores;
+        const uId = this.$store.state.participantId;
+        const totalResponse = { response: Response, scores: totalScores, participantId: uId };
+        this.formatData(totalResponse);
+      },
+      formatData(data) {
+        const currentIndex = parseInt(this.$store.state.activityIndex);
+        console.log(464, 'data response: ', data.response[currentIndex]);
+        const TOKEN = this.$store.getters.getAuthToken;
+        const expiryMinutes = this.$store.state.expiryMinutes;
+        const jszip = new JSZip();
+        const fileName = `${uuidv4()}-${this.participantId}-activity${currentIndex}`;
+        _.map(data.response[currentIndex], (itemObj) => {
+          const newObj = { ...itemObj };
+          if (itemObj['@type'] === 'reproschema:Response') {
+            if (itemObj.value instanceof Blob) {
+              const keyStrings = (itemObj.isAbout.split('/'));
+              const rId = itemObj['@id'].split('uuid:')[1];
+              jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.wav`, itemObj.value);
+              newObj.value = `${keyStrings[keyStrings.length-1]}-${rId}.wav`;
+            }
+          }
+        });
+        // write out the activity files
+        jszip.folder(fileName).file(`activity_${currentIndex}.jsonld`,
+                JSON.stringify(data.response[currentIndex], null, 4));
+        jszip.generateAsync({ type: 'blob' })
+          .then((myzipfile) => {
+            // console.log(492, 'generate async ');
+            // if (this.downloadAndSubmit) {
+            //   console.log(494, 'download ');
+            //   saveAs(myzipfile, `${fileName}.zip`);
+            // }
+            const formData = new FormData();
+            formData.append('file', myzipfile, `${fileName}.zip`);
+            formData.append('auth_token', `${TOKEN}`);
+            formData.append('expires', `${expiryMinutes}`);
+            this.sendRetry(`${config.backendServer}/submit`, formData);
+
+          });
+      },
+      async sendRetry(url, formData, retries = 3, backoff = 10000) {
+        const config1 = {
+          'Content-Type': 'multipart/form-data'
+        };
+        try {
+          const res = await axios.post(`${config.backendServer}/submit`, formData, config1);
+          // console.log(530, 'SUCCESS!!', formData, res.status);
+        } catch (e) {
+          if (retries > 0) {
+            setTimeout(() => {
+              return this.sendRetry(url, formData, retries-1, backoff * 2);
+            }, backoff)
+          }
+          else {
+            console.log(e.response.status);
+          }
+        }
+      }
     },
     watch: {
       $route() {
