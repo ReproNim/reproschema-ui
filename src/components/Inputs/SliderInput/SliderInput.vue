@@ -17,7 +17,7 @@
       </div>
     </b-row>
     <b-form @submit="sendData">
-      <b-button type="submit" :disabled="!isAnswered">{{ $t('submit-button')}}</b-button>
+      <b-button type="submit">{{ $t('submit-button')}}</b-button>
     </b-form>
   </div>
 </template>
@@ -84,9 +84,6 @@ export default {
       }
       return false;
     },
-    isAnswered() {
-      return !!this.input;
-    }
   },
   data() {
     return {
