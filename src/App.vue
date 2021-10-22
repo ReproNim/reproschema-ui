@@ -39,11 +39,12 @@
         </div>
         <ul class="list-unstyled components">
           <!-- <p>Dummy Heading</p> -->
-          <li v-for="(ui, index) in schemaOrder" :key="index">
+          <li v-for="(ui, index) in schemaOrder" :key="index"
+              :class="{'current': index===parseInt(activityIndex) }">
 <!--            hi {{ index }} {{ visibility }}-->
             <a @click="setActivity(index)"
                v-if="visibility[index]"
-               :class="{'current': index===activityIndex}">
+               :class="{'current': index===parseInt(activityIndex)}">
               <circleProgress v-if="isProtocolUrl"
                 :radius="20"
                 :progress="progress[index]"
@@ -838,7 +839,7 @@ export default {
     color: white;
   }
 
-  .current {
+  li.current {
     background-color: #17a2b8;
     color: white !important;
   }
