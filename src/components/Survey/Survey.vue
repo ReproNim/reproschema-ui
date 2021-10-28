@@ -7,7 +7,7 @@
     <div v-else>
       <div class="text-center" v-if="complete && autoAdvance">
         <div v-if="isVis">
-          <p v-if="complete">
+          <p v-if="complete && currentActivityIndex < listShow.length">
             {{ $t('review-and-next')}}</p>
           <b-button v-if="nextActivity[activityUrl]" variant="danger" @click="nextActivity1">{{ $t('next-button')}}</b-button>
         </div>
