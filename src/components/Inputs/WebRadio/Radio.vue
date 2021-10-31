@@ -8,6 +8,7 @@
             :options="options"
             stacked
             plain
+            style="line-height: 2.5em"
             class="text-left"
             ref="checkboxbutton"
           ></b-form-checkbox-group>
@@ -24,6 +25,7 @@
           class="text-left"
           @change="sendData"
           ref="radiobutton"
+          style="line-height: 2.5em"
         >
         </b-form-radio-group>
       </b-form-group>
