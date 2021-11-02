@@ -27,13 +27,19 @@
       <b-form-group label="" v-if="!isImageSelect">
         <b-form-radio-group
           v-model="selected"
-          :options="options"
           stacked
           class="text-left"
           @change="sendData"
           ref="radiobutton"
-          style="line-height: 2.5em"
         >
+          <b-form-radio
+            v-for="opt in options"
+            :value="opt.value"
+            :key="opt.value"
+            class="mb-3"
+            >
+            {{ opt.text }}
+          </b-form-radio>
         </b-form-radio-group>
       </b-form-group>
       <div class="text-center" v-else>
