@@ -586,6 +586,9 @@ export default {
     if (this.$route.query.auth_token) {
       this.$store.dispatch('setAuthToken', this.$route.query.auth_token);
     }
+    if (this.$route.query.param_vis) {
+      this.$store.dispatch('setParamVis', this.$route.query.param_vis);
+    }
     if (!_.isEmpty(this.$route.query)) {
         this.$store.dispatch('setQueryParameters', this.$route.query);
     }

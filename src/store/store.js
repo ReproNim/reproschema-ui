@@ -78,6 +78,10 @@ const getters = {
     return state.token;
   },
   // eslint-disable-next-line
+  getParamVis(state) {
+    return state.param_vis;
+  },
+  // eslint-disable-next-line
   getHasExport(state) {
     return state.hasExport;
   },
@@ -131,6 +135,10 @@ const mutations = {
   // eslint-disable-next-line
   setAuthToken(state, authToken) {
     state.token = authToken;
+  },
+  // eslint-disable-next-line
+  setParamVis(state, param_vis) {
+    state.param_vis = param_vis;
   },
   // eslint-disable-next-line
   setParticipantUUID(state, uid) {
@@ -247,6 +255,9 @@ const actions = {
   },
   setAuthToken({ commit }, tok) {
     commit('setAuthToken', tok);
+  },
+  setParamVis({ commit }, tok) {
+    commit('setParamVis', tok);
   },
   setExpiryMinutes({ commit }, mins) {
     commit('setExpiryMinutes', mins);

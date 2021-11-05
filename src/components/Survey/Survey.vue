@@ -398,6 +398,11 @@
             if (_.isString(val)) {
               val = this.evaluateString(val, responseMapper);
             }
+            // if a number is provided, we compare to the param_vis
+            else if (_.isNumber(val)) {
+              if (val == this.$store.getters.getParamVis) val = true
+              else val = false
+            }
             if (responseMapper[a['http://schema.repronim.org/variableName'][0]['@value']]) {
               visibilityMapper[responseMapper[a['http://schema.repronim.org/variableName'][0]['@value']].ref] = val;
             }
