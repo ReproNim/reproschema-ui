@@ -5,12 +5,20 @@
         <b-form-group label="">
           <b-form-checkbox-group
             v-model="checkboxSelected"
-            :options="options"
             stacked
             plain
             class="text-left"
             ref="checkboxbutton"
-          ></b-form-checkbox-group>
+          >
+            <b-form-checkbox
+              v-for="opt in options"
+              :value="opt.value"
+              :key="opt.value"
+              class="mb-3"
+              >
+              {{ opt.text }}
+              </b-form-checkbox>
+          </b-form-checkbox-group>
         </b-form-group>
         <b-btn type="submit">{{ $t('submit-button')}}</b-btn>
       </b-form>
@@ -19,12 +27,19 @@
       <b-form-group label="" v-if="!isImageSelect">
         <b-form-radio-group
           v-model="selected"
-          :options="options"
           stacked
           class="text-left"
           @change="sendData"
           ref="radiobutton"
         >
+          <b-form-radio
+            v-for="opt in options"
+            :value="opt.value"
+            :key="opt.value"
+            class="mb-3"
+            >
+            {{ opt.text }}
+          </b-form-radio>
         </b-form-radio-group>
       </b-form-group>
       <div class="text-center" v-else>
