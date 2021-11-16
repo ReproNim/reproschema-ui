@@ -28,7 +28,8 @@
           <survey-item
                   :key="'c' + content['@id']"
                   v-if="shouldShow[index]"
-                  :item="content" :index="contextReverse.length - index - 1"
+                  :item="content"
+                  :index="contextReverse.length - index - 1"
                   :init="responses[content['@id']]"
                   v-on:skip="nextQuestion(contextReverse.length - index - 1, 1, 0)"
                   v-on:dontKnow="nextQuestion(contextReverse.length - index - 1, 0, 1)"
@@ -245,7 +246,7 @@
           return criteria1 && criteria2;
         });
       },
-      setResponse(val, index) {
+      setResponse(val, index, mp_progress=100) {
         const itemUrl = this.context[index]['@id'];
         let exportVal = val;
         let usedList = [];
@@ -319,7 +320,7 @@
             this.$emit('saveScores', this.srcUrl, this.scores);
           }
         }
-        this.updateProgress();
+        this.updateProgress(mp_progress);
       },
       setScore(scoreObj, index) {
         this.$emit('saveScores', this.context[index]['@id'], scoreObj);
@@ -406,7 +407,7 @@
         }
         return {};
       },
-      updateProgress() {
+      updateProgress(mp_pr=100) {
         let totalQ = this.context.length;
         if (!_.isEmpty(this.visibility)) {
           totalQ = 0;
@@ -420,7 +421,7 @@
           });
           // totalQ = _.filter(this.visibility).length;
         }
-        const progress = ((Object.keys(this.responses).length) / totalQ) * 100;
+        const progress = ((Object.keys(this.responses).length - 1 + mp_pr/100) / totalQ) * 100;
         // console.log(401, 'updateProgress------ ', Object.keys(this.responses).length, totalQ, this.context, this.context.length, progress)
         this.$emit('updateProgress', progress);
       },
