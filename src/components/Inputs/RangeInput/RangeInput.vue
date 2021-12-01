@@ -4,7 +4,7 @@
       <b-row>
         <b-col lg="4" class="col-4 col-md-4">
           <b-form-group>
-            <b-form-input ref="rangeInput" v-model="input1"
+            <b-form-input placeholder="start" ref="rangeInput" v-model="input1"
                           :class="{'is-valid': isValidFloat}">
             </b-form-input>
 <!--            <div class="invalid-feedback">-->
@@ -14,7 +14,7 @@
         </b-col>
         <b-col lg="4" class="col-4 col-md-4">
           <b-form-group>
-            <b-form-input ref="rangeInput" v-model="input2"
+            <b-form-input placeholder="end" ref="rangeInput" v-model="input2"
                           :class="{'is-valid': isValidFloat}">
             </b-form-input>
 <!--            <div class="invalid-feedback">-->
