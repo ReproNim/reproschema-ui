@@ -137,6 +137,14 @@
           :init="init" v-on:valueChanged="sendData"/>
     </div>
 
+    <!-- If type is range -->
+    <div v-else-if="inputType === 'range'">
+        <RangeInput
+          :constraints="valueConstraints"
+          :selected_language="selected_language"
+          :init="init" v-on:valueChanged="sendData"/>
+    </div>    
+
     <!-- If type is date -->
     <div v-else-if="inputType === 'date' || inputType === 'year'">
       <DateInput
@@ -232,6 +240,7 @@ import TextInput from '../Inputs/WebTextInput/';
 import TextArea from '../Inputs/TextArea/';
 import IntegerInput from '../Inputs/WebIntegerInput/';
 import FloatInput from '../Inputs/WebFloatInput/';
+import RangeInput from '../Inputs/RangeInput/';
 import DateInput from '../Inputs/YearInput/';
 import DocumentUpload from '../Inputs/DocumentUpload';
 import MultiTextInput from '../Inputs/MultiTextInput';
@@ -298,6 +307,7 @@ export default {
     EmailInput,
     IntegerInput,
     FloatInput,
+    RangeInput,
     DateInput,
     DocumentUpload,
     MultiTextInput,
