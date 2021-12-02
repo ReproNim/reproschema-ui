@@ -27,6 +27,7 @@ See it in action [HERE](https://www.repronim.org/reproschema-ui/)
     - [Run unit tests](#run-unit-tests)
     - [Run e2e tests](#run-e2e-tests)
     - [Run all tests](#run-all-tests)
+    - [Lints and fixes files](#lints-and-fixes-files)
 
 <!-- /TOC -->
 
@@ -43,6 +44,7 @@ One exception is :
 ### Text inputs
 
 -   text: `WebTextInput/TextInput.vue`
+-   textArea: `TextArea/TextArea.vue`   
 -   multitext: `MultiTextInput/MultiTextInput.vue`
 -   email: `EmailInput/EmailInput.vue`
 
