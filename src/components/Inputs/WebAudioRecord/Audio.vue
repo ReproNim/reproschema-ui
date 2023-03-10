@@ -17,7 +17,9 @@
       <b-button v-if="!isRecording && !hasRecording" @click="record" variant="danger">
         {{ $t('record-button')}}
       </b-button>
-      <b-button v-if="isRecording" @click="finish">{{ $t('stop-button') }}</b-button>
+      <div v-if="mode!='audioRecordNoStop'" class="mb-3">
+        <b-button v-if="isRecording" @click="finish">{{ $t('stop-button') }}</b-button>
+      </div>
       <div v-if="isRecording">
         <small>{{timeRemaining}} {{ $t('x-seconds-left')}}</small>
       </div>
