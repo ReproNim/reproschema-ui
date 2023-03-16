@@ -7,7 +7,7 @@ import config from '../config';
 
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
   routes: [
     {
       path: '/',
@@ -29,3 +29,23 @@ export default new Router({
     },
   ],
 });
+
+router.beforeEach((to, from, next) => {
+  
+  if ((from.query.auth_token && !to.query.auth_token) 
+      || (from.query.uid && !to.query.uid)){
+    if (from.path === to.path) {
+      next(false);
+    } else {
+      next({
+        path: to.path,
+        query: from.query,
+      });
+    }
+  } else {
+    next();
+  }
+
+})
+
+export default router
