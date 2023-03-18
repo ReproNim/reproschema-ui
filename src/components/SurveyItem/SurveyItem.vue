@@ -357,7 +357,7 @@
       sendData(val) {
         this.variant = null;
         /* eslint-enable */
-        this.$emit('setData', val, this.index);
+        this.$emit('setData', val, this.index, this.mp_progress);
       },
       sendDataAndGoNext(val) {
         // console.log('sending data and going next', val);
