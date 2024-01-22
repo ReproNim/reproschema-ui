@@ -108,6 +108,10 @@
       Loader,
     },
     methods: {
+      onSurveyResponse(response) {
+        this.$store.dispatch('saveResponse', response);
+        this.$store.dispatch('evaluateVisibility');
+      },
       getData() {
         jsonld.expand(this.srcUrl).then((resp) => {
           this.activity = resp[0];
