@@ -112,7 +112,6 @@ const mutations = {
     state.scores = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => ({}));
     state.activities = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => ({}));
     state.storeReady = true;
-    this.dispatch('loadIsVisConditions', data[0]);
     if (state.schema['http://schema.repronim.org/landingPage']) {
       // console.log(82, 'store setbase', state.schema['http://schema.repronim.org/landingPage']);
       const landingPage = state.schema['http://schema.repronim.org/landingPage'];
@@ -213,6 +212,15 @@ const mutations = {
   },
 };
 
+// Helper function to map responses
+function responseMapper(responses) {
+  const responseMap = {};
+  Object.entries(responses).forEach(([key, value]) => {
+    responseMap[key] = value;
+  });
+  return responseMap;
+}
+
 const actions = {
   async loadProtocolSchema({ commit }, url) {
     const schema = await jsonld.expand(url);
@@ -287,13 +295,13 @@ const actions = {
   },
   evaluateVisibility({ commit, state }) {
     const visibility = {};
-    const responseMapper = this.responseMapper(state.responses);
+    const responses = responseMapper(state.responses);
 
     Object.entries(state.isVisConditions).forEach(([variableName, condition]) => {
       let evaluatedCondition = condition;
 
       // Replace variables in the condition with actual response values
-      Object.entries(responseMapper).forEach(([key, value]) => {
+      Object.entries(responses).forEach(([key, value]) => {
         evaluatedCondition = evaluatedCondition.replace(new RegExp(`\\b${key}\\b`, 'g'), value);
       });
 
@@ -302,17 +310,7 @@ const actions = {
     });
 
     commit('setVisibleSurveys', visibility);
-  },
-
-  // Helper function to map responses
-  responseMapper(responses) {
-    const responseMap = {};
-    Object.entries(responses).forEach(([key, value]) => {
-      // Assuming the structure of responses, adjust as per your data format
-      responseMap[key] = value;
-    });
-    return responseMap;
-  },
+  }
 };
 
 export default new Vuex.Store({

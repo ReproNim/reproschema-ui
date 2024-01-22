@@ -40,6 +40,10 @@ export default {
       consent: config.consent,
     };
   },
+  mounted() {
+    // Dispatch the action to load the protocol schema using the URL from config
+    this.$store.dispatch('loadProtocolSchema', config.githubSrc);
+  },
   computed: {
     reprotermsUrl() {
       return this.$store.getters.getTermsUrl;
