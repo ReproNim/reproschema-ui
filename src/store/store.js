@@ -214,6 +214,11 @@ const mutations = {
 };
 
 const actions = {
+  async loadProtocolSchema({ commit }, url) {
+    const schema = await jsonld.expand(url);
+    commit('setBaseSchema', schema);
+    dispatch('loadIsVisConditions', schema[0]);
+  },
   async getReproTerm({ commit }, url) {
     commit('setReprotermUrl', url);
   },
