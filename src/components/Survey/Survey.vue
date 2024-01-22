@@ -109,7 +109,9 @@
     },
     methods: {
       onSurveyResponse(response) {
+        // Save the response to the Vuex store
         this.$store.dispatch('saveResponse', response);
+        // Re-evaluate visibility conditions based on the new response
         this.$store.dispatch('evaluateVisibility');
       },
       getData() {
@@ -302,6 +304,10 @@
         }
         const valueAndDataExport = [val, responseActivity, respData];
         this.$emit('saveResponse', this.context[index]['@id'], valueAndDataExport);
+        // Dispatch the saveResponse action to update the Vuex store
+        this.$store.dispatch('saveResponse', { key: this.context[index]['@id'], value: valueAndDataExport });
+        // Re-evaluate visibility conditions based on the updated responses
+        this.$store.dispatch('evaluateVisibility');
         this.t0 = t1;
         const currResponses = { ...this.responses };
         if (val instanceof Object) {
@@ -554,6 +560,10 @@
       },
     },
     computed: {
+      visibleSections() {
+        // Returns the visibility status of surveys from the Vuex store
+        return this.$store.state.visibleSurveys;
+      },
       complete() {
         return this.progress >= 100;
       },
