@@ -34,7 +34,7 @@
         >
           <b-form-radio
             v-for="opt in options"
-            :value="opt.text"
+            :value="opt.value"
             :key="opt.value"
             class="mb-3"
             >
