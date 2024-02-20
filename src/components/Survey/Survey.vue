@@ -252,7 +252,6 @@
         let exportVal = val;
         let usedList = [];
         let isAboutUrl = itemUrl;
-        console.log(`${val} Aaaaaa`)
         if (val?.constructor === Object && !val?.hasOwnProperty('unitCode')) { // to find sub-activities; condition might need to be changed
           const sectionItemKey = Object.keys(val)[0];
           const sectionItemValue = Object.values(val)[0];
@@ -322,6 +321,7 @@
             this.$emit('saveScores', this.srcUrl, this.scores);
           }
         }
+        // TODO: Evaluate -- this was broken for Radio Button input
         this.updateProgress();
       },
       setScore(scoreObj, index) {

@@ -96,7 +96,7 @@ export default {
         }
         return {
           text, // ESLint object-shorthand
-          value: v['http://schema.repronim.org/value'][0]['@value'] ? v['http://schema.repronim.org/value'][0]['@value'] : text,
+          value: v['http://schema.repronim.org/value'][0]['@value'] ? v['http://schema.repronim.org/value'][0]['@value'] : text, // Fallback to 'text' in case schema.repronim value isn't found
           image: v['http://schema.org/image'] ? v['http://schema.org/image'][0]['@value'] : null,
         };
       });
@@ -155,7 +155,6 @@ export default {
       this.$emit('valueChanged', this.checkboxSelected);
     },
     sendData() {
-      console.log(`${this.selected} Aaron`)
        this.$emit('valueChanged', this.selected);
     }
   },
