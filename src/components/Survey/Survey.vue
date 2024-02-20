@@ -248,10 +248,12 @@
       },
       setResponse(val, index, mp_progress=100) {
         const itemUrl = this.context[index]['@id'];
+        console.log(itemUrl)
         let exportVal = val;
         let usedList = [];
         let isAboutUrl = itemUrl;
-        if (val.constructor === Object && !val.hasOwnProperty('unitCode')) { // to find sub-activities; condition might need to be changed
+        console.log(`${val} Aaaaaa`)
+        if (val?.constructor === Object && !val?.hasOwnProperty('unitCode')) { // to find sub-activities; condition might need to be changed
           const sectionItemKey = Object.keys(val)[0];
           const sectionItemValue = Object.values(val)[0];
           exportVal = sectionItemValue;
@@ -320,7 +322,7 @@
             this.$emit('saveScores', this.srcUrl, this.scores);
           }
         }
-        this.updateProgress(mp_progress);
+        this.updateProgress();
       },
       setScore(scoreObj, index) {
         this.$emit('saveScores', this.context[index]['@id'], scoreObj);

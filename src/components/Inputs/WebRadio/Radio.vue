@@ -34,7 +34,7 @@
         >
           <b-form-radio
             v-for="opt in options"
-            :value="opt.value"
+            :value="opt.text"
             :key="opt.value"
             class="mb-3"
             >
@@ -96,7 +96,7 @@ export default {
         }
         return {
           text, // ESLint object-shorthand
-          value: v['http://schema.repronim.org/value'][0]['@value'],
+          value: v['http://schema.repronim.org/value'][0]['@value'] ? v['http://schema.repronim.org/value'][0]['@value'] : text,
           image: v['http://schema.org/image'] ? v['http://schema.org/image'][0]['@value'] : null,
         };
       });
@@ -154,13 +154,10 @@ export default {
       e.preventDefault();
       this.$emit('valueChanged', this.checkboxSelected);
     },
-    sendData(val) {
-      this.$emit('valueChanged', val);
-    },
-    onSelectImage(d) {
-      this.selected = d.id;
-      this.sendData(d.id);
-    },
+    sendData() {
+      console.log(`${this.selected} Aaron`)
+       this.$emit('valueChanged', this.selected);
+    }
   },
 };
 

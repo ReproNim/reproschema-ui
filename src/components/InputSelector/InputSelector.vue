@@ -19,7 +19,9 @@
         :constraints="valueConstraints"
         :selected_language="selected_language"
         :reprotermsUrl="reprotermsUrl"
-        :init="init" v-on:valueChanged="sendData"/>
+        :init="init"
+        v-on:valueChanged="sendData"
+      />
     </div>
 
     <div v-else-if="inputType === 'audioCheck'">
@@ -341,6 +343,7 @@ export default {
       this.$emit('dontKnow');
     },
     sendData(val) {
+      console.log(val)
       if (val instanceof Date) {
         this.$emit('valueChanged', val.getFullYear());
       } else this.$emit('valueChanged', val);

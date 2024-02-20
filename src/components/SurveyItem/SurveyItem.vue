@@ -4,6 +4,7 @@
     <!-- https://codepen.io/vikttor_/pen/jeqoPN?page=1& -->
     <div class="contextItem align-self-center center w-100">
       <transition name="fade" mode="out-in">
+<!--        // Aaron-->
         <InputSelector v-if="status === 'ready' && ui !== 'multipart' && ui !== 'section'"
                        :inputType="ui"
                        :readOnly="widgetType"
@@ -181,7 +182,7 @@
       ui() {
         /* eslint-disable */
         if (this.data['@type'] && this.data['@type'][0] === "http://schema.repronim.org/Activity") {
-          return 'section';
+          console.log(this.data)
         }
         else if (this.data['http://schema.repronim.org/inputType']) {
           return this.data['http://schema.repronim.org/inputType'][0]['@value'];
@@ -374,7 +375,6 @@
       },
       clearMPResponses() {
         this.mp_responses = {};
-        this.mp_progress = 0;
         this.$emit('setData', {}, this.index);
       },
       setMPProgress(progress) {
