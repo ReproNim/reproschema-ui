@@ -156,7 +156,11 @@ export default {
     },
     sendData() {
        this.$emit('valueChanged', this.selected);
-    }
+    },
+    onSelectImage(d) {
+      this.selected = d.id;
+      this.sendData(d.id);
+    },
   },
 };
 
