@@ -19,7 +19,9 @@
         :constraints="valueConstraints"
         :selected_language="selected_language"
         :reprotermsUrl="reprotermsUrl"
-        :init="init" v-on:valueChanged="sendData"/>
+        :init="init"
+        v-on:valueChanged="sendData"
+      />
     </div>
 
     <div v-else-if="inputType === 'audioCheck'">
