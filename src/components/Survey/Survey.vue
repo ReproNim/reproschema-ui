@@ -80,7 +80,7 @@
   import SurveyItem from '../SurveyItem/';
   import Loader from '../Loader/';
   import JSZip from "jszip";
-  import {saveAs} from "file-saver";
+  //import {saveAs} from "file-saver";
   import config from "../../config";
   import axios from "axios";
 
@@ -251,6 +251,7 @@
         let exportVal = val;
         let usedList = [];
         let isAboutUrl = itemUrl;
+        // eslint-disable-next-line no-prototype-builtins
         if (_.isObject(val) && !val.hasOwnProperty('unitCode')) { // to find sub-activities; condition might need to be changed
           const sectionItemKey = Object.keys(val)[0];
           const sectionItemValue = Object.values(val)[0];
@@ -501,6 +502,7 @@
           'Content-Type': 'multipart/form-data'
         };
         try {
+          // eslint-disable-next-line no-unused-vars
           const res = await axios.post(`${config.backendServer}/submit`, formData, config1);
           // console.log(530, 'SUCCESS!!', formData, res.status);
         } catch (e) {
