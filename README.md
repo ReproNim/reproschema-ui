@@ -152,12 +152,12 @@ need to [fork this repository](https://help.github.com/en/github/getting-started
 and [clone it](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository)
 on your machine.
 
-This app uses an older version of node, hence the easiest option is to use a 
-Docker setup.
+If you don't have node or are not familiar with it, the easiest option is to 
+use a Docker setup.
 
 ```shell
 docker run -it --rm -p 8080:8080 -v $(pwd):/src --entrypoint bash \
-    --platform linux/amd64 node:14.21.3-buster-slim
+    --platform linux/amd64 node:21.7.2-bookworm-slim
 ```
 
 In the container terminal
