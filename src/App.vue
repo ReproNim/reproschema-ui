@@ -366,35 +366,47 @@ export default {
       _.map(keys, (k) => {
         // grab the value of the key from responseMapper
         let val = responseMapper[k].val;
-        if (val !== 'skipped' && val !== 'dontknow') {
-          if (_.isString(val)) {
-            val = `'${val}'`; // put the string in quotes
+        if (val !== undefined) {
+          if (val !== 'skipped' && val !== 'dontknow') {
+            if (_.isString(val)) {
+              val = `'${val}'`; // put the string in quotes
+            }
+            if (_.isArray(val)) {
+              val = `[${val}]`; // put braces for array
+            }
+            output = output.replaceAll(new RegExp(`\\b${k}\\b` || `\\b${k}\\.`, 'g'), val);
+          } else {
+            output = output.replaceAll(new RegExp(`\\b${k}\\b`, 'g'), 0);
           }
-          if (_.isArray(val)) {
-            val = `[${val}]`; // put braces for array
-          }
-          output = output.replace(new RegExp(`\\b${k}\\b` || `\\b${k}\\.`), val);
-        } else {
-          output = output.replace(new RegExp(`\\b${k}\\b`), 0);
         }
       });
       return safeEval(output);
     },
-    responseMapper(index, responses) {
-      let keyArr;
+    responseMapper(index, responses, responseMap) {
+      let keyArr = [];
       // a variable map is defined! great
       if (this.schema['http://schema.repronim.org/addProperties']) {
         const vmap = this.schema['http://schema.repronim.org/addProperties'];
-        keyArr = _.map(vmap, (v) => {
-          const key = v['http://schema.repronim.org/isAbout'][0]['@id'];
-          const qId = v['http://schema.repronim.org/variableName'][0]['@value'];
-          const rp = _.filter(responses, r => key in r);
-          let val = rp[0];
-          if (rp[0]) {
-            val = rp[0][key];
-          }
-          return { key, val, qId };
-        });
+        Object.entries(vmap).forEach(
+            // eslint-disable-next-line no-unused-vars
+            ([unused, v]) => {
+              const key = v['http://schema.repronim.org/isAbout'][0]['@id'];
+              const qId = v['http://schema.repronim.org/variableName'][0]['@value'];
+              if (key in responseMap) {
+                Object.entries(responseMap[key]).forEach(
+                    ([key1, value1]) => {
+                      const joined_key = ''.concat(qId,'.',key1);
+                      keyArr.push({ qId: joined_key, val: value1['val'], key: value1['ref'] });
+                    });
+                }
+              const rp = _.filter(responses, r => key in r);
+              let val = rp[0];
+              if (rp[0]) {
+                val = rp[0][key];
+              }
+              keyArr.push({ key, val, qId });
+            }
+            );
         if (this.$store.getters.getQueryParameters) {
           const q = this.$store.getters.getQueryParameters;
           Object.entries(q).forEach(
@@ -433,6 +445,7 @@ export default {
       }
     },
     async computeVisibilityCondition(cond, index) {
+      console.log('computeVisibilityCondition', cond, index);
       if (_.isObject(cond)) {
         const request = {
           method: cond.method,
@@ -452,13 +465,13 @@ export default {
           // default to false
           this.visibility[index] = false;
         }
-        // console.log('making request', request, 'cache', this.cache);
+        console.log('making request', request, 'cache', this.cache);
         const resp = await axios(request);
         // this.visibility[index] = resp.data;
         this.cache[cacheKey] = resp.data.qualified;
         return resp.data.qualified;
       } else if (_.isString(cond)) {
-        const responseMapper = this.responseMapper(index, this.$store.state.responses);
+        const responseMapper = this.responseMapper(index, this.$store.state.responses, this.$store.state.responseMap);
         const v = this.evaluateString(cond, responseMapper);
         // this.visibilty[index] = v;
         return v;

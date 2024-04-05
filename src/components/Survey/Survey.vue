@@ -251,7 +251,7 @@
         let exportVal = val;
         let usedList = [];
         let isAboutUrl = itemUrl;
-        if (val.constructor === Object && !val.hasOwnProperty('unitCode')) { // to find sub-activities; condition might need to be changed
+        if (_.isObject(val) && !val.hasOwnProperty('unitCode')) { // to find sub-activities; condition might need to be changed
           const sectionItemKey = Object.keys(val)[0];
           const sectionItemValue = Object.values(val)[0];
           exportVal = sectionItemValue;
@@ -368,6 +368,12 @@
           });
 
         }
+        const respMapper = {};
+        _.map(keyArr, (a) => {
+          respMapper[a.qId] = { val: a.val, ref: a.key };
+        });
+        // Store the response variables in the state
+        this.$store.state.responseMap[this.activity['@id']] = respMapper;
         if (this.$store.getters.getQueryParameters) {
           const q = this.$store.getters.getQueryParameters;
           Object.entries(q).forEach(

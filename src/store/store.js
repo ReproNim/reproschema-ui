@@ -12,6 +12,7 @@ const state = {
   schema: {},
   progress: [],
   responses: [],
+  responseMap: {}, // Stores the responses indexed by variable name
   exportResponses: [],
   scores: {},
   participantId: '',
