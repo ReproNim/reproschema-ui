@@ -56,7 +56,6 @@
 
 <script>
 import _ from 'lodash';
-import Bowser from "bowser";
 
 
 const MediaStreamRecorder = require('msr');
@@ -153,7 +152,6 @@ export default {
       };
 
       // check audio level
-      const audioContext = new AudioContext();
       const analyser = this.audioCtx.createAnalyser();
       const microphone = this.audioCtx.createMediaStreamSource(audioStream);
       const scriptNode = this.audioCtx.createScriptProcessor(2048, 1, 1);

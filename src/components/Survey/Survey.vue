@@ -85,7 +85,6 @@
   import axios from "axios";
 
   Vue.component('survey-item', SurveyItem);
-  const safeEval = require('safe-eval');
 
   export default {
     name: 'Survey',
@@ -353,7 +352,7 @@
           }
         });
         // console.log(356, output);
-        return safeEval(output);
+        return Function('return ' + output)();
       },
       responseMapper(responses) {
         // const keys = _.map(this.order(), c => c['@id']); // Object.keys(this.responses);

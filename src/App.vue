@@ -143,7 +143,6 @@ import i18n from './i18n';
 
 Vue.use(BootstrapVue);
 Vue.filter('reverse', value => value.slice().reverse());
-const safeEval = require('safe-eval');
 const MediaStreamRecorder = require('msr');
 
 function getFilename(s) {
@@ -363,6 +362,7 @@ export default {
     evaluateString(string, responseMapper) {
       const keys = Object.keys(responseMapper);
       let output = string;
+      let output_modified = false;
       _.map(keys, (k) => {
         // grab the value of the key from responseMapper
         let val = responseMapper[k].val;
@@ -374,13 +374,22 @@ export default {
             if (_.isArray(val)) {
               val = `[${val}]`; // put braces for array
             }
+            let output_old = output;
             output = output.replaceAll(new RegExp(`\\b${k}\\b` || `\\b${k}\\.`, 'g'), val);
+            if (output_old !== output) output_modified = true;
           } else {
+            let output_old = output;
             output = output.replaceAll(new RegExp(`\\b${k}\\b`, 'g'), 0);
+            if (output_old !== output) output_modified = true;
           }
         }
       });
-      return safeEval(output);
+      if (output_modified) {
+        return Function("return " + output)();
+      }
+      else {
+        return false;
+      }
     },
     responseMapper(index, responses, responseMap) {
       let keyArr = [];

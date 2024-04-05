@@ -42,7 +42,6 @@ import jsonld from 'jsonld/dist/jsonld.min';
 import _ from 'lodash';
 import Loader from '../Loader/';
 
-const safeEval = require('safe-eval');
 
 // const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
 
@@ -80,6 +79,7 @@ export default {
     };
   },
   components: {
+    // eslint-disable-next-line vue/no-unused-components
     Loader,
   },
   mounted() {
@@ -178,7 +178,7 @@ export default {
           output = output.replace(k, 0);
         }
       });
-      return safeEval(output);
+      return Function('return ' + output)();
     },
     restart() {
       this.currentIndex = 0;

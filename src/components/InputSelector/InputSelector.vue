@@ -257,7 +257,7 @@ import MultiTextInput from '../Inputs/MultiTextInput';
 import SliderInput from '../Inputs/SliderInput';
 import TimeRange from '../Inputs/TimeRange';
 import SelectInput from '../Inputs/SelectInput';
-import AudioCheck from '../Inputs/AudioCheck';
+// import AudioCheck from '../Inputs/AudioCheck';
 import StaticReadOnly from '../Inputs/StaticReadOnly';
 import SaveData from '../Inputs/SaveData/SaveData';
 import StudySign from '../StudySign/StudySign';
@@ -324,7 +324,6 @@ export default {
     SliderInput,
     TimeRange,
     SelectInput,
-    AudioCheck,
     StaticReadOnly,
     Static,
   },

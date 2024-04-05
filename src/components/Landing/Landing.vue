@@ -13,7 +13,7 @@
 
 <script>
 import _ from 'lodash';
-import VueMarkdown from 'vue-markdown';
+import VueMarkdown from '@adapttive/vue-markdown';
 import Loader from '../Loader';
 import config from '../../config';
 
