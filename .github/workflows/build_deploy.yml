@@ -20,12 +20,12 @@ jobs:
     steps:
 
     - name: Setup Node
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v4
       with:
-        node-version: '12.x'
+        node-version: '21.x'
 
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     # Runs a set of commands using the runners shell
     - name: Run a multi-line script
@@ -35,7 +35,7 @@ jobs:
         touch dist/.nojekyll
 
     - name: Deploy 🚀
-      uses: JamesIves/github-pages-deploy-action@releases/v3
+      uses: JamesIves/github-pages-deploy-action@v4
       if: github.ref == 'refs/heads/master'
       with:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}

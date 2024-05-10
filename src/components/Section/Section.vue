@@ -68,8 +68,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 Vue.use(VuejsDialog);
 
-const safeEval = require('safe-eval');
-
 export default {
   name: 'Section',
   props: {
@@ -204,7 +202,7 @@ export default {
           output = output.replace(new RegExp(`\\b${k}\\b`), 0);
         }
       });
-      return safeEval(output);
+      return Function('return ' + output)();
     },
     restart() {
       this.currentIndex = 0;
@@ -243,6 +241,7 @@ export default {
       }
       const respActivityUuid = uuidv4();
       const responseUuid = uuidv4();
+      // eslint-disable-next-line no-unused-vars
       const responseActivity = {
         '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/1.0.0-rc2/contexts/generic',
         '@type': 'reproschema:ResponseActivity',
@@ -337,6 +336,7 @@ export default {
       } if (!flag && this.activity['http://schema.repronim.org/overrideProperties']) { // priority 3
         // console.log(268, 'priority 3');
       } else { // priority 4 - look in activity addProperties
+        // eslint-disable-next-line no-unused-vars
         let addPA = _.filter(this.activity['http://schema.repronim.org/addProperties'], c =>
           //console.log(271, c['http://schema.repronim.org/isAbout'][0]['@id'], this.context[idx]['@id']);
           (c['http://schema.repronim.org/isAbout'][0]['@id'] === this.context[idx]['@id']) && c['http://schema.repronim.org/message']

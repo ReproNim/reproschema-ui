@@ -152,33 +152,19 @@ need to [fork this repository](https://help.github.com/en/github/getting-started
 and [clone it](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository)
 on your machine.
 
-To then run the app locally, you will have to install javascript `node.js`. A
-good way to do this, is to install [node version manager](https://github.com/nvm-sh/nvm)
-(NVM) to help you deal with different version of `node.js`.
+If you don't have node or are not familiar with it, the easiest option is to 
+use a Docker setup.
 
-If you are running linux, you can install NVM by typing:
-
-```
-curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+```shell
+docker run -it --rm -p 8080:8080 -v $(pwd):/src --entrypoint bash \
+    --platform linux/amd64 node:21.7.2-bookworm-slim
 ```
 
-Then close your terminal and reopen it then run the following to install the
-version 9 of `node.js`
+In the container terminal
 
-```
-nvm install node
-nvm install 9
-```
-
-You should then be able to use node to the following:
-
-### Install the dependencies
-``` bash
+```shell
+cd /src
 npm install
-```
-
-### Serve the app locally
-``` bash
 npm run serve
 ```
 

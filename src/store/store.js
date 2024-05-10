@@ -12,6 +12,7 @@ const state = {
   schema: {},
   progress: [],
   responses: [],
+  responseMap: {}, // Stores the responses indexed by variable name
   exportResponses: [],
   scores: {},
   participantId: '',
@@ -94,6 +95,7 @@ const mutations = {
       // console.log(67, response.data);
       const ctx = response.data['@context'];
       // const ctx = _.filter(response.data['@context'], c => c.includes('contexts/generic'));
+      // eslint-disable-next-line no-unused-vars
       axios.get(ctx).then((resp) => {
         // console.log(68, resp.data);
         // state.termUrl = resp.data['@context'].reproterms;

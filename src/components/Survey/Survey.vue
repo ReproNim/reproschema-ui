@@ -80,12 +80,11 @@
   import SurveyItem from '../SurveyItem/';
   import Loader from '../Loader/';
   import JSZip from "jszip";
-  import {saveAs} from "file-saver";
+  //import {saveAs} from "file-saver";
   import config from "../../config";
   import axios from "axios";
 
   Vue.component('survey-item', SurveyItem);
-  const safeEval = require('safe-eval');
 
   export default {
     name: 'Survey',
@@ -251,7 +250,8 @@
         let exportVal = val;
         let usedList = [];
         let isAboutUrl = itemUrl;
-        if (val.constructor === Object && !val.hasOwnProperty('unitCode')) { // to find sub-activities; condition might need to be changed
+        // eslint-disable-next-line no-prototype-builtins
+        if (_.isObject(val) && !val.hasOwnProperty('unitCode')) { // to find sub-activities; condition might need to be changed
           const sectionItemKey = Object.keys(val)[0];
           const sectionItemValue = Object.values(val)[0];
           exportVal = sectionItemValue;
@@ -352,7 +352,7 @@
           }
         });
         // console.log(356, output);
-        return safeEval(output);
+        return Function('return ' + output)();
       },
       responseMapper(responses) {
         // const keys = _.map(this.order(), c => c['@id']); // Object.keys(this.responses);
@@ -368,6 +368,12 @@
           });
 
         }
+        const respMapper = {};
+        _.map(keyArr, (a) => {
+          respMapper[a.qId] = { val: a.val, ref: a.key };
+        });
+        // Store the response variables in the state
+        this.$store.state.responseMap[this.activity['@id']] = respMapper;
         if (this.$store.getters.getQueryParameters) {
           const q = this.$store.getters.getQueryParameters;
           Object.entries(q).forEach(
@@ -495,6 +501,7 @@
           'Content-Type': 'multipart/form-data'
         };
         try {
+          // eslint-disable-next-line no-unused-vars
           const res = await axios.post(`${config.backendServer}/submit`, formData, config1);
           // console.log(530, 'SUCCESS!!', formData, res.status);
         } catch (e) {
