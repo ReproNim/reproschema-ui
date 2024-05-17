@@ -1,9 +1,7 @@
 <template>
   <div class="staticReadOnly">
-    <div v-if="input">
-      <h4> {{ input }}</h4>
-      <br>
-      <b-btn @click="onSubmit"> Done </b-btn>
+    <div v-if="true">
+      <b-btn @click="onSubmit"> Done reading </b-btn>
     </div>
     <div v-else>
       <b-alert show>
@@ -24,9 +22,7 @@ export default {
   methods: {
     onSubmit(e) {
       e.preventDefault();
-      if (this.input) {
-        this.$emit('valueChanged', this.input);
-      }
+      this.$emit('valueChanged', this.input);
     },
   },
   data() {
