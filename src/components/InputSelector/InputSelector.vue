@@ -196,6 +196,7 @@
         :constraints="valueConstraints"
         :selected_language="selected_language"
         :result="true"
+        :input="title"
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
@@ -215,12 +216,14 @@
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
+    <!--
     <div v-else-if="inputType === 'static'">
       <Static
         :constraints="valueConstraints"
         :selected_language="selected_language"
         :init="init" v-on:valueChanged="sendData"/>
     </div>
+    -->
 
     <!-- if we don't have a component built for this type, then show an error -->
     <div v-else>
@@ -261,7 +264,7 @@ import SelectInput from '../Inputs/SelectInput';
 import StaticReadOnly from '../Inputs/StaticReadOnly';
 import SaveData from '../Inputs/SaveData/SaveData';
 import StudySign from '../StudySign/StudySign';
-import Static from '../Inputs/Static';
+// import Static from '../Inputs/Static';
 import EmailInput from '../Inputs/EmailInput';
 import ParticipantId from '../Inputs/ParticipantId/ParticipantId';
 
@@ -325,7 +328,7 @@ export default {
     TimeRange,
     SelectInput,
     StaticReadOnly,
-    Static,
+    // Static,
   },
   data() {
     return {

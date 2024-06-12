@@ -454,7 +454,7 @@ export default {
       }
     },
     async computeVisibilityCondition(cond, index) {
-      console.log('computeVisibilityCondition', cond, index);
+      // console.log('computeVisibilityCondition', cond, index);
       if (_.isObject(cond)) {
         const request = {
           method: cond.method,
