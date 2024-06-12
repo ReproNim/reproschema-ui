@@ -1,5 +1,5 @@
 module.exports = {
-  githubSrc: 'https://raw.githubusercontent.com/ReproNim/demo-protocol/tst/static/DemoProtocol/DemoProtocol_schema',
+  githubSrc: 'https://raw.githubusercontent.com/ReproNim/demo-protocol/master/DemoProtocol/DemoProtocol_schema',
   startButton: {
     "en": 'Join',
     "es": 'Participar'
