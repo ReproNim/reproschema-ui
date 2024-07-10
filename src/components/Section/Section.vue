@@ -243,7 +243,7 @@ export default {
       const responseUuid = uuidv4();
       // eslint-disable-next-line no-unused-vars
       const responseActivity = {
-        '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/1.0.0-rc2/contexts/generic',
+        '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/1.0.0/contexts/reproschema',
         '@type': 'reproschema:ResponseActivity',
         '@id': `uuid:${respActivityUuid}`,
         used: [`${itemUrl}`,
@@ -260,7 +260,7 @@ export default {
         generated: `uuid:${responseUuid}`,
       };
       const respData = {
-        '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/1.0.0-rc2/contexts/generic',
+        '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/1.0.0/contexts/reproschema',
         '@type': 'reproschema:Response',
         '@id': `uuid:${responseUuid}`,
         wasAttributedTo: {

@@ -474,7 +474,7 @@ export default {
           // default to false
           this.visibility[index] = false;
         }
-        console.log('making request', request, 'cache', this.cache);
+        // console.log('making request', request, 'cache', this.cache);
         const resp = await axios(request);
         // this.visibility[index] = resp.data;
         this.cache[cacheKey] = resp.data.qualified;
