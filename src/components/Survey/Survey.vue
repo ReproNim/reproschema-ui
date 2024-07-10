@@ -247,11 +247,12 @@
       },
       setResponse(val, index, mp_progress=100) {
         const itemUrl = this.context[index]['@id'];
+        //console.log(val, index, mp_progress, itemUrl);
         let exportVal = val;
         let usedList = [];
         let isAboutUrl = itemUrl;
         // eslint-disable-next-line no-prototype-builtins
-        if (_.isObject(val) && !val.hasOwnProperty('unitCode')) { // to find sub-activities; condition might need to be changed
+        if (_.isObject(val) && !val.hasOwnProperty('unitCode') && !(val instanceof Blob)) { // to find sub-activities; condition might need to be changed
           const sectionItemKey = Object.keys(val)[0];
           const sectionItemValue = Object.values(val)[0];
           exportVal = sectionItemValue;
@@ -269,7 +270,7 @@
         const respActivityUuid = uuidv4();
         const responseUuid = uuidv4();
         const responseActivity = {
-          '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/1.0.0-rc2/contexts/generic',
+          '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/1.0.0/contexts/reproschema',
           '@type': 'reproschema:ResponseActivity',
           '@id': `uuid:${respActivityUuid}`,
           used: usedList,
@@ -284,7 +285,7 @@
           generated: `uuid:${responseUuid}`,
         };
         const respData = {
-          '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/1.0.0-rc2/contexts/generic',
+          '@context': 'https://raw.githubusercontent.com/ReproNim/reproschema/1.0.0/contexts/reproschema',
           '@type': 'reproschema:Response',
           '@id': `uuid:${responseUuid}`,
           wasAttributedTo: {
@@ -462,7 +463,7 @@
       },
       formatData(data) {
         const currentIndex = parseInt(this.$store.state.activityIndex);
-        console.log(464, 'data response: ', data.response[currentIndex]);
+        // console.log(464, 'data response: ', data.response[currentIndex]);
         const TOKEN = this.$store.getters.getAuthToken;
         const expiryMinutes = this.$store.state.expiryMinutes;
         const jszip = new JSZip();
