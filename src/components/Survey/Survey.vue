@@ -252,7 +252,7 @@
         let usedList = [];
         let isAboutUrl = itemUrl;
         // eslint-disable-next-line no-prototype-builtins
-        if (_.isObject(val) && !val.hasOwnProperty('unitCode') && !(val instanceof Blob)) { // to find sub-activities; condition might need to be changed
+        if (_.isObject(val) && !_.isArray(val) && !val.hasOwnProperty('unitCode') && !(val instanceof Blob)) { // to find sub-activities; condition might need to be changed
           const sectionItemKey = Object.keys(val)[0];
           const sectionItemValue = Object.values(val)[0];
           exportVal = sectionItemValue;
