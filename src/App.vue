@@ -482,7 +482,7 @@ export default {
       } else if (_.isString(cond)) {
         const responseMapper = this.responseMapper(index, this.$store.state.responses, this.$store.state.responseMap);
         const v = this.evaluateString(cond, responseMapper);
-        // this.visibilty[index] = v;
+        // this.visibility[index] = v;
         return v;
       }
       return cond;
