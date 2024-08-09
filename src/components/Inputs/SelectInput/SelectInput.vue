@@ -3,25 +3,37 @@
     <multiselect v-if=" inputType=== 'select' && this.constraints['http://schema.org/itemListElement']"
                  v-model="selected" :options="this.options" :searchable="false"
                  :show-labels="false"
-                 placeholder="Pick a value" @input="checkNotOtherAndSendData">
+                 placeholder="Pick a value">
     </multiselect>
-    <multiselect v-else v-model="selected" id="ajax"
+    <multiselect v-else-if="multipleAllowed" v-model="selected" id="ajax"
                  placeholder="Type to search"
-                 :options="this.options" :multiple="multipleAllowed"
+                 :options="this.options" :multiple="true"
                  :searchable="true"
                  :internal-search="true" :clear-on-select="false"
                  :close-on-select="true" :options-limit="300"
                  :limit="5" :limit-text="limitText" :max-height="600"
-                 :show-no-results="false" :hide-selected="true"
-                 @input="checkNotOtherAndSendData">
+                 :show-no-results="false" :hide-selected="true">
+    </multiselect>
+    <multiselect v-else v-model="selected" id="ajax"
+                 placeholder="Type to search"
+                 :options="this.options"
+                 :searchable="true"
+                 :internal-search="true" :clear-on-select="false"
+                 :close-on-select="true" :options-limit="300"
+                 :limit="5" :limit-text="limitText" :max-height="600"
+                 :show-no-results="false" :hide-selected="false">
       <span slot="noResult">{{ $t('select-invalid-query')}}</span>
     </multiselect>
     <div v-if="checkOther" id="ifOther" style="display: block;">
-      <br><b-form-input v-model="otherInput" placeholder="Please describe" @change="sendData">
-    </b-form-input>
+      <br>
+          <b-form-input v-model="otherInput" placeholder="Please describe">
+        </b-form-input>
     </div>
+    <br>
+      <b-form v-if="this.selected" @submit="checkAndSendData">
+        <b-btn type="submit">{{ $t('submit-button')}}</b-btn>
+      </b-form>
   </div>
-
 </template>
 
 <script>
@@ -57,13 +69,18 @@ export default {
 
   },
   methods: {
-    checkNotOtherAndSendData(val) {
-      if (val !== 'Other') {
-        this.$emit('valueChanged', val);
+    checkAndSendData() {
+      if (this.selected) {
+        if (this.selected.includes('Other')) {
+          if (this.multipleAllowed) {
+            this.$emit('valueChanged', [...this.selected.slice(0, -1), this.otherInput]);
+          } else {
+            this.$emit('valueChanged', this.otherInput);
+          }
+        } else {
+          this.$emit('valueChanged', this.selected);
+        }
       }
-    },
-    sendData(val) {
-      this.$emit('valueChanged', [this.selected, val]);
     },
     limitText(count) {
       return `and ${count} other countries`;
@@ -97,12 +114,13 @@ export default {
     multipleAllowed() {
       if (this.constraints['http://schema.repronim.org/multipleChoice']) {
         // console.log(94, this.constraints[this.reprotermsUrl+'multipleChoice']);
-        return true;
-      } return false;
+        return this.constraints['http://schema.repronim.org/multipleChoice'][0]['@value'];
+      }
+      return false;
     },
     checkOther() {
-      if (this.selected === 'Other') {
-        return true;
+      if (this.selected) {
+        return this.selected.includes('Other');
       }
       return false;
     },
