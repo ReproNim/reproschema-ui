@@ -121,11 +121,7 @@ export default {
   },
   methods: {
     sendData() {
-      this.$emit('valueChanged', {
-        startTime: this.sleptAt.toISOString(),
-        endTime: this.wokeAt.toISOString(),
-        difference: this.timeSlept,
-      });
+      this.$emit('valueChanged', this.sleptAt.toISOString() + "/" + this.wokeAt.toISOString());
     },
   },
   watch: {
