@@ -251,14 +251,6 @@
         let exportVal = val;
         let usedList = [];
         let isAboutUrl = itemUrl;
-        // eslint-disable-next-line no-prototype-builtins
-        if (_.isObject(val) && !_.isArray(val) && !val.hasOwnProperty('unitCode') && !(val instanceof Blob)) { // to find sub-activities; condition might need to be changed
-          const sectionItemKey = Object.keys(val)[0];
-          const sectionItemValue = Object.values(val)[0];
-          exportVal = sectionItemValue;
-          usedList.push(sectionItemKey);
-          isAboutUrl = sectionItemKey;
-        }
         usedList.push(`${itemUrl}`, `${this.srcUrl}`);
         const d2 = new Date();
         const t1 = d2.toISOString();
