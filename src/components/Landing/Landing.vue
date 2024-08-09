@@ -102,7 +102,7 @@ export default {
     font-weight: bold;
   }
 
-  /* DOCKED LAYOUT (header annd footer at top and bottom of viewport,
+  /* DOCKED LAYOUT (header and footer at top and bottom of viewport,
   center elements each scroll) */
   .docked-layout {
     display: flex;
