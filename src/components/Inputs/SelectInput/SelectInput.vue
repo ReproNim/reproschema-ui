@@ -3,25 +3,37 @@
     <multiselect v-if=" inputType=== 'select' && this.constraints['http://schema.org/itemListElement']"
                  v-model="selected" :options="this.options" :searchable="false"
                  :show-labels="false"
-                 placeholder="Pick a value" @input="checkNotOtherAndSendData">
+                 placeholder="Pick a value">
     </multiselect>
-    <multiselect v-else v-model="selected" id="ajax"
+    <multiselect v-else-if="multipleAllowed" v-model="selected" id="ajax"
                  placeholder="Type to search"
-                 :options="this.options" :multiple="multipleAllowed"
+                 :options="this.options" :multiple="true"
                  :searchable="true"
                  :internal-search="true" :clear-on-select="false"
                  :close-on-select="true" :options-limit="300"
                  :limit="5" :limit-text="limitText" :max-height="600"
-                 :show-no-results="false" :hide-selected="true"
-                 @input="checkNotOtherAndSendData">
+                 :show-no-results="false" :hide-selected="true">
+    </multiselect>
+    <multiselect v-else v-model="selected" id="ajax"
+                 placeholder="Type to search"
+                 :options="this.options"
+                 :searchable="true"
+                 :internal-search="true" :clear-on-select="false"
+                 :close-on-select="true" :options-limit="300"
+                 :limit="5" :limit-text="limitText" :max-height="600"
+                 :show-no-results="false" :hide-selected="false">
       <span slot="noResult">{{ $t('select-invalid-query')}}</span>
     </multiselect>
     <div v-if="checkOther" id="ifOther" style="display: block;">
-      <br><b-form-input v-model="otherInput" placeholder="Please describe" @change="sendData">
-    </b-form-input>
+      <br>
+          <b-form-input v-model="otherInput" placeholder="Please describe">
+        </b-form-input>
     </div>
+    <br>
+      <b-form v-if="this.selected" @submit="checkAndSendData">
+        <b-btn type="submit">{{ $t('submit-button')}}</b-btn>
+      </b-form>
   </div>
-
 </template>
 
 <script>
@@ -47,6 +59,7 @@ export default {
       options: [],
       selectedCountries: [],
       isLoading: false,
+      valueMap: {},
     };
   },
   watch: {
@@ -57,13 +70,33 @@ export default {
 
   },
   methods: {
-    checkNotOtherAndSendData(val) {
-      if (val !== 'Other') {
-        this.$emit('valueChanged', val);
+    checkAndSendData() {
+      if (this.selected) {
+        if (this.selected.includes('Other')) {
+          if (!_.isEmpty(this.valueMap)) {
+            this.valueMap["Other"] = this.otherInput;
+          }
+        }
+        let out = null;
+        if (this.multipleAllowed) {
+          if (!_.isEmpty(this.valueMap)) {
+            out = _.map(this.selected, v => this.valueMap[v]);
+          } else if (this.selected.includes('Other')) {
+            out = [...this.selected.slice(0, -1), this.otherInput];
+          } else {
+            out = [...this.selected]
+          }
+        } else {
+          if (!_.isEmpty(this.valueMap)) {
+            out = this.valueMap[this.selected];
+          } else if (this.selected === 'Other') {
+            out = this.otherInput;
+          } else {
+            out = this.selected;
+          }
+        }
+        this.$emit('valueChanged', out);
       }
-    },
-    sendData(val) {
-      this.$emit('valueChanged', [this.selected, val]);
     },
     limitText(count) {
       return `and ${count} other countries`;
@@ -82,6 +115,9 @@ export default {
         const activeValueChoices = _.filter(v['http://schema.org/name'], ac => ac['@language'] === this.selected_language);
         return (activeValueChoices[0]['@value']);
       });
+      this.options.forEach((key, index) => {
+        this.valueMap[key] = this.constraints['http://schema.repronim.org/choices'][index]['http://schema.repronim.org/value'][0]['@value'];
+      });
     } else if (this.constraints['http://schema.repronim.org/choices'].length === 1) { // choice list defined in external file
       axios.get(this.constraints['http://schema.repronim.org/choices'][0]['@value'])
         .then((resp) => {
@@ -97,12 +133,17 @@ export default {
     multipleAllowed() {
       if (this.constraints['http://schema.repronim.org/multipleChoice']) {
         // console.log(94, this.constraints[this.reprotermsUrl+'multipleChoice']);
-        return true;
-      } return false;
+        return this.constraints['http://schema.repronim.org/multipleChoice'][0]['@value'];
+      }
+      return false;
     },
     checkOther() {
-      if (this.selected === 'Other') {
-        return true;
+      if (this.selected) {
+        if (this.multipleAllowed) {
+          return this.selected.includes('Other');
+        } else {
+          return this.selected === 'Other';
+        }
       }
       return false;
     },

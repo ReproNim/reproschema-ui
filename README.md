@@ -202,3 +202,48 @@ npm test
 npm run lint
 ```
 
+## To test protocols and schemas locally
+
+Run this cors server script in the root directory of your reproschema. For
+example, if you clone the demo-protocol, run the script inside the cloned 
+directory. This script will serve the tree locally.
+
+```python
+#!/usr/bin/env python3
+
+# It's python3 -m http.server PORT for a CORS world
+
+from http.server import HTTPServer, SimpleHTTPRequestHandler
+import sys
+
+
+class CORSRequestHandler(SimpleHTTPRequestHandler):
+    
+    def end_headers(self):
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', '*')
+        self.send_header('Access-Control-Allow-Headers', '*')
+        self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate')
+        return super(CORSRequestHandler, self).end_headers()
+
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.end_headers()
+
+host = sys.argv[1] if len(sys.argv) > 2 else '0.0.0.0'
+port = int(sys.argv[len(sys.argv)-1]) if len(sys.argv) > 1 else 8000
+
+print("Listening on {}:{}".format(host, port))
+httpd = HTTPServer((host, port), CORSRequestHandler)
+httpd.serve_forever()
+```
+
+Change config.js in this ui repo to point to your local schema. For example,
+if you cloned the demo protocol it would look like this:
+
+```
+  githubSrc: 'http://localhost:8000/DemoProtocol/DemoProtocol_schema',
+```
+
+
+

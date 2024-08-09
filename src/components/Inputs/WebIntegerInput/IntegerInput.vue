@@ -73,7 +73,11 @@ export default {
       this.$refs.form.className = 'was-validated';
       if (this.isValidInt) {
         if (this.hasUnit) { // send value + unit
-          const name = { value: this.input1, unitCode: this.input2 };
+          const name = {
+            value: this.input1,
+            unitCode: this.input2,
+            "@type": "schema:QuantitativeValue"
+          };
           this.$emit('valueChanged', name);
         } this.$emit('valueChanged', this.input1); // else send only value
       }

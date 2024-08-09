@@ -20,20 +20,16 @@ export default {
   watch: {
     input() {
       // if there is a change, emit it.
-      this.$emit('valueChanged', this.input);
-
+      this.$emit('valueChanged', this.customFormatter(this.input));
       // make sure you validate the date based on this.constraints.
     },
   },
   methods: {
-    sendData(val) {
-      this.$emit('valueChanged', val.getFullYear());
-    },
     customFormatter(date) {
       if (this.inputType === 'year') {
         return moment(date).format('YYYY');
       } else if (this.inputType === 'date') {
-        return moment(date).format('MMM DD YYYY');
+        return moment(date).format('YYYY MMM DD');
       } return date;
     },
   },

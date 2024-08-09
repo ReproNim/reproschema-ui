@@ -35,7 +35,10 @@ export default {
   methods: {
     onSubmit(e) {
       e.preventDefault();
-      const name = { first_name: this.input1, middle_name: this.input2, last_name: this.input3 };
+      const name = { "schema:givenName": this.input1,
+        "schema:additionalName": this.input2,
+        "schema:familyName": this.input3,
+        "@type": "schema:Person" };
       this.$emit('valueChanged', name);
     },
   },

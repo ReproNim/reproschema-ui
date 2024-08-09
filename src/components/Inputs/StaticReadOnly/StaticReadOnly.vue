@@ -1,7 +1,7 @@
 <template>
   <div class="staticReadOnly">
     <div v-if="true">
-      <b-btn @click="onSubmit"> Done reading </b-btn>
+      <b-btn @click="onSubmit"> Continue activity </b-btn>
     </div>
     <div v-else>
       <b-alert show>

@@ -343,9 +343,7 @@ export default {
       this.$emit('dontKnow');
     },
     sendData(val) {
-      if (val instanceof Date) {
-        this.$emit('valueChanged', val.getFullYear());
-      } else this.$emit('valueChanged', val);
+      this.$emit('valueChanged', val);
       this.$emit('next');
     },
   },
