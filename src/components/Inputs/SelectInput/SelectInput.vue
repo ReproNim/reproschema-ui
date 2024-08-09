@@ -59,6 +59,7 @@ export default {
       options: [],
       selectedCountries: [],
       isLoading: false,
+      valueMap: {},
     };
   },
   watch: {
@@ -72,14 +73,29 @@ export default {
     checkAndSendData() {
       if (this.selected) {
         if (this.selected.includes('Other')) {
-          if (this.multipleAllowed) {
-            this.$emit('valueChanged', [...this.selected.slice(0, -1), this.otherInput]);
+          if (!_.isEmpty(this.valueMap)) {
+            this.valueMap["Other"] = this.otherInput;
+          }
+        }
+        let out = null;
+        if (this.multipleAllowed) {
+          if (!_.isEmpty(this.valueMap)) {
+            out = _.map(this.selected, v => this.valueMap[v]);
+          } else if (this.selected.includes('Other')) {
+            out = [...this.selected.slice(0, -1), this.otherInput];
           } else {
-            this.$emit('valueChanged', this.otherInput);
+            out = [...this.selected]
           }
         } else {
-          this.$emit('valueChanged', this.selected);
+          if (!_.isEmpty(this.valueMap)) {
+            out = this.valueMap[this.selected];
+          } else if (this.selected === 'Other') {
+            out = this.otherInput;
+          } else {
+            out = this.selected;
+          }
         }
+        this.$emit('valueChanged', out);
       }
     },
     limitText(count) {
@@ -98,6 +114,9 @@ export default {
       this.options = _.map(this.constraints['http://schema.repronim.org/choices'], (v) => {
         const activeValueChoices = _.filter(v['http://schema.org/name'], ac => ac['@language'] === this.selected_language);
         return (activeValueChoices[0]['@value']);
+      });
+      this.options.forEach((key, index) => {
+        this.valueMap[key] = this.constraints['http://schema.repronim.org/choices'][index]['http://schema.repronim.org/value'][0]['@value'];
       });
     } else if (this.constraints['http://schema.repronim.org/choices'].length === 1) { // choice list defined in external file
       axios.get(this.constraints['http://schema.repronim.org/choices'][0]['@value'])
@@ -120,7 +139,11 @@ export default {
     },
     checkOther() {
       if (this.selected) {
-        return this.selected.includes('Other');
+        if (this.multipleAllowed) {
+          return this.selected.includes('Other');
+        } else {
+          return this.selected === 'Other';
+        }
       }
       return false;
     },
