@@ -146,7 +146,7 @@ export default {
             visibilityMapper[responseMapper[a[`${this.reprotermsUrl}variableName`][0]['@value']].ref] = val;
           }
         });
-        // console.log(142, 'in section', visibilityMapper);
+        //console.log(142, 'in section', visibilityMapper);
         return visibilityMapper;
       }
       return {};
@@ -184,24 +184,31 @@ export default {
       return outMapper;
     },
     evaluateString(string, responseMapper) {
-      // console.log(176, string, responseMapper);
-      const keys = Object.keys(responseMapper);
+    
+      //console.log(176, string, responseMapper);
+      //const keys = Object.keys(responseMapper);
       let output = string;
       _.map(keys, (k) => {
+        //console.log(k, output)
+
         // grab the value of the key from responseMapper
         let val = responseMapper[k].val;
-        if (Array.isArray(responseMapper[k].val)) {
-          val = responseMapper[k].val[0];
-        }
         if (val !== 'http://schema.repronim.org/Skipped' && val !== 'http://schema.repronim.org/DontKnow') {
           if (_.isString(val)) {
             val = `'${val}'`; // put the string in quotes
           }
+          else if (_.isArray(val)) {
+              val = `[${val}]`; // enclose val in []
+            }
+          else if (!val && string.includes('includes')) { // if val is undefined and is supposed to be a list
+              val = `[]`;
+            }
           output = output.replace(new RegExp(`\\b${k}\\b`), val);
         } else {
           output = output.replace(new RegExp(`\\b${k}\\b`), 0);
         }
       });
+      //console.log(output)
       return Function('return ' + output)();
     },
     restart() {
