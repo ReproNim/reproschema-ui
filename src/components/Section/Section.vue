@@ -186,7 +186,7 @@ export default {
     evaluateString(string, responseMapper) {
     
       //console.log(176, string, responseMapper);
-      //const keys = Object.keys(responseMapper);
+      const keys = Object.keys(responseMapper);
       let output = string;
       _.map(keys, (k) => {
         //console.log(k, output)
