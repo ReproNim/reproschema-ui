@@ -197,7 +197,7 @@ export default {
     sendRetry(url, formData, index, retries = 3, backoff = 10000) {
         if (!this.shouldUpload) {
           console.log("Not uploading")
-          return;
+          return 200;
         }
         const config1 = {
         'Content-Type': 'multipart/form-data'
