@@ -195,10 +195,14 @@ export default {
         });
     },
     sendRetry(url, formData, index, retries = 3, backoff = 10000) {
+        if (!this.shouldUpload) {
+          console.log("Not uploading")
+          return;
+        }
         const config1 = {
         'Content-Type': 'multipart/form-data'
         };
-        return axios.post(`${config.backendServer}/submit`, formData, config1).then((res) => {
+        return axios.post(url, formData, config1).then((res) => {
           // console.log(322, 'SUCCESS!!', `${fileName}.zip.00${index}`, res.status);
           slicedArray.splice(index, 1); // remove successfully POSTed slice
           sentPartCount++;

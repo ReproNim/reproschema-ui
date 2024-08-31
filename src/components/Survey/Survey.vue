@@ -490,12 +490,16 @@
           });
       },
       async sendRetry(url, formData, retries = 3, backoff = 10000) {
+        if (!this.shouldUpload) {
+          console.log("Not uploading")
+          return;
+        }
         const config1 = {
           'Content-Type': 'multipart/form-data'
         };
         try {
           // eslint-disable-next-line no-unused-vars
-          const res = await axios.post(`${config.backendServer}/submit`, formData, config1);
+          const res = await axios.post(url, formData, config1);
           // console.log(530, 'SUCCESS!!', formData, res.status);
         } catch (e) {
           if (retries > 0) {
@@ -581,6 +585,9 @@
           // console.log(495, criteria1, criteria2);
           return criteria1 && criteria2;
         });
+      },
+      shouldUpload() {
+        return !!(config.backendServer && this.$store.getters.getAuthToken);
       },
       context() {
         /* eslint-disable */
