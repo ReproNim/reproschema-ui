@@ -170,14 +170,6 @@
           width: '100%',
         };
       },
-      bodyStyle() {
-        if (this.ui === 'section' || this.ui === 'multipart') {
-          return {
-            padding: 0,
-          };
-        }
-        return {};
-      },
       ui() {
         /* eslint-disable */
         if (this.data['@type'] && this.data['@type'][0] === "http://schema.repronim.org/Activity") {
@@ -229,42 +221,8 @@
       fieldData() {
         return this.data;
       },
-      findPassOptions() {
-        if (this.data['http://schema.repronim.org/responseOptions']) {
-          // when responseOptions is a remote object
-          if (Object.keys(this.data['http://schema.repronim.org/responseOptions'][0]).indexOf('@id') > -1) {
-            this.getRequiredVal();
-            return this.requireVal;
-          }
-          // when responseOptions in embedded in item object itself
-          if (this.data['http://schema.repronim.org/responseOptions'][0]) {
-            // make sure the requiredValue key is defined
-            // todo: requiredValue has moved to activity level, so change the code here
-            if (this.data['http://schema.repronim.org/responseOptions'][0]['http://schema.org/valueRequired']) {
-              return this.data['http://schema.repronim.org/responseOptions'][0]['http://schema.org/valueRequired'][0]['@value'];
-            }
-          }
-        }
-        return false;
-      },
     },
     methods: {
-      getRequiredVal() { // todo: this needs to change. requiredValue is in activity level now
-        jsonld.expand(this.data['http://schema.repronim.org/responseOptions'][0]['@id'])
-                .then((rsp) => {
-                  this.requireVal = rsp[0]['http://schema.org/valueRequired'][0]['@value'];
-                  // eslint-disable-next-line no-unused-vars
-                }).catch((e) => {
-          // console.log(240, 'constraint error', e);
-          jsonld.expand(`${this.data['http://schema.repronim.org/responseOptions'][0]['@id']}.jsonld`).then((resp) => {
-            // console.log(250, resp);
-            this.requireVal = resp[0]['http://schema.org/valueRequired'][0]['@value'];
-            // eslint-disable-next-line no-unused-vars
-          }).catch((e1) => {
-            // console.log(252, e1);
-          });
-        });
-      },
       getValueConstraintsData(url) {
         jsonld.expand(url).then((rsp) => {
           this.valueC = rsp[0];
