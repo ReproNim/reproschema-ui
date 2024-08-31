@@ -122,13 +122,34 @@ export default {
           const answered = _.filter(this.context, c =>
             Object.keys(this.responses).indexOf(c['@id']) > -1);
           if (!answered.length) {
-            this.listShow = [0];
+            this.listShow = [this.initializeListShow()];
           } else {
             this.listShow = _.map(new Array(answered.length + 1), (c, i) => i);
           }
           this.visibility = this.getVisibility(this.responses);
         });
       });
+    },
+    initializeListShow() {
+      const responseMapper = this.responseMapper(this.responses);
+      let i = 0;
+      for (i = 0; i < this.context.length; i += 1) {
+        const eachItem = (this.context)[i];
+        // return _.map(this.context, (o, index) => {
+        const matchedObject = _.filter(this.activity['http://schema.repronim.org/addProperties'], a => a['http://schema.repronim.org/isAbout'][0]['@id'] === eachItem['@id']);
+        let val = true; // true by default if not mentioned
+        if (matchedObject[0]['http://schema.repronim.org/isVis']) {
+          val = matchedObject[0]['http://schema.repronim.org/isVis'][0]['@value'];
+        }
+        if (_.isString(val)) {
+          val = this.evaluateString(val, responseMapper);
+        }
+        if (val === true) { // first visible item
+          break;
+        }
+      }
+      return i;
+      // });
     },
     getVisibility(responses) {
       const responseMapper = this.responseMapper(responses);
