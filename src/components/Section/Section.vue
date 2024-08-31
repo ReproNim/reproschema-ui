@@ -47,8 +47,8 @@
 
 
     <div class="text-right mt-3" v-if="showPassOptions !== null ">
-      <b-button variant="default"
-                @click="restart">Restart</b-button>
+      <!--<b-button variant="default"
+                @click="restart">Restart</b-button> -->
       <b-button variant="default" v-if="showPassOptions['dontKnow']"
                 @click="dontKnow">Don't Know</b-button>
       <b-button variant="default" v-if="showPassOptions['skip']"
@@ -152,7 +152,7 @@ export default {
       return {};
     },
     responseMapper(responses) {
-      let keyArr;
+      let keyArr = [];
       // a variable map is defined! great
       if (this.activity['http://schema.repronim.org/addProperties']) {
         const vmap = this.activity['http://schema.repronim.org/addProperties'];
@@ -164,6 +164,33 @@ export default {
         });
 
       }
+      const respMapper = {};
+      _.map(keyArr, (a) => {
+        respMapper[a.qId] = { val: a.val, ref: a.key };
+      });
+      // Store the response variables in the state
+      this.$store.state.responseMap[this.activity['@id']] = respMapper;
+      // Create a mapping from uris to variable names
+      let uri2varmap = {};
+      Object.entries(this.$store.state.responseMap).forEach(
+            // eslint-disable-next-line no-unused-vars
+            ([unused, v]) => {
+              Object.entries(v).forEach(
+                  ([key1, value1]) => {
+                    uri2varmap[value1['ref']] = key1;
+                  })
+            });
+      Object.entries(this.$store.state.responseMap).forEach(
+            // eslint-disable-next-line no-unused-vars
+            ([key, v]) => {
+              Object.entries(v).forEach(
+                  ([key1, value1]) => {
+                    if (key in uri2varmap) {
+                      const joined_key = ''.concat(uri2varmap[key],'.',key1);
+                      keyArr.push({ qId: joined_key, val: value1['val'], key: value1['ref'] });
+                    }
+                  })
+            });
       if (this.$store.getters.getQueryParameters) {
         const q = this.$store.getters.getQueryParameters;
         Object.entries(q).forEach(
@@ -184,25 +211,36 @@ export default {
       return outMapper;
     },
     evaluateString(string, responseMapper) {
-      // console.log(176, string, responseMapper);
       const keys = Object.keys(responseMapper);
       let output = string;
+      let output_modified = false;
       _.map(keys, (k) => {
         // grab the value of the key from responseMapper
         let val = responseMapper[k].val;
-        if (Array.isArray(responseMapper[k].val)) {
-          val = responseMapper[k].val[0];
-        }
-        if (val !== 'http://schema.repronim.org/Skipped' && val !== 'http://schema.repronim.org/DontKnow') {
-          if (_.isString(val)) {
-            val = `'${val}'`; // put the string in quotes
+        if (val !== undefined) {
+          if (val !== 'skipped' && val !== 'dontknow') {
+            if (_.isString(val)) {
+              val = `'${val}'`; // put the string in quotes
+            }
+            if (_.isArray(val)) {
+              val = `[${val}]`; // put braces for array
+            }
+            let output_old = output;
+            output = output.replaceAll(new RegExp(`\\b${k}\\b` || `\\b${k}\\.`, 'g'), val);
+            if (output_old !== output) output_modified = true;
+          } else {
+            let output_old = output;
+            output = output.replaceAll(new RegExp(`\\b${k}\\b`, 'g'), 0);
+            if (output_old !== output) output_modified = true;
           }
-          output = output.replace(new RegExp(`\\b${k}\\b`), val);
-        } else {
-          output = output.replace(new RegExp(`\\b${k}\\b`), 0);
         }
       });
-      return Function('return ' + output)();
+      if (output_modified) {
+        return Function("return " + output)();
+      }
+      else {
+        return false;
+      }
     },
     restart() {
       this.currentIndex = 0;
@@ -353,9 +391,11 @@ export default {
       document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
       this.checkAlertMessage(idx);
       if (skip) {
+        this.$emit('saveResponse', this.context[idx]['@id'], 'http://schema.repronim.org/Skipped');
         this.setResponse('http://schema.repronim.org/Skipped', idx);
       }
       if (dontKnow) {
+        this.$emit('saveResponse', this.context[idx]['@id'], 'http://schema.repronim.org/DontKnow');
         this.setResponse('http://schema.repronim.org/DontKnow', idx);
       }
 
