@@ -339,9 +339,9 @@
             else if (!val && string.includes('includes')) { // if val is undefined and is supposed to be a list
               val = `[]`;
             }
-            output = output.replace(new RegExp(`\\b${k}\\b`), val);
+            output = output.replaceAll(new RegExp(`\\b${k}\\b`, 'g'), val);
           } else {
-            output = output.replace(new RegExp(`\\b${k}\\b`), 0);
+            output = output.replaceAll(new RegExp(`\\b${k}\\b`, 'g'), 0);
           }
         });
         // console.log(356, output);
