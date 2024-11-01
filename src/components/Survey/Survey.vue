@@ -439,8 +439,9 @@
         const currentIndex = parseInt(this.$store.state.activityIndex);
         const visibleAct = _.map(this.actVisibility, (ac, key) => (ac === true ? key : '')).filter(String);
         const nextIndex = visibleAct[visibleAct.indexOf(currentIndex) + 1];
-        const query = this.$route.fullPath.replace(this.$route.path, '')
-        this.$router.push(`/activities/${nextIndex}` + query);
+        this.$router.push({
+          'path': `/activities/${nextIndex}`,
+          'query': this.$route.query});
       },
       uploadZipData() {
         const Response = this.$store.state.exportResponses;

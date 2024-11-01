@@ -66,8 +66,10 @@ export default {
       // eslint-disable-next-line consistent-return
       const visibleAct = _.map(this.actVisibility, (ac, key) => (ac === true ? key : '')).filter(String);
       const nextIndex = visibleAct[visibleAct.indexOf(currentIndex) + 1];
-      const query = this.$route.fullPath.replace(this.$route.path, '')
-      this.$router.push(`/activities/${nextIndex}` + query);
+      this.$router.push({
+        'path': `/activities/${nextIndex}`,
+        'query': this.$route.query}
+      );
     },
   },
 };
