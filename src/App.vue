@@ -284,8 +284,9 @@ export default {
     },
     setActivity(index) {
       if (!this.checkDisableBack && this.isProtocolUrl) { // check if disableBack not enabled
-        const query = this.$route.fullPath.replace(this.$route.path, '')
-        this.$router.push(`/activities/${index}` + query);
+        this.$router.push({
+          'path': `/activities/${index}`,
+          'query': this.$route.query});
       }
     },
     updateProgress(progress) {
