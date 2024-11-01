@@ -7,7 +7,7 @@
       <div id="timer" class="timer" v-if="showTimer">
         <!--  Timer Component  -->
         <Timer
-            starttime="Dec 23, 2020 02:37:25"
+            starttime="Oct 31, 2024 21:00:00"
             :endtime=expiryTime
             trans='{
             "day":"Day",
@@ -127,7 +127,6 @@ import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
 import axios from 'axios';
 import Bowser from "bowser";
-import moment from 'moment';
 import _ from 'lodash';
 import JSZip from 'jszip';
 import { v4 as uuidv4 } from 'uuid';
@@ -285,11 +284,8 @@ export default {
     },
     setActivity(index) {
       if (!this.checkDisableBack && this.isProtocolUrl) { // check if disableBack not enabled
-        if (this.$route.query.url) {
-          this.$router.push(`/activities/${index}?url=${this.$route.query.url}`);
-        } else {
-          this.$router.push(`/activities/${index}`);
-        }
+        const query = this.$route.fullPath.replace(this.$route.path, '')
+        this.$router.push(`/activities/${index}` + query);
       }
     },
     updateProgress(progress) {
@@ -652,10 +648,14 @@ export default {
         return path;
       },
       expiryTime() {
-        let endDate = moment(this.$store.getters.getExpiryTime)['_i'];
-        endDate = endDate.replace(' ', '+');
-        // console.log(537, endDate, new Date(endDate).toString(), new Date(endDate).getTime());
-        return new Date(endDate).getTime();
+        const timestamp = this.$store.getters.getExpiryTime;
+        const formattedTime = timestamp.replace(
+            /(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z/,
+            '$1-$2-$3T$4:$5:$6Z'
+        );
+        const time = Date.parse(formattedTime);
+        console.log(537, timestamp, formattedTime, time);
+        return time;
       },
       showTimer() {
           return !!this.$store.getters.getExpiryTime;

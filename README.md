@@ -157,7 +157,7 @@ use a Docker setup.
 
 ```shell
 docker run -it --rm -p 8080:8080 -v $(pwd):/src --entrypoint bash \
-    --platform linux/amd64 node:21.7.2-bookworm-slim
+    --platform linux/amd64 node:23.1.0-bookworm-slim
 ```
 
 In the container terminal

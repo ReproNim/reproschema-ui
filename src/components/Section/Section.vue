@@ -312,7 +312,7 @@ export default {
         startedAtTime: this.t0,
         endedAtTime: t1,
         wasAssociatedWith: {
-          version: '0.0.1',
+          version: '1.0.0',
           url: uiUrl,
           '@id': 'https://github.com/ReproNim/reproschema-ui',
         },

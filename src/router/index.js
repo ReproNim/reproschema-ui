@@ -5,7 +5,16 @@ import Landing from '@/components/Landing/';
 import StudyIntroduction from '@/components/StudyIntroduction/';
 import config from '../config';
 
+const originalPush = Router.prototype.push
+Router.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch(err => {
+    if (err.name !== 'NavigationDuplicated') {
+      throw err
+    }
+  })
+}
 Vue.use(Router);
+
 
 const router = new Router({
   routes: [
@@ -29,23 +38,5 @@ const router = new Router({
     },
   ],
 });
-
-router.beforeEach((to, from, next) => {
-  
-  if ((from.query.auth_token && !to.query.auth_token) 
-      || (from.query.uid && !to.query.uid)){
-    if (from.path === to.path) {
-      next(false);
-    } else {
-      next({
-        path: to.path,
-        query: from.query,
-      });
-    }
-  } else {
-    next();
-  }
-
-})
 
 export default router

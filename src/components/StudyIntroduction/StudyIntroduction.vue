@@ -87,7 +87,8 @@ export default {
       if (this.step < this.totalSteps) {
         this.step += 1;
       } else if (this.step === this.totalSteps) {
-        this.$router.push('/activities/0');
+        const query = this.$route.fullPath.replace(this.$route.path, '')
+        this.$router.push(`/activities/0` + query);
       }
     },
     learnMore() {
