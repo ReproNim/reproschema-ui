@@ -270,7 +270,7 @@
           startedAtTime: this.t0,
           endedAtTime: t1,
           wasAssociatedWith: {
-            version: '0.0.1',
+            version: '1.0.0',
             url: uiUrl,
             '@id': 'https://github.com/ReproNim/reproschema-ui',
           },
@@ -439,11 +439,8 @@
         const currentIndex = parseInt(this.$store.state.activityIndex);
         const visibleAct = _.map(this.actVisibility, (ac, key) => (ac === true ? key : '')).filter(String);
         const nextIndex = visibleAct[visibleAct.indexOf(currentIndex) + 1];
-        if (this.$route.query.url) {
-          this.$router.push(`/activities/${nextIndex}?url=${this.$route.query.url}`);
-        } else {
-          this.$router.push(`/activities/${nextIndex}`);
-        }
+        const query = this.$route.fullPath.replace(this.$route.path, '')
+        this.$router.push(`/activities/${nextIndex}` + query);
       },
       uploadZipData() {
         const Response = this.$store.state.exportResponses;
@@ -460,6 +457,7 @@
         const expiryMinutes = this.$store.state.expiryMinutes;
         const jszip = new JSZip();
         const fileName = `${uuidv4()}-${this.participantId}-activity${currentIndex}`;
+        const activityData = [];
         _.map(data.response[currentIndex], (itemObj) => {
           const newObj = { ...itemObj };
           if (itemObj['@type'] === 'reproschema:Response') {
@@ -470,10 +468,11 @@
               newObj.value = `${keyStrings[keyStrings.length-1]}-${rId}.wav`;
             }
           }
+          activityData.push(newObj);
         });
         // write out the activity files
         jszip.folder(fileName).file(`activity_${currentIndex}.jsonld`,
-                JSON.stringify(data.response[currentIndex], null, 4));
+                JSON.stringify(activityData, null, 4));
         jszip.generateAsync({ type: 'blob' })
           .then((myzipfile) => {
             // console.log(492, 'generate async ');
