@@ -24,7 +24,8 @@
             v-on:setData="setResponse"
             :responses="responses"
             :selected_language="selected_language"
-            :showPassOptions="showPassOptions"
+            :showPassOptions="findPassOptions"
+            :individualPassList="individualPassList"
             :reprotermsUrl="reprotermsUrl"
           />
         </transition>
@@ -99,7 +100,8 @@ export default {
       visibility: {},
       scores: {},
       currentIndex: 0,
-      showModal: false
+      showModal: false,
+      individualPassList: [],
     };
   },
   components: {
@@ -117,6 +119,7 @@ export default {
       // this.$store.dispatch('getActivityData');
       jsonld.expand(this.srcUrl).then((resp) => {
         this.activity = resp[0];
+        this.findIndividualPassOptions();
         this.listShow = [0];
         this.$nextTick(() => {
           const answered = _.filter(this.context, c =>
@@ -150,6 +153,17 @@ export default {
       }
       return i;
       // });
+    },
+    findIndividualPassOptions() {
+      if (this.activity['http://schema.repronim.org/addProperties']) {
+        this.individualPassList = _.filter(this.activity['http://schema.repronim.org/addProperties'], ap => {
+          // eslint-disable-next-line no-prototype-builtins
+          if (ap.hasOwnProperty('http://schema.repronim.org/allow')) {
+            return ap;
+          }
+        });
+        // console.log(138, a);
+      }
     },
     getVisibility(responses) {
       const responseMapper = this.responseMapper(responses);
