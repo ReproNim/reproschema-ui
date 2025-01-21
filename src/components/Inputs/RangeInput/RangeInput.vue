@@ -67,7 +67,10 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 
 export default {
   name: 'RangeInput',
-  props: ['constraints', 'init'],
+  props: {
+    'constraints': {},
+    'init': {}
+  },
   components: {
     Multiselect,
   },
@@ -97,7 +100,7 @@ export default {
       const num = parseFloat(this.input);
       if (isNaN(num)) {
         return false;
-      }   
+      }
       return Number.isFinite(num);
     },
     isValidRange() {
@@ -107,7 +110,7 @@ export default {
       if (num2 > num1) {
         return true;
       } return false;
-    },    
+    },
     selectedLanguageLabel(unit) {
       const activeUnitOption = _.filter(unit['http://www.w3.org/2004/02/skos/core#prefLabel'], u => u['@language'] === this.selected_language);
       if (!Array.isArray(activeUnitOption) || !activeUnitOption.length) {

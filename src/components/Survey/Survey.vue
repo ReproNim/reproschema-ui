@@ -88,7 +88,21 @@
 
   export default {
     name: 'Survey',
-    props: ['reprotermsUrl', 'srcUrl', 'responses', 'selected_language', 'progress', 'autoAdvance', 'actVisibility', 'nextActivity', 'ipAddress', 'participantID'],
+    props: {
+      'reprotermsUrl': {},
+      'srcUrl': {},
+      'responses': {},
+      'selected_language': {},
+      'progress': {},
+      'autoAdvance': {},
+      'actVisibility': {},
+      'nextActivity': {},
+      'ipAddress': {},
+      'participantID': {},
+    },
+    components: {
+      Loader,
+    },
     data() {
       return {
         activity: {},
@@ -102,9 +116,6 @@
         individualPassList: [],
         downloadAndSubmit: config.downloadAndSubmit,
       };
-    },
-    components: {
-      Loader,
     },
     methods: {
       getData() {
@@ -513,46 +524,6 @@
         }
       }
     },
-    watch: {
-      $route() {
-        this.getData();
-        if (this.readyForActivity) {
-          if (this.$store) {
-            this.$store.dispatch('getActivityData');
-          }
-        }
-      },
-      actVisibility: {
-        deep: true,
-        handler(newVal) {
-          // newVal.shift();
-          this.isVis = _.some(newVal);
-        },
-      },
-      listContentRev() {
-        this.$forceUpdate();
-      },
-      listShow() {
-        this.updateProgress();
-      },
-      srcUrl() {
-        if (this.srcUrl) {
-          this.getData();
-        }
-      },
-      readyForActivity() {
-        if (this.readyForActivity) {
-          if (this.$store) {
-            this.$store.dispatch('getActivityData');
-          }
-        }
-      },
-      storeContext() {
-        if (this.$store) {
-          this.$store.dispatch('setActivityList', this.storeContext);
-        }
-      },
-    },
     computed: {
       complete() {
         return this.progress >= 100;
@@ -670,6 +641,46 @@
       this.t0 = d.toISOString();
       // this.t0 = performance.now();
 
+    },
+    watch: {
+      $route() {
+        this.getData();
+        if (this.readyForActivity) {
+          if (this.$store) {
+            this.$store.dispatch('getActivityData');
+          }
+        }
+      },
+      actVisibility: {
+        deep: true,
+        handler(newVal) {
+          // newVal.shift();
+          this.isVis = _.some(newVal);
+        },
+      },
+      listContentRev() {
+        this.$forceUpdate();
+      },
+      listShow() {
+        this.updateProgress();
+      },
+      srcUrl() {
+        if (this.srcUrl) {
+          this.getData();
+        }
+      },
+      readyForActivity() {
+        if (this.readyForActivity) {
+          if (this.$store) {
+            this.$store.dispatch('getActivityData');
+          }
+        }
+      },
+      storeContext() {
+        if (this.$store) {
+          this.$store.dispatch('setActivityList', this.storeContext);
+        }
+      },
     },
   };
 </script>

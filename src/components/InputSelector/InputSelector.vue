@@ -153,7 +153,7 @@
           :constraints="valueConstraints"
           :selected_language="selected_language"
           :init="init" v-on:valueChanged="sendData"/>
-    </div>    
+    </div>
 
     <!-- If type is date -->
     <div v-else-if="inputType === 'date' || inputType === 'year'">

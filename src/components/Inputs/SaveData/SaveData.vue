@@ -62,7 +62,12 @@ let sentPartCount = 0;
 
 export default {
   name: 'SaveData',
-  props: ['constraints', 'init', 'selected_language', 'ipAddress'],
+  props: {
+    'constraints': {},
+    'init': {},
+    'selected_language': {},
+    'ipAddress': {}
+  },
   components: {
     Loader,
   },
@@ -80,24 +85,6 @@ export default {
       dataUploadPath: config.dataUploadPath,
       contact: config.contact
     };
-  },
-  computed: {
-    shouldUpload() {
-      return !!(config.backendServer && this.$store.getters.getAuthToken);
-    },
-    participantId() {
-      return this.$store.getters.getParticipantId;
-    },
-    exportOption() {
-      return this.$store.getters.getHasExport;
-    },
-    hasStripe() {
-      return !(this.percentCompleted === 100);
-    },
-    hasTimedOut() {
-      return this.timeout;
-    },
-
   },
   methods: {
     finish() {
@@ -227,6 +214,24 @@ export default {
             }
           });
     }
+  },
+  computed: {
+    shouldUpload() {
+      return !!(config.backendServer && this.$store.getters.getAuthToken);
+    },
+    participantId() {
+      return this.$store.getters.getParticipantId;
+    },
+    exportOption() {
+      return this.$store.getters.getHasExport;
+    },
+    hasStripe() {
+      return !(this.percentCompleted === 100);
+    },
+    hasTimedOut() {
+      return this.timeout;
+    },
+
   },
 };
 </script>

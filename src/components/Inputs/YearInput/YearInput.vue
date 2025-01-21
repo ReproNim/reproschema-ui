@@ -13,25 +13,14 @@ import moment from 'moment';
 
 export default {
   name: 'DateInput',
-  props: ['constraints', 'init', 'inputType', 'selected_language'],
+  props: {
+    'constraints': {},
+    'init': {},
+    'inputType': {},
+    'selected_language': {}
+  },
   components: {
     Datepicker,
-  },
-  watch: {
-    input() {
-      // if there is a change, emit it.
-      this.$emit('valueChanged', this.customFormatter(this.input));
-      // make sure you validate the date based on this.constraints.
-    },
-  },
-  methods: {
-    customFormatter(date) {
-      if (this.inputType === 'year') {
-        return moment(date).format('YYYY');
-      } else if (this.inputType === 'date') {
-        return moment(date).format('YYYY MMM DD');
-      } return date;
-    },
   },
   data() {
     return {
@@ -45,12 +34,28 @@ export default {
       },
     };
   },
+  methods: {
+    customFormatter(date) {
+      if (this.inputType === 'year') {
+        return moment(date).format('YYYY');
+      } else if (this.inputType === 'date') {
+        return moment(date).format('YYYY MMM DD');
+      } return date;
+    },
+  },
   mounted() {
     if (this.init) {
       if (this.inputType === 'year') {
         this.input = new Date(this.init, 0, 365);
       } else this.input = this.init;
     }
+  },
+  watch: {
+    input() {
+      // if there is a change, emit it.
+      this.$emit('valueChanged', this.customFormatter(this.input));
+      // make sure you validate the date based on this.constraints.
+    },
   },
 };
 </script>

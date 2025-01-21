@@ -27,7 +27,11 @@
     import config from '../../config';
     export default {
         name: 'Timer',
-        props: ['starttime','endtime','trans'] ,
+        props: {
+            'starttime': {},
+            'endtime': {},
+            'trans': {}
+        },
         data() {
             return {
                 timer:"",
@@ -46,20 +50,6 @@
         },
         created: function () {
             this.wordString = JSON.parse(this.trans);
-        },
-        mounted(){
-            this.start = new Date(this.starttime).getTime();
-            this.end = new Date(this.endtime).getTime();
-            // Update the count down every 1 second
-            this.timerCount(this.start,this.end);
-            this.interval = setInterval(() => {
-                this.timerCount(this.start,this.end);
-            }, 1000);
-        },
-        computed: {
-            timeoutMessage() {
-                return this.$t('timeout-message');
-            },
         },
         methods: {
             timerCount(start,end){
@@ -99,7 +89,21 @@
                 this.seconds = Math.floor((dist % (1000 * 60)) / 1000);
             }
 
-        }
+        },
+        computed: {
+            timeoutMessage() {
+                return this.$t('timeout-message');
+            },
+        },
+        mounted(){
+            this.start = new Date(this.starttime).getTime();
+            this.end = new Date(this.endtime).getTime();
+            // Update the count down every 1 second
+            this.timerCount(this.start,this.end);
+            this.interval = setInterval(() => {
+                this.timerCount(this.start,this.end);
+            }, 1000);
+        },
     };
 
 </script>

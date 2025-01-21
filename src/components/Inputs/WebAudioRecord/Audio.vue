@@ -79,20 +79,6 @@
         isPlaying: false,
       };
     },
-    computed: {
-      recordingTime() {
-        return this.constraints['http://schema.org/maxValue'][0]['@value'];
-      },
-      generateNumber() {
-        return 100000 + Math.floor(Math.random() * 900000); // random number of length 6
-      },
-      getAudioSource() {
-        if (this.fieldData['http://schema.org/audio']) {
-          return this.fieldData['http://schema.org/audio'][0]['http://schema.org/contentUrl'][0]['@id'];
-        }
-        return '';
-      }
-    },
     methods: {
       record() {
         this.isRecording = true;
@@ -146,12 +132,19 @@
       error() {
       },
     },
-    watch: {
-      init() {
-        if (this.init === 'skip' || this.init === 'dontKnow') {
-          this.hasRecording = false;
-        }
+    computed: {
+      recordingTime() {
+        return this.constraints['http://schema.org/maxValue'][0]['@value'];
       },
+      generateNumber() {
+        return 100000 + Math.floor(Math.random() * 900000); // random number of length 6
+      },
+      getAudioSource() {
+        if (this.fieldData['http://schema.org/audio']) {
+          return this.fieldData['http://schema.org/audio'][0]['http://schema.org/contentUrl'][0]['@id'];
+        }
+        return '';
+      }
     },
     mounted() {
       this.recording = new Audio();
@@ -183,6 +176,13 @@
         this.supported = false;
         // console.log('Getusermedia API is not supported on this browser');
       }
+    },
+    watch: {
+      init() {
+        if (this.init === 'skip' || this.init === 'dontKnow') {
+          this.hasRecording = false;
+        }
+      },
     },
   };
 </script>

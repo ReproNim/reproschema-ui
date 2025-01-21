@@ -53,7 +53,12 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 
 export default {
   name: 'TextInput',
-  props: ['constraints', 'init', 'inputType', 'selected_language'],
+  props: {
+    'constraints': {},
+    'init': {},
+    'inputType': {},
+    'selected_language': {}
+  },
   components: {
     Multiselect,
   },

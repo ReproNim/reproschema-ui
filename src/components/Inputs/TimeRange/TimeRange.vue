@@ -61,7 +61,15 @@ window.moment = moment;
 
 export default {
   name: 'timeRangeInput',
-  props: ['constraints', 'init', 'selected_language', 'id'],
+  props: {
+    'constraints': {},
+    'init': {},
+    'selected_language': {},
+    'id':  {}
+  },
+  components: {
+    VueTimepicker,
+  },
   data() {
     return {
       slept: {
@@ -78,8 +86,10 @@ export default {
       yesterday: null,
     };
   },
-  components: {
-    VueTimepicker,
+  methods: {
+    sendData() {
+      this.$emit('valueChanged', this.sleptAt.toISOString() + "/" + this.wokeAt.toISOString());
+    },
   },
   computed: {
     timeSlept() {
@@ -119,23 +129,6 @@ export default {
       return endTime;
     },
   },
-  methods: {
-    sendData() {
-      this.$emit('valueChanged', this.sleptAt.toISOString() + "/" + this.wokeAt.toISOString());
-    },
-  },
-  watch: {
-    init: {
-      handler() {
-        if (this.init != null) {
-          // TODO: parse the input correctly
-        } else {
-          // TODO: parse the input correctly
-        }
-      },
-      deep: true, // this watches all of the changes within an object. init: {value: 1}  not init: 1
-    },
-  },
   mounted() {
     if (this.init !== undefined || this.init != null) {
       // TODO: parse the input correctly
@@ -148,6 +141,18 @@ export default {
       this.woke.hh = endTime.split(':')[0];
       this.woke.mm = endTime.split(':')[1].split(' ')[0];
     }
+  },
+  watch: {
+    init: {
+      handler() {
+        if (this.init != null) {
+          // TODO: parse the input correctly
+        } else {
+          // TODO: parse the input correctly
+        }
+      },
+      deep: true, // this watches all of the changes within an object. init: {value: 1}  not init: 1
+    },
   },
 };
 

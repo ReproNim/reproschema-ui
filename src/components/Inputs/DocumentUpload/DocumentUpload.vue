@@ -10,7 +10,10 @@
 
 export default {
   name: 'DocumentUpload',
-  props: ['constraints', 'init'],
+  props: {
+    'constraints': {},
+    'init': {}
+  },
   data() {
     return {
       selectedFile: null,

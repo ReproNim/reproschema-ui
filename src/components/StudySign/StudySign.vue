@@ -119,10 +119,14 @@ export default {
       scope: '',
     };
   },
-  mounted() {
-    if (this.init) {
-      this.name = this.init;
-    }
+  methods: {
+    reject() {
+      this.$emit('valueChanged', 'disagree');
+    },
+    accept() {
+      console.log(140, this.name);
+      this.$emit('valueChanged', this.name);
+    },
   },
   computed: {
     canSubmit() {
@@ -132,14 +136,10 @@ export default {
       return this.scope === '';
     },
   },
-  methods: {
-    reject() {
-      this.$emit('valueChanged', 'disagree');
-    },
-    accept() {
-      console.log(140, this.name);
-      this.$emit('valueChanged', this.name);
-    },
+  mounted() {
+    if (this.init) {
+      this.name = this.init;
+    }
   },
 };
 </script>

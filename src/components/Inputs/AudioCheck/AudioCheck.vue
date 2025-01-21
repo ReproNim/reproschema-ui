@@ -91,11 +91,6 @@ export default {
       hasError: false,
     };
   },
-  computed: {
-    recordingTime() {
-      return this.constraints['http://schema.org/maxValue'][0]['@value'];
-    },
-  },
   methods: {
     record() {
       this.isRecording = true;
@@ -197,11 +192,9 @@ export default {
       // this.$dialog.alert(notification, options);
     },
   },
-  watch: {
-    init() {
-      if (this.init === 'skip' || this.init === 'dontKnow') {
-        this.hasRecording = false;
-      }
+  computed: {
+    recordingTime() {
+      return this.constraints['http://schema.org/maxValue'][0]['@value'];
     },
   },
   mounted() {
@@ -265,6 +258,13 @@ export default {
       this.supported = false;
       // console.log(259, 'Getusermedia API is not supported on this browser');
     }
+  },
+  watch: {
+    init() {
+      if (this.init === 'skip' || this.init === 'dontKnow') {
+        this.hasRecording = false;
+      }
+    },
   },
 };
 </script>
