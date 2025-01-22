@@ -308,6 +308,7 @@ export default {
     ipAddress: {
       type: String,
     },
+
   },
   components: {
     ParticipantId,
@@ -328,12 +329,12 @@ export default {
     TimeRange,
     SelectInput,
     StaticReadOnly,
+    //InputSelector-AudioRecord: AudioRecord
     // Static,
   },
   data() {
     return {
-
-    };
+    }
   },
   methods: {
     skip() {

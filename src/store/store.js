@@ -28,7 +28,8 @@ const state = {
   queryParams: {},
   token: null,
   landing: [],
-  hasExport: false
+  hasExport: false,
+  selectedAudioInput: null
 };
 
 const getters = {
