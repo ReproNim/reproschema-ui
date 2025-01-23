@@ -103,6 +103,7 @@
         navigator.mediaDevices.enumerateDevices().then((devices) => {
           const audioInputDevices = devices.filter((device) => device.kind === 'audioinput');
           this.devices = audioInputDevices.map((device) => device.label || `Microphone ${device.deviceId}`);
+          this.tempDeviceName = devices[0]
         }).catch((err) => {
           console.error("Error enumerating devices:", err);
         });
