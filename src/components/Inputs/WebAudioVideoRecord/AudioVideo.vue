@@ -5,19 +5,24 @@
       <div v-if="mode==='audioImageRecord'" class="mb-3">
         <img class="img-fluid" :src="fieldData['http://schema.org/image'][0]['@id']" />
       </div>
+    <!-- <video ref="video" autoplay class="video-feed"></video> -->
+     <div>
+        <video v-show= "!hasRecording" ref = "live" id = "live_recording" playsinline autoplay muted></video>
+        <video v-show = "hasRecording && isPlaying" ref = "recorded" id = "recorded-footage" playsinline autoplay></video>
+     </div>
     <!--Added by Veronika - trying to open a select menu if audio input type not indicated-->
-    <div v-if="(!audioStreamDevice)" onload="getDevices">
-      <label>Please select the type of microphone you wish to use.</label>
-      <select @change="nameDevice">
-        <option v-for="device in devices" :key="device" :value="device">{{ device }}</option>
-      </select>
-    </div>
+      <div v-if="(!audioStreamDevice)" onload="getDevices">
+        <label>Please select the type of microphone you wish to use.</label>
+        <select @change="nameDevice">
+          <option v-for="device in devices" :key="device" :value="device">{{ device }}</option>
+        </select>
+      </div>
       <div v-if="mode==='audioRecordNumberTask'" class="mb-3">
         <strong style="font-size:30px">{{ generateNumber }}</strong>
       </div>
       <div v-if="mode==='audioRecordAudioTask'" class="mb-3">
         <audio controls>
-          <source :src="getAudioSource" type="audio/mpeg">
+          <source :src="getAudioSource" type="video/mp4" codecs="avc1.42E01E">
           Your browser does not support the audio element.
         </audio>
       </div>
@@ -37,10 +42,18 @@
 
 
 
+
+
+
+
       <b-button variant="secondary"
                 v-if="hasRecording && isPlaying" @click="pause" ref="play">
         <span> {{ $t('pause-button') }} </span>
       </b-button>
+
+
+
+
 
 
 
@@ -55,21 +68,26 @@
 
 
 
+
+
+
+
 <style>
 </style>
 
 
 
 
+
+
+
+
 <script>
   import _ from 'lodash';
+  //import VideoRecord from '../Inputs/WebVideoRecord/';
 
 
-
-
-  const MediaStreamRecorder = require('msr');
-
-
+  const MediaStreamRecorder = require('msr'); //might be useless right now but that's fine?
 
 
   export default {
@@ -91,15 +109,24 @@
     },
     data() {
       return {
+        recordedBlobs : [],
         recording: {},
         isRecording: false,
         hasRecording: false,
         audioCtx: {},
         audioConstraints: {
-          audio: {
-            deviceId:{exact:this.audioStreamDevice},
+          audio:
+          {
+            //deviceId:{exact:this.audioStreamDevice},
+            echoCancellation: true,
+            noiseSuppression: true
           },
-          video: false },
+          video: true,
+        },
+
+
+
+
         // chunks: [],
         mediaRecorder: {},
         supported: null,
@@ -145,8 +172,13 @@
         }
       },
       play() {
-        this.recording.play();
+        //get the video elements from this.$refs.live and play it in this.$refs.recorded
+        //source: https://medium.com/geekculture/record-and-download-video-in-your-browser-using-javascript-b15efe347e57#:~:text=To%20play%20the%20recorded%20blobs%2C%20we%20need%20to%3A,stopPlaying%28videoElement%29%3B%20videoElement.controls%20%3D%20true%3B%20videoElement.src%20%3D%20url%3B%20videoElement.play%28%29%3B
         this.isPlaying = true;
+        this.recording.controls = true;
+        this.$refs.recorded.src = this.recording.src;
+        this.$refs.recorded.play();
+        this.$refs.recorded.onended = this.endPlay;
       },
       pause() {
         this.recording.pause();
@@ -155,22 +187,33 @@
       endPlay() {
         this.isPlaying = false;
       },
-      finish() {
+      finish() { //take the recorded data + store it
         this.mediaRecorder.stop();
         this.hasRecording = true;
         this.isRecording = false;
         clearInterval(this.interval);
+      },
+      processBlobs(){
+        //const blob = new Blob(this.recordedBlobs, {type:"video/mp4"});
+        const combined_blob = new Blob(this.recordedBlobs, {type:"video/mp4"});
+        const footageURL = window.URL.createObjectURL(combined_blob);
+        //this.$refs.live.src = footageURL;
+        this.$refs.recorded.src = footageURL;
       },
       reset(e) {
         e.preventDefault();
         this.hasRecording = false;
         this.isRecording = false;
         navigator.mediaDevices.getUserMedia(this.audioConstraints).then(this.initialize, this.error);
+        this.recordedBlobs = [];
       },
-      initialize(audioStream) {
-        this.mediaRecorder = new MediaStreamRecorder(audioStream);
-        this.mediaRecorder.mimeType = 'audio/wav'; // check this line for audio/wav
+      initialize(stream) {
+        const options = {mimeType:"video/mp4", codecs:"avc1.42E01E"};
+        this.mediaRecorder = new MediaStreamRecorder(stream, options);
+        this.$refs.live.srcObject = stream; // Set the stream to the video element so user can see it
         this.timeRemaining = this.recordingTime / 1000;
+
+
         window.mediaRecorder = this.mediaRecorder;
         const self = this;
         this.mediaRecorder.ondataavailable = (e) => {
@@ -181,8 +224,9 @@
           self.finish();
         };
       },
-      error() {
-      },
+      error(){
+        console.log("navigator said error :(");
+      }
     },
     computed: {
       audioStreamDevice(){
@@ -202,11 +246,10 @@
       }
     },
     mounted() {
-      this.recording = new Audio();
-      this.recording.onended = this.endPlay;
+      //this.recording.onended = this.endPlay;
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       this.audioCtx = new AudioContext();
-      this.getDevices()
+      this.getDevices();
       if (navigator.mediaDevices.getUserMedia) {
         this.supported = true;
         navigator.mediaDevices.getUserMedia(this.audioConstraints).then(this.initialize, this.error);

@@ -104,7 +104,6 @@
 
   // const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
 
-
   export default {
     name: 'SurveyItem',
     props: {
@@ -341,6 +340,7 @@
     },
     mounted() {
       this.getData();
+      console.log("did you just open a new page? - SurveyItem");
       // console.log(389, this.init);
       if (this.init) {
         if (this.init === 'skipped') {

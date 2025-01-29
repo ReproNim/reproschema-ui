@@ -107,6 +107,7 @@ const mutations = {
   // eslint-disable-next-line
   async setBaseSchema(state, data) {
     state.schema = data[0];
+    console.log("state: ", state)
     state.progress = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => 0);
     state.responses = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => ({}));
     state.exportResponses = _.map(data[0][`${state.termUrl}order`][0]['@list'], () => ([]));

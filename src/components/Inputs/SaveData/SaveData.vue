@@ -117,11 +117,16 @@ export default {
         _.map(eachActivityList, (itemObj) => {
           const newObj = { ...itemObj };
           if (itemObj['@type'] === 'reproschema:Response') {
-            if (itemObj.value instanceof Blob) {
+            if (itemObj.value instanceof Blob && itemObj.mimeType === "audio/wav") {
               const keyStrings = (itemObj.isAbout.split('/'));
               const rId = itemObj['@id'].split('uuid:')[1];
-              jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.wav`, itemObj.value);
-              newObj.value = `${keyStrings[keyStrings.length-1]}-${rId}.wav`;
+              jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.wav`, itemObj.value); //changed from .wav
+              newObj.value = `${keyStrings[keyStrings.length-1]}-${rId}.wav`; //changed from .wav
+            } else if (itemObj.value instanceof Blob && itemObj.mimeType === "video/mp4") {
+              const keyStrings = (itemObj.isAbout.split('/'));
+              const rId = itemObj['@id'].split('uuid:')[1];
+              jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.mp4`, itemObj.value); //changed from .wav
+              newObj.value = `${keyStrings[keyStrings.length-1]}-${rId}.mp4`; //changed from .wav
             }
           }
           activityData.push(newObj);
