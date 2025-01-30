@@ -5,6 +5,13 @@
       <b-button v-if="!isRecording && !hasRecording" @click="record" variant="danger">
         {{ $t('start-button') }}
       </b-button>
+          <!--Added by Veronika - trying to open a select menu if audio input type not indicated-->
+    <div v-if="(!audioStreamDevice)" onload="getDevices">
+      <label>Please select the type of microphone you wish to use.</label>
+      <select @change="nameDevice">
+        <option v-for="device in devices" :key="device" :value="device">{{ device }}</option>
+      </select>
+    </div>
       <div v-if="isRecording" class="container-fluid">
         <div class="pids-wrapper">
           <div class="pid"></div>
@@ -80,7 +87,11 @@ export default {
       isRecording: false,
       hasRecording: false,
       audioCtx: {},
-      audioConstraints: { audio: true, video: false },
+      audioConstraints: {
+          audio: {
+            deviceId:{exact:this.audioStreamDevice},
+          },
+          video: false },
       // chunks: [],
       mediaRecorder: {},
       supported: null,
@@ -89,10 +100,33 @@ export default {
       isPlaying: false,
       selectedImage: null,
       hasError: false,
+      devices: null,
+      tempDeviceName: null
     };
   },
   methods: {
+    getDevices() {
+      navigator.mediaDevices.enumerateDevices().then((devices) => {
+        const audioInputDevices = devices.filter((device) => device.kind === 'audioinput');
+        this.devices = audioInputDevices.map((device) => device.label || `Microphone ${device.deviceId}`);
+        this.tempDeviceName = devices[0]
+      }).catch((err) => {
+        console.error("Error enumerating devices:", err);
+      });
+    },
+    selectAudioDevice(deviceId){
+      this.audioStreamDevice = deviceId;
+    },
+    nameDevice(e){
+      this.tempDeviceName = e.target.value
+    },
+    setDevice(){
+      this.$store.state.selectedAudioInput = this.tempDeviceName;
+    },
     record() {
+      if (!this.audioStreamDevice){
+          this.setDevice();
+        }
       this.isRecording = true;
       this.mediaRecorder.start(this.recordingTime);
       this.interval = setInterval(this.countdown, 1000);
@@ -193,6 +227,9 @@ export default {
     },
   },
   computed: {
+    audioStreamDevice(){
+        return this.$store.state.selectedAudioInput;
+      },
     recordingTime() {
       return this.constraints['http://schema.org/maxValue'][0]['@value'];
     },
@@ -200,7 +237,8 @@ export default {
   mounted() {
     this.recording = new Audio();
     this.recording.onended = this.endPlay;
-
+    this.getDevices();
+    
     // Older browsers might not implement mediaDevices at all, so we set an empty object first
     if (navigator.mediaDevices === undefined) {
       navigator.mediaDevices = {};

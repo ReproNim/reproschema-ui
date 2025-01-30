@@ -5,6 +5,17 @@
       <b-button v-if="!isRecording && !hasRecording" @click="record" variant="danger">
         {{ $t('start-button') }}
       </b-button>
+      <div>
+        <video v-show= "!hasRecording" ref = "live" id = "live_recording" playsinline autoplay muted></video>
+        <video v-show = "hasRecording && isPlaying" ref = "recorded" id = "recorded-footage" playsinline autoplay></video>
+     </div>
+         <!--Added by Veronika - trying to open a select menu if audio input type not indicated-->
+      <div v-if="(!audioStreamDevice)" onload="getDevices">
+        <label>Please select the type of microphone you wish to use.</label>
+        <select @change="nameDevice">
+          <option v-for="device in devices" :key="device" :value="device">{{ device }}</option>
+        </select>
+      </div>
       <div v-if="isRecording" class="container-fluid">
         <div class="pids-wrapper">
           <div class="pid"></div>
@@ -61,14 +72,14 @@ import _ from 'lodash';
 const MediaStreamRecorder = require('msr');
 
 export default {
-  name: 'audioRecord',
+  name: 'AudioVideoRecord',
   props: {
     init: {
       type: [String, Blob],
     },
     mode: {
       type: String,
-      default: 'audioRecord',
+      default: 'AudioVideoRecord',
     },
     constraints: {
       type: Object,
@@ -80,7 +91,16 @@ export default {
       isRecording: false,
       hasRecording: false,
       audioCtx: {},
-      audioConstraints: { audio: true, video: false },
+      videoConstraints: {
+          audio:
+          {
+            deviceId:{exact:this.audioStreamDevice},
+            echoCancellation: true,
+            noiseSuppression: true
+          },
+          video: true,
+        },
+
       // chunks: [],
       mediaRecorder: {},
       supported: null,
@@ -89,10 +109,41 @@ export default {
       isPlaying: false,
       selectedImage: null,
       hasError: false,
+      devices: null,
+      tempDeviceName: null,
     };
   },
+  computed: {
+    audioStreamDevice(){
+        return this.$store.state.selectedAudioInput;
+      },
+    recordingTime() {
+      return this.constraints['http://schema.org/maxValue'][0]['@value'];
+    },
+  },
   methods: {
+    getDevices() {
+        navigator.mediaDevices.enumerateDevices().then((devices) => {
+          const audioInputDevices = devices.filter((device) => device.kind === 'audioinput');
+          this.devices = audioInputDevices.map((device) => device.label || `Microphone ${device.deviceId}`);
+          this.tempDeviceName = devices[0]
+        }).catch((err) => {
+          console.error("Error enumerating devices:", err);
+        });
+      },
+      selectAudioDevice(deviceId){
+        this.audioStreamDevice = deviceId;
+      },
+      nameDevice(e){
+        this.tempDeviceName = e.target.value
+      },
+      setDevice(){
+        this.$store.state.selectedAudioInput = this.tempDeviceName;
+      },
     record() {
+      if (!this.audioStreamDevice){
+          this.setDevice();
+      }
       this.isRecording = true;
       this.mediaRecorder.start(this.recordingTime);
       this.interval = setInterval(this.countdown, 1000);
@@ -105,8 +156,11 @@ export default {
       }
     },
     play() {
-      this.recording.play();
       this.isPlaying = true;
+      this.recording.controls = true;
+      this.$refs.recorded.src = this.recording.src;
+      this.$refs.recorded.play();
+      this.$refs.recorded.onended = this.endPlay;
     },
     pause() {
       this.recording.pause();
@@ -131,11 +185,12 @@ export default {
       e.preventDefault();
       this.hasRecording = false;
       this.isRecording = false;
-      navigator.mediaDevices.getUserMedia(this.audioConstraints).then(this.initialize, this.error);
+      navigator.mediaDevices.getUserMedia(this.videoConstraints).then(this.initialize, this.error);
     },
-    initialize(audioStream) {
-      this.mediaRecorder = new MediaStreamRecorder(audioStream);
-      this.mediaRecorder.mimeType = 'video/mp4'; // check this line for audio/wav
+    initialize(stream) {
+      const options = {mimeType:"video/mp4", codecs:"avc1.42E01E"};
+      this.mediaRecorder = new MediaStreamRecorder(stream, options);
+      this.$refs.live.srcObject = stream;
       this.timeRemaining = this.recordingTime / 1000;
       window.mediaRecorder = this.mediaRecorder;
       const self = this;
@@ -143,12 +198,13 @@ export default {
         const blobURL = URL.createObjectURL(e);
         self.recording.src = blobURL;
         self.recording.blob = e;
+        this.$emit('valueChanged', this.recording.blob);
         self.stop();
       };
 
       // check audio level
       const analyser = this.audioCtx.createAnalyser();
-      const microphone = this.audioCtx.createMediaStreamSource(audioStream);
+      const microphone = this.audioCtx.createMediaStreamSource(stream);
       const scriptNode = this.audioCtx.createScriptProcessor(2048, 1, 1);
 
       analyser.smoothingTimeConstant = 0.8;
@@ -192,13 +248,15 @@ export default {
       // this.$dialog.alert(notification, options);
     },
   },
-  computed: {
-    recordingTime() {
-      return this.constraints['http://schema.org/maxValue'][0]['@value'];
+  watch: {
+    init() {
+      if (this.init === 'skip' || this.init === 'dontKnow') {
+        this.hasRecording = false;
+      }
     },
   },
   mounted() {
-    this.recording = new Audio();
+    // this.recording = new Audio();
     this.recording.onended = this.endPlay;
 
     // Older browsers might not implement mediaDevices at all, so we set an empty object first
@@ -229,13 +287,13 @@ export default {
       };
     }
 
-    // set up forked web audio context, for multiple browsers
-    // window. is needed otherwise Safari explodes
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     this.audioCtx = new AudioContext();
+    this.getDevices();
+
     if (navigator.mediaDevices.getUserMedia) {
       this.supported = true;
-      navigator.mediaDevices.getUserMedia(this.audioConstraints).then(this.initialize, this.error);
+      navigator.mediaDevices.getUserMedia(this.videoConstraints).then(this.initialize, this.error);
       if (this.init) {
         if (_.isString(this.init)) {
           if (this.init.startsWith('blob')) {
@@ -258,13 +316,6 @@ export default {
       this.supported = false;
       // console.log(259, 'Getusermedia API is not supported on this browser');
     }
-  },
-  watch: {
-    init() {
-      if (this.init === 'skip' || this.init === 'dontKnow') {
-        this.hasRecording = false;
-      }
-    },
   },
 };
 </script>

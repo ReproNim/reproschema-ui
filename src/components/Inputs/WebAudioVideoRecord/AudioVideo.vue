@@ -2,7 +2,7 @@
   <div>
     <b-alert :show="!supported">{{ $t('audio-support-msg')}}</b-alert>
     <div v-if="supported">
-      <div v-if="mode==='audioImageRecord'" class="mb-3">
+      <div v-if="mode==='audioVideoImageRecord'" class="mb-3">
         <img class="img-fluid" :src="fieldData['http://schema.org/image'][0]['@id']" />
       </div>
     <!-- <video ref="video" autoplay class="video-feed"></video> -->
@@ -17,10 +17,10 @@
           <option v-for="device in devices" :key="device" :value="device">{{ device }}</option>
         </select>
       </div>
-      <div v-if="mode==='audioRecordNumberTask'" class="mb-3">
+      <div v-if="mode==='audioVideoRecordNumberTask'" class="mb-3">
         <strong style="font-size:30px">{{ generateNumber }}</strong>
       </div>
-      <div v-if="mode==='audioRecordAudioTask'" class="mb-3">
+      <div v-if="mode==='audioVideoRecordAudioTask'" class="mb-3">
         <audio controls>
           <source :src="getAudioSource" type="video/mp4" codecs="avc1.42E01E">
           Your browser does not support the audio element.
@@ -29,7 +29,7 @@
       <b-button v-if="!isRecording && !hasRecording" @click="record" variant="danger">
         {{ $t('record-button')}}
       </b-button>
-      <div v-if="mode!='audioRecordNoStop'" class="mb-3">
+      <div v-if="mode!='audioVideoRecordNoStop'" class="mb-3">
         <b-button v-if="isRecording" @click="finish">{{ $t('stop-button') }}</b-button>
       </div>
       <div v-if="isRecording">
@@ -38,25 +38,10 @@
       <b-button variant="success" v-if="hasRecording && !isPlaying" @click="play" ref="play">
         <span> {{ $t('play-button') }} </span>
       </b-button>
-
-
-
-
-
-
-
-
       <b-button variant="secondary"
                 v-if="hasRecording && isPlaying" @click="pause" ref="play">
         <span> {{ $t('pause-button') }} </span>
       </b-button>
-
-
-
-
-
-
-
 
       <div v-if="hasRecording" class="mt-2">
         <a href="" @click="reset">{{ $t('redo-recording') }}</a>
@@ -68,37 +53,26 @@
 
 
 
-
-
-
-
 <style>
 </style>
 
 
 
-
-
-
-
-
 <script>
   import _ from 'lodash';
-  //import VideoRecord from '../Inputs/WebVideoRecord/';
-
 
   const MediaStreamRecorder = require('msr'); //might be useless right now but that's fine?
 
 
   export default {
-    name: 'audioRecord',
+    name: 'audioVideoRecord',
     props: {
       init: {
         type: [String, Blob, Array],
       },
       mode: {
         type: String,
-        default: 'audioRecord',
+        default: 'audioVideoRecord',
       },
       constraints: {
         type: Object,
@@ -117,14 +91,12 @@
         audioConstraints: {
           audio:
           {
-            //deviceId:{exact:this.audioStreamDevice},
+            deviceId:{exact:this.audioStreamDevice},
             echoCancellation: true,
             noiseSuppression: true
           },
           video: true,
         },
-
-
 
 
         // chunks: [],
@@ -211,8 +183,9 @@
         const options = {mimeType:"video/mp4", codecs:"avc1.42E01E"};
         this.mediaRecorder = new MediaStreamRecorder(stream, options);
         this.$refs.live.srcObject = stream; // Set the stream to the video element so user can see it
+        console.log("this.timeRemaining: ", this.timeRemaining);
+        console.log("this.recordingTime: ", this.recordingTime);
         this.timeRemaining = this.recordingTime / 1000;
-
 
         window.mediaRecorder = this.mediaRecorder;
         const self = this;
