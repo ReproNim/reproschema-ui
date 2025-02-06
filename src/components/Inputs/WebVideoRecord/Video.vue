@@ -12,7 +12,7 @@
         <div v-if="mode==='videoRecordNumberTask'" class="mb-3">
           <strong style="font-size:30px">{{ generateNumber }}</strong>
         </div>
-        <div v-if="mode==='videoRecordAudioTask'" class="mb-3">
+        <div v-if="mode==='videoRecordVideoTask'" class="mb-3">
           <audio controls>
             <source :src="getAudioSource" type="video/mp4" codecs="avc1.42E01E">
             Your browser does not support the video element.

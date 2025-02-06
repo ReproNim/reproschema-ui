@@ -157,40 +157,14 @@
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
-    <div v-else-if="inputType === 'videoPassageRecord'">
+    <!-- If type is videoRecordVideoTask -->
+    <div v-else-if="inputType === 'videoRecordVideoTask'">
       <VideoRecord
-        :constraints="valueConstraints"
-        :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"/>
-    </div>
-
-    <!-- If type is videoImageRecord -->
-    <div v-else-if="inputType === 'videoImageRecord'">
-      <VideoRecord
-        :constraints="valueConstraints"
-        :fieldData="fieldData"
-        :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"
-        mode="videoImageRecord" />
-    </div>
-
-    <!-- If type is videoRecordNumberTask -->
-    <div v-else-if="inputType === 'videoRecordNumberTask'">
-      <VideoRecord
-        :constraints="valueConstraints"
-        :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"
-        mode="videoRecordNumberTask" />
-    </div>
-
-    <!-- If type is videoRecordAudioTask -->
-    <div v-else-if="inputType === 'videoRecordAudioTask'">
-      <videoRecord
         :constraints="valueConstraints"
         :selected_language="selected_language"
         :init="init" v-on:valueChanged="sendData"
         :fieldData="fieldData"
-        mode="videoRecordAudioTask" />
+        mode="videoRecordVideoTask" />
     </div>
 
     <!-- If type is videoRecordNoStop -->
