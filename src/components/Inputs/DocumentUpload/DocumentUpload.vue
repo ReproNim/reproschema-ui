@@ -10,12 +10,14 @@
 
 export default {
   name: 'DocumentUpload',
-  props: ['constraints', 'init'],
-  watch: {
-    input() {
-      // if there is a change, emit it.
-      this.$emit('valueChanged', this.input);
-    },
+  props: {
+    'constraints': {},
+    'init': {}
+  },
+  data() {
+    return {
+      selectedFile: null,
+    };
   },
   methods: {
     onFileSelected(event) {
@@ -31,15 +33,16 @@ export default {
       return this.a + this.b;
     },
   },
-  data() {
-    return {
-      selectedFile: null,
-    };
-  },
   mounted() {
     if (this.init) {
       this.selectedFile = this.init;
     }
   },
+  watch: {
+    input() {
+      // if there is a change, emit it.
+      this.$emit('valueChanged', this.input);
+    },
+  }
 };
 </script>

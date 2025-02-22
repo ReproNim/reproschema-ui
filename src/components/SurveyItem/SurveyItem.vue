@@ -104,7 +104,6 @@
 
   // const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
 
-
   export default {
     name: 'SurveyItem',
     props: {
@@ -156,71 +155,6 @@
         requireVal: false,
         itemAllow: {},
       };
-    },
-    computed: {
-      style() {
-        if (this.ui === 'section' || this.ui === 'multipart') {
-          return {
-            'border-color': 'white',
-            '-webkit-box-flex': 1,
-            flex: '1 1 auto',
-          };
-        }
-        return {
-          width: '100%',
-        };
-      },
-      ui() {
-        /* eslint-disable */
-        if (this.data['@type'] && this.data['@type'][0] === "http://schema.repronim.org/Activity") {
-          return 'section';
-        }
-        else if (this.data['http://schema.repronim.org/inputType']) {
-          return this.data['http://schema.repronim.org/inputType'][0]['@value'];
-        }
-        return 'N/A';
-        /* eslint-enable */
-      },
-      widgetType() {
-        if (this.data['http://schema.org/readonlyValue']) {
-          return this.data['http://schema.org/readonlyValue'][0]['@value'];
-        }
-        return false;
-      },
-      title() {
-        if (this.data['http://schema.org/question']) {
-          const activeQuestion = _.filter(this.data['http://schema.org/question'], q => q['@language'] === this.selected_language);
-          if (!Array.isArray(activeQuestion) || !activeQuestion.length) {
-            // array does not exist, is not an array, or empty - when selected_language string absent
-            // ⇒ return value in default language
-            const answeredLanguage = this.data['http://schema.org/question'][0]['@language'];
-            this.$store.dispatch('setAnsweredLanguage', answeredLanguage); // set default language present
-            return this.data['http://schema.org/question'][0]['@value'];
-          }
-          this.$store.dispatch('setAnsweredLanguage', activeQuestion[0]['@language']); // set selected_language
-          return activeQuestion[0]['@value'];
-        }
-        return null;
-      },
-      itemPreamble() {
-        if (this.data['http://schema.repronim.org/preamble']) {
-          const activePreamble = _.filter(this.data['http://schema.repronim.org/preamble'], q => q['@language'] === this.selected_language);
-          return activePreamble[0]['@value'];
-        }
-        return null;
-      },
-      valueConstraints() {
-        if (this.data['http://schema.repronim.org/responseOptions']) {
-          // eslint-disable-next-line
-          // console.log(216, this.data['http://schema.repronim.org/responseOptions']);
-          return this.valueC;
-        }
-        /* eslint-enable */
-        return { requiredValue: false };
-      },
-      fieldData() {
-        return this.data;
-      },
     },
     methods: {
       getValueConstraintsData(url) {
@@ -337,6 +271,71 @@
       },
       setMPProgress(progress) {
         this.mp_progress = progress;
+      },
+    },
+    computed: {
+      style() {
+        if (this.ui === 'section' || this.ui === 'multipart') {
+          return {
+            'border-color': 'white',
+            '-webkit-box-flex': 1,
+            flex: '1 1 auto',
+          };
+        }
+        return {
+          width: '100%',
+        };
+      },
+      ui() {
+        /* eslint-disable */
+        if (this.data['@type'] && this.data['@type'][0] === "http://schema.repronim.org/Activity") {
+          return 'section';
+        }
+        else if (this.data['http://schema.repronim.org/inputType']) {
+          return this.data['http://schema.repronim.org/inputType'][0]['@value'];
+        }
+        return 'N/A';
+        /* eslint-enable */
+      },
+      widgetType() {
+        if (this.data['http://schema.org/readonlyValue']) {
+          return this.data['http://schema.org/readonlyValue'][0]['@value'];
+        }
+        return false;
+      },
+      title() {
+        if (this.data['http://schema.org/question']) {
+          const activeQuestion = _.filter(this.data['http://schema.org/question'], q => q['@language'] === this.selected_language);
+          if (!Array.isArray(activeQuestion) || !activeQuestion.length) {
+            // array does not exist, is not an array, or empty - when selected_language string absent
+            // ⇒ return value in default language
+            const answeredLanguage = this.data['http://schema.org/question'][0]['@language'];
+            this.$store.dispatch('setAnsweredLanguage', answeredLanguage); // set default language present
+            return this.data['http://schema.org/question'][0]['@value'];
+          }
+          this.$store.dispatch('setAnsweredLanguage', activeQuestion[0]['@language']); // set selected_language
+          return activeQuestion[0]['@value'];
+        }
+        return null;
+      },
+      itemPreamble() {
+        if (this.data['http://schema.repronim.org/preamble']) {
+          const activePreamble = _.filter(this.data['http://schema.repronim.org/preamble'], q => q['@language'] === this.selected_language);
+          return activePreamble[0]['@value'];
+        }
+        return null;
+      },
+      valueConstraints() {
+        if (this.data['http://schema.repronim.org/responseOptions']) {
+          // eslint-disable-next-line
+          // console.log(216, this.data['http://schema.repronim.org/responseOptions']);
+          return this.valueC;
+        }
+        /* eslint-enable */
+        return { requiredValue: false };
+      },
+      fieldData() {
+        return this.data;
       },
     },
     mounted() {

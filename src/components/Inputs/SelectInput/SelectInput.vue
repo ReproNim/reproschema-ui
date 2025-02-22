@@ -46,7 +46,13 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 
 export default {
   name: 'SelectInput',
-  props: ['reprotermsUrl', 'constraints', 'init', 'selected_language', 'inputType'],
+  props: {
+    'reprotermsUrl': {},
+    'constraints': {},
+    'init': {},
+    'selected_language': {},
+    'inputType': {}
+  },
   components: {
     Multiselect,
   },
@@ -61,13 +67,6 @@ export default {
       isLoading: false,
       valueMap: {},
     };
-  },
-  watch: {
-    input() {
-      // if there is a change, emit it.
-      this.$emit('valueChanged', this.selected);
-    },
-
   },
   methods: {
     checkAndSendData() {
@@ -102,6 +101,25 @@ export default {
       return `and ${count} other countries`;
     },
   },
+  computed: {
+    multipleAllowed() {
+      if (this.constraints['http://schema.repronim.org/multipleChoice']) {
+        // console.log(94, this.constraints[this.reprotermsUrl+'multipleChoice']);
+        return this.constraints['http://schema.repronim.org/multipleChoice'][0]['@value'];
+      }
+      return false;
+    },
+    checkOther() {
+      if (this.selected) {
+        if (this.multipleAllowed) {
+          return this.selected.includes('Other');
+        } else {
+          return this.selected === 'Other';
+        }
+      }
+      return false;
+    },
+  },
   mounted() {
     if (this.init) {
       // console.log(74, this.init);
@@ -129,24 +147,12 @@ export default {
         });
     }
   },
-  computed: {
-    multipleAllowed() {
-      if (this.constraints['http://schema.repronim.org/multipleChoice']) {
-        // console.log(94, this.constraints[this.reprotermsUrl+'multipleChoice']);
-        return this.constraints['http://schema.repronim.org/multipleChoice'][0]['@value'];
-      }
-      return false;
+  watch: {
+    input() {
+      // if there is a change, emit it.
+      this.$emit('valueChanged', this.selected);
     },
-    checkOther() {
-      if (this.selected) {
-        if (this.multipleAllowed) {
-          return this.selected.includes('Other');
-        } else {
-          return this.selected === 'Other';
-        }
-      }
-      return false;
-    },
+
   },
 };
 </script>

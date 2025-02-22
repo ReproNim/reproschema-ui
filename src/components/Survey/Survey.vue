@@ -88,7 +88,21 @@
 
   export default {
     name: 'Survey',
-    props: ['reprotermsUrl', 'srcUrl', 'responses', 'selected_language', 'progress', 'autoAdvance', 'actVisibility', 'nextActivity', 'ipAddress', 'participantID'],
+    props: {
+      'reprotermsUrl': {},
+      'srcUrl': {},
+      'responses': {},
+      'selected_language': {},
+      'progress': {},
+      'autoAdvance': {},
+      'actVisibility': {},
+      'nextActivity': {},
+      'ipAddress': {},
+      'participantID': {},
+    },
+    components: {
+      Loader,
+    },
     data() {
       return {
         activity: {},
@@ -102,9 +116,6 @@
         individualPassList: [],
         downloadAndSubmit: config.downloadAndSubmit,
       };
-    },
-    components: {
-      Loader,
     },
     methods: {
       getData() {
@@ -462,15 +473,19 @@
         _.map(data.response[currentIndex], (itemObj) => {
           const newObj = { ...itemObj };
           if (itemObj['@type'] === 'reproschema:Response') {
-            if (itemObj.value instanceof Blob) {
+            if (itemObj.value instanceof Blob && itemObj.mimeType === "audio/wav") {
               const keyStrings = (itemObj.isAbout.split('/'));
               const rId = itemObj['@id'].split('uuid:')[1];
-              jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.wav`, itemObj.value);
-              newObj.value = `${keyStrings[keyStrings.length-1]}-${rId}.wav`;
-            }
+              jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.wav`, itemObj.value);//changed from wav
+              newObj.value = `${keyStrings[keyStrings.length-1]}-${rId}.wav`; //changed from wav
+            } else if (itemObj.value instanceof Blob && itemObj.mimeType === "video/mp4") {
+              const keyStrings = (itemObj.isAbout.split('/'));
+              const rId = itemObj['@id'].split('uuid:')[1];
+              jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.mp4`, itemObj.value);//changed from wav
+              newObj.value = `${keyStrings[keyStrings.length-1]}-${rId}.mp4`; //changed from wav
           }
           activityData.push(newObj);
-        });
+        }
         // write out the activity files
         jszip.folder(fileName).file(`activity_${currentIndex}.jsonld`,
                 JSON.stringify(activityData, null, 4));
@@ -488,6 +503,7 @@
             this.sendRetry(`${config.backendServer}/submit`, formData);
 
           });
+        });
       },
       async sendRetry(url, formData, retries = 3, backoff = 10000) {
         if (!this.shouldUpload) {
@@ -512,46 +528,6 @@
           }
         }
       }
-    },
-    watch: {
-      $route() {
-        this.getData();
-        if (this.readyForActivity) {
-          if (this.$store) {
-            this.$store.dispatch('getActivityData');
-          }
-        }
-      },
-      actVisibility: {
-        deep: true,
-        handler(newVal) {
-          // newVal.shift();
-          this.isVis = _.some(newVal);
-        },
-      },
-      listContentRev() {
-        this.$forceUpdate();
-      },
-      listShow() {
-        this.updateProgress();
-      },
-      srcUrl() {
-        if (this.srcUrl) {
-          this.getData();
-        }
-      },
-      readyForActivity() {
-        if (this.readyForActivity) {
-          if (this.$store) {
-            this.$store.dispatch('getActivityData');
-          }
-        }
-      },
-      storeContext() {
-        if (this.$store) {
-          this.$store.dispatch('setActivityList', this.storeContext);
-        }
-      },
     },
     computed: {
       complete() {
@@ -670,6 +646,46 @@
       this.t0 = d.toISOString();
       // this.t0 = performance.now();
 
+    },
+    watch: {
+      $route() {
+        this.getData();
+        if (this.readyForActivity) {
+          if (this.$store) {
+            this.$store.dispatch('getActivityData');
+          }
+        }
+      },
+      actVisibility: {
+        deep: true,
+        handler(newVal) {
+          // newVal.shift();
+          this.isVis = _.some(newVal);
+        },
+      },
+      listContentRev() {
+        this.$forceUpdate();
+      },
+      listShow() {
+        this.updateProgress();
+      },
+      srcUrl() {
+        if (this.srcUrl) {
+          this.getData();
+        }
+      },
+      readyForActivity() {
+        if (this.readyForActivity) {
+          if (this.$store) {
+            this.$store.dispatch('getActivityData');
+          }
+        }
+      },
+      storeContext() {
+        if (this.$store) {
+          this.$store.dispatch('setActivityList', this.storeContext);
+        }
+      },
     },
   };
 </script>

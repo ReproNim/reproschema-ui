@@ -518,11 +518,16 @@ export default {
         _.map(eachActivityList, (itemObj) => {
           const newObj = { ...itemObj };
           if (itemObj['@type'] === 'reproschema:Response') {
-            if (itemObj.value instanceof Blob) {
+            if (itemObj.value instanceof Blob && itemObj.mimeType == "audio/wav") {
               const keyStrings = (itemObj.isAbout.split('/'));
               const rId = itemObj['@id'].split('uuid:')[1];
-              jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.wav`, itemObj.value);
-              newObj.value = `${keyStrings[keyStrings.length-1]}-${rId}.wav`;
+              jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.wav`, itemObj.value); //changed from wav
+              newObj.value = `${keyStrings[keyStrings.length-1]}-${rId}.wav`; //changed from wav
+            } else if (itemObj.value instanceof Blob && itemObj.mimeType == "video/mp4") {
+              const keyStrings = (itemObj.isAbout.split('/'));
+              const rId = itemObj['@id'].split('uuid:')[1];
+              jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.mp4`, itemObj.value); //changed from wav
+              newObj.value = `${keyStrings[keyStrings.length-1]}-${rId}.mp4`; //changed from wav
             }
           }
           activityData.push(newObj);
@@ -551,81 +556,6 @@ export default {
           saveAs(myzipfile, `${fileName}.zip`);
         });
     },
-  },
-  watch: {
-    $route() {
-      if (this.$route.params.id !== undefined) {
-        this.$store.dispatch('setActivityIndex', this.$route.params.id);
-      }
-    },
-    visibilityConditions: {
-      handler(newC) {
-        if (!_.isEmpty(newC)) {
-          this.setVisbility();
-        }
-      },
-      deep: true,
-    },
-  },
-  created() {
-    const url = this.$route.query.url;
-    if (url) {
-      this.protocolUrl = url;
-    }
-    this.$store.dispatch('getBaseSchema', url).then(() => this.getPrefLabel());
-    // this.$store.dispatch('getBaseSchema', url);
-  },
-  mounted() {
-    new EmailDecoder('[data-email]');
-    this.clientSpecs = JSON.stringify(Bowser.parse(window.navigator.userAgent));
-    this.browserType = Bowser.parse(window.navigator.userAgent).browser.name;
-    if (config.checkMediaPermission) {
-      this.checkPermission();
-    }
-    if (this.$route.query.lang) {
-      this.selected_language = this.$route.query.lang;
-      i18n.locale = this.selected_language;
-    } else this.selected_language = 'en';
-
-    if (this.$route.query.uid) {
-      // console.log(407, this.$route.query.uid);
-      this.$store.dispatch('saveParticipantId', this.$route.query.uid);
-    } else if (config.generateRandomUid) {
-      this.$store.dispatch('saveParticipantId', uuidv4());
-    }
-    if (this.$route.params.id) {
-      this.$store.dispatch('setActivityIndex', this.$route.params.id);
-    }
-    axios.get('https://raw.githubusercontent.com/ReproNim/reproschema-library/master/resources/languages.json').then((resp) => {
-      this.langMap = resp.data;
-    });
-    this.$store.dispatch('setParticipantUUID', uuidv4()); // set participant UUID for the current user
-    if (this.$route.query.expiry_time) {
-      this.$store.dispatch('setExpiryMinutes', this.$route.query.expiry_time);
-    }
-    if (this.$route.query.auth_token) {
-      this.$store.dispatch('setAuthToken', this.$route.query.auth_token);
-    }
-    if (!_.isEmpty(this.$route.query)) {
-        this.$store.dispatch('setQueryParameters', this.$route.query);
-    }
-
-    // const formData = new FormData();
-    // const TOKEN = this.$store.getters.getAuthToken;
-    // if (TOKEN) {
-    //   formData.append('file', null);
-    //   formData.append('auth_token', `${TOKEN}`);
-    //   axios.post(`${config.backendServer}/submit`, formData, {
-    //     'Content-Type': 'multipart/form-data',
-    //   }).then((res) => {
-    //     // console.log('SUCCESS!!', res.status);
-    //   })
-    //   .catch((e) => {
-    //             if (e.response.status === 403) {
-    //               this.invalidToken = true;
-    //             }
-    //           });
-    // }
   },
   computed: {
     accessDeniedPath() {
@@ -704,6 +634,7 @@ export default {
       if (!_.isEmpty(this.$store.state.schema)) {
         const order = _.map(this.$store.state.schema['http://schema.repronim.org/order'][0]['@list'],
           u => u['@id']);
+        console.log(order)
         return order;
       }
       return [];
@@ -817,6 +748,81 @@ export default {
       return this.$store.getters.getParticipantId;
     },
   },
+  mounted() {
+    new EmailDecoder('[data-email]');
+    this.clientSpecs = JSON.stringify(Bowser.parse(window.navigator.userAgent));
+    this.browserType = Bowser.parse(window.navigator.userAgent).browser.name;
+    if (config.checkMediaPermission) {
+      this.checkPermission();
+    }
+    if (this.$route.query.lang) {
+      this.selected_language = this.$route.query.lang;
+      i18n.locale = this.selected_language;
+    } else this.selected_language = 'en';
+
+    if (this.$route.query.uid) {
+      // console.log(407, this.$route.query.uid);
+      this.$store.dispatch('saveParticipantId', this.$route.query.uid);
+    } else if (config.generateRandomUid) {
+      this.$store.dispatch('saveParticipantId', uuidv4());
+    }
+    if (this.$route.params.id) {
+      this.$store.dispatch('setActivityIndex', this.$route.params.id);
+    }
+    axios.get('https://raw.githubusercontent.com/ReproNim/reproschema-library/master/resources/languages.json').then((resp) => {
+      this.langMap = resp.data;
+    });
+    this.$store.dispatch('setParticipantUUID', uuidv4()); // set participant UUID for the current user
+    if (this.$route.query.expiry_time) {
+      this.$store.dispatch('setExpiryMinutes', this.$route.query.expiry_time);
+    }
+    if (this.$route.query.auth_token) {
+      this.$store.dispatch('setAuthToken', this.$route.query.auth_token);
+    }
+    if (!_.isEmpty(this.$route.query)) {
+        this.$store.dispatch('setQueryParameters', this.$route.query);
+    }
+
+    // const formData = new FormData();
+    // const TOKEN = this.$store.getters.getAuthToken;
+    // if (TOKEN) {
+    //   formData.append('file', null);
+    //   formData.append('auth_token', `${TOKEN}`);
+    //   axios.post(`${config.backendServer}/submit`, formData, {
+    //     'Content-Type': 'multipart/form-data',
+    //   }).then((res) => {
+    //     // console.log('SUCCESS!!', res.status);
+    //   })
+    //   .catch((e) => {
+    //             if (e.response.status === 403) {
+    //               this.invalidToken = true;
+    //             }
+    //           });
+    // }
+  },
+    watch: {
+    $route() {
+      if (this.$route.params.id !== undefined) {
+        this.$store.dispatch('setActivityIndex', this.$route.params.id);
+      }
+    },
+    visibilityConditions: {
+      handler(newC) {
+        if (!_.isEmpty(newC)) {
+          this.setVisbility();
+        }
+      },
+      deep: true,
+    },
+  },
+  created() {
+    const url = this.$route.query.url;
+    if (url) {
+      this.protocolUrl = url;
+    }
+    this.$store.dispatch('getBaseSchema', url).then(() => this.getPrefLabel());
+    // this.$store.dispatch('getBaseSchema', url);
+  }
 };
 </script>
 
@@ -943,5 +949,3 @@ export default {
 
 
 </style>
-
-

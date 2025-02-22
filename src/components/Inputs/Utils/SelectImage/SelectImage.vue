@@ -90,28 +90,6 @@ export default {
       multipleSelected: []
     }
   },
-  watch: {
-    // selectedImages() {
-    //   this.setInitialSelection();
-    // },
-  },
-  computed: {
-    dataImagesLocal: function () {
-      return this.dataImages || []
-    },
-    classThumbnail() {
-      return _.map(this.dataImagesLocal, (imageId) => {
-        const baseClass = `${this.rootClass}__thumbnail`;
-        if (this.singleSelected.id === imageId.id) {
-          return `${baseClass} ${baseClass}${this.activeClass}`
-        }
-        return `${baseClass}`});
-    },
-  },
-  mounted () {
-    // set initial selectedImage
-    this.setInitialSelection()
-  },
   methods: {
     classThumbnailMultiple(id) {
       const baseClass = `${this.rootClass}__thumbnail`
@@ -164,7 +142,29 @@ export default {
         }
       }
     }
-  }
+  },
+  computed: {
+    dataImagesLocal: function () {
+      return this.dataImages || []
+    },
+    classThumbnail() {
+      return _.map(this.dataImagesLocal, (imageId) => {
+        const baseClass = `${this.rootClass}__thumbnail`;
+        if (this.singleSelected.id === imageId.id) {
+          return `${baseClass} ${baseClass}${this.activeClass}`
+        }
+        return `${baseClass}`});
+    },
+  },
+  mounted () {
+    // set initial selectedImage
+    this.setInitialSelection()
+  },
+  watch: {
+    // selectedImages() {
+    //   this.setInitialSelection();
+    // },
+  },
 }
 </script>
 

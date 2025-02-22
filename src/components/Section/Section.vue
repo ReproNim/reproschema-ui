@@ -39,7 +39,7 @@
           <br>
           <p>Text the Crisis TextLine through SMS:</p>
           <p>US or Canada: 741741</p>
-          <p class="contact"><a href="https://www.messenger.com/login.php?next=https%3A%2F%2Fwww.messenger.com%2Ft%2F204427966369963%2F%3Fmessaging_source%3Dsource%253Apages%253Amessage_shortlink" target="_blank">Facebook Messenger</a>
+          <p class="contact"><a href="https://www.messenger.com/login.php?next=https%3A%2F%2Fwww.messenger.com%2Ft%2F204427966369963%2F%3Fmessaging_source%3Dsource%253Apages%253Amessage_shortlink" target="_blank">Facebook Messenger</a></p>
           <p>For other countries:</p>
           <p class="contact"><a href="https://www.befrienders.org" target="_blank">www.befrienders.org</a></p>
         </b-modal>
@@ -92,6 +92,9 @@ export default {
       type: Object,
     },
   },
+  components: {
+    Loader,
+  },
   data() {
     return {
       activity: {},
@@ -103,16 +106,6 @@ export default {
       showModal: false,
       individualPassList: [],
     };
-  },
-  components: {
-    Loader,
-  },
-  mounted() {
-    if (this.srcUrl) {
-      // eslint-disable-next-line
-        this.getData();
-      this.t0 = performance.now();
-    }
   },
   methods: {
     getData() {
@@ -470,13 +463,6 @@ export default {
       return this.activity['http://schema.repronim.org/order'][0]['@list'];
     },
   },
-  watch: {
-    srcUrl() {
-      if (this.srcUrl) {
-        this.getData();
-      }
-    },
-  },
   computed: {
     currentItem() {
       return this.context[this.currentIndex];
@@ -532,6 +518,19 @@ export default {
         else return null;
       }
     },
+    mounted() {
+    if (this.srcUrl) {
+      // eslint-disable-next-line
+        this.getData();
+      this.t0 = performance.now();
+    }
+  },
+  watch: {
+    srcUrl() {
+      if (this.srcUrl) {
+        this.getData();
+      }
+    },
+  },
   };
 </script>
-

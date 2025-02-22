@@ -57,7 +57,10 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 
 export default {
   name: 'FloatInput',
-  props: ['constraints', 'init'],
+  props: {
+    'constraints': {},
+    'init': {}
+  },
   components: {
     Multiselect,
   },
