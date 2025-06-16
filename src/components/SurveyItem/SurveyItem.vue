@@ -18,6 +18,7 @@
                        :ipAddress="clientIp"
                        :showPassOptions="showPassOptions"
                        :showItemPassOptions="itemAllow"
+                       :ui="uiConfig"
                        v-on:skip="sendSkip"
                        v-on:dontKnow="sendDontKnow"
                        v-on:next="sendNext"
@@ -181,6 +182,19 @@
         return 'N/A';
         /* eslint-enable */
       },
+      uiConfig() {
+        const config = {};
+        if (this.data['http://schema.repronim.org/inputType']) {
+          config.inputType = this.data['http://schema.repronim.org/inputType'][0]['@value'];
+        }
+        if (this.data['http://schema.repronim.org/backgroundImage']) {
+          config.backgroundImage = this.data['http://schema.repronim.org/backgroundImage'][0]['@value'];
+        }
+        if (this.data['http://schema.repronim.org/allow']) {
+          config.allow = this.data['http://schema.repronim.org/allow'].map(a => a['@id']);
+        }
+        return config;
+      },
       widgetType() {
         if (this.data['http://schema.org/readonlyValue']) {
           return this.data['http://schema.org/readonlyValue'][0]['@value'];
@@ -241,6 +255,8 @@
         // console.log(247, resp);
         if (resp.length) {
           this.data = resp[0];
+          console.log('SurveyItem processActivityData - data:', this.data);
+          console.log('SurveyItem processActivityData - backgroundImage:', this.data['http://schema.repronim.org/backgroundImage']);
           if (this.data['http://schema.repronim.org/responseOptions']) {
             if (Object.keys(this.data['http://schema.repronim.org/responseOptions'][0]).indexOf('@id') > -1) {
               // console.log(260, this.data['http://schema.repronim.org/responseOptions'][0]['@id']);

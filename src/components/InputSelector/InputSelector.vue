@@ -172,6 +172,16 @@
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
+    <!-- If type is canvas drawing -->
+    <div v-else-if="inputType === 'canvas'">
+      <CanvasInput
+        :constraints="valueConstraints"
+        :selected_language="selected_language"
+        :init="init"
+        :backgroundImage="ui.backgroundImage"
+        v-on:valueChanged="sendData"/>
+    </div>
+
     <!-- If type is a slider -->
     <div v-else-if="inputType === 'slider'">
       <SliderInput
@@ -247,26 +257,25 @@
 </template>
 
 <script>
-import Radio from '../Inputs/WebRadio/';
-import AudioRecord from '../Inputs/WebAudioRecord/';
-import TextInput from '../Inputs/WebTextInput/';
-import TextArea from '../Inputs/TextArea/';
-import IntegerInput from '../Inputs/WebIntegerInput/';
-import FloatInput from '../Inputs/WebFloatInput/';
-import RangeInput from '../Inputs/RangeInput/';
-import DateInput from '../Inputs/YearInput/';
-import DocumentUpload from '../Inputs/DocumentUpload';
-import MultiTextInput from '../Inputs/MultiTextInput';
-import SliderInput from '../Inputs/SliderInput';
-import TimeRange from '../Inputs/TimeRange';
-import SelectInput from '../Inputs/SelectInput';
-// import AudioCheck from '../Inputs/AudioCheck';
-import StaticReadOnly from '../Inputs/StaticReadOnly';
-import SaveData from '../Inputs/SaveData/SaveData';
-import StudySign from '../StudySign/StudySign';
-// import Static from '../Inputs/Static';
-import EmailInput from '../Inputs/EmailInput';
-import ParticipantId from '../Inputs/ParticipantId/ParticipantId';
+import Radio from '../Inputs/WebRadio/Radio.vue';
+import AudioRecord from '../Inputs/WebAudioRecord/Audio.vue';
+import TextInput from '../Inputs/WebTextInput/TextInput.vue';
+import TextArea from '../Inputs/TextArea/TextArea.vue';
+import IntegerInput from '../Inputs/WebIntegerInput/IntegerInput.vue';
+import FloatInput from '../Inputs/WebFloatInput/FloatInput.vue';
+import RangeInput from '../Inputs/RangeInput/RangeInput.vue';
+import DateInput from '../Inputs/YearInput/YearInput.vue';
+import DocumentUpload from '../Inputs/DocumentUpload/DocumentUpload.vue';
+import MultiTextInput from '../Inputs/MultiTextInput/MultiTextInput.vue';
+import SliderInput from '../Inputs/SliderInput/SliderInput.vue';
+import TimeRange from '../Inputs/TimeRange/TimeRange.vue';
+import SelectInput from '../Inputs/SelectInput/SelectInput.vue';
+import StaticReadOnly from '../Inputs/StaticReadOnly/StaticReadOnly.vue';
+import SaveData from '../Inputs/SaveData/SaveData.vue';
+import StudySign from '../Inputs/StudySign/StudySign.vue';
+import EmailInput from '../Inputs/EmailInput/EmailInput.vue';
+import ParticipantId from '../Inputs/ParticipantId/ParticipantId.vue';
+import CanvasInput from '../Inputs/CanvasInput/CanvasInput.vue';
 
 
 export default {
@@ -308,6 +317,11 @@ export default {
     ipAddress: {
       type: String,
     },
+    ui: {
+      type: Object,
+      required: false,
+      default: () => ({})
+    }
   },
   components: {
     ParticipantId,
@@ -328,7 +342,7 @@ export default {
     TimeRange,
     SelectInput,
     StaticReadOnly,
-    // Static,
+    CanvasInput,
   },
   data() {
     return {
