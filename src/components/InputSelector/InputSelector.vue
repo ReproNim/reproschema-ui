@@ -272,7 +272,7 @@ import TimeRange from '../Inputs/TimeRange/';
 import SelectInput from '../Inputs/SelectInput/';
 import StaticReadOnly from '../Inputs/StaticReadOnly/';
 import SaveData from '../Inputs/SaveData/';
-import StudySign from '../Inputs/StudySign/';
+import StudySign from '../StudySign/';
 import EmailInput from '../Inputs/EmailInput/';
 import ParticipantId from '../Inputs/ParticipantId/';
 import CanvasInput from '../Inputs/CanvasInput/';
