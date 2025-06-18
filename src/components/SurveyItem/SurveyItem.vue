@@ -255,8 +255,6 @@
         // console.log(247, resp);
         if (resp.length) {
           this.data = resp[0];
-          console.log('SurveyItem processActivityData - data:', this.data);
-          console.log('SurveyItem processActivityData - backgroundImage:', this.data['http://schema.repronim.org/backgroundImage']);
           if (this.data['http://schema.repronim.org/responseOptions']) {
             if (Object.keys(this.data['http://schema.repronim.org/responseOptions'][0]).indexOf('@id') > -1) {
               // console.log(260, this.data['http://schema.repronim.org/responseOptions'][0]['@id']);
