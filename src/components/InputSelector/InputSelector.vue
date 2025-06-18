@@ -172,6 +172,16 @@
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
+    <!-- If type is canvas drawing -->
+    <div v-else-if="inputType === 'canvas'">
+      <CanvasInput
+        :constraints="valueConstraints"
+        :selected_language="selected_language"
+        :init="init"
+        :backgroundImage="ui.backgroundImage"
+        v-on:valueChanged="sendData"/>
+    </div>
+
     <!-- If type is a slider -->
     <div v-else-if="inputType === 'slider'">
       <SliderInput
@@ -255,18 +265,17 @@ import IntegerInput from '../Inputs/WebIntegerInput/';
 import FloatInput from '../Inputs/WebFloatInput/';
 import RangeInput from '../Inputs/RangeInput/';
 import DateInput from '../Inputs/YearInput/';
-import DocumentUpload from '../Inputs/DocumentUpload';
-import MultiTextInput from '../Inputs/MultiTextInput';
-import SliderInput from '../Inputs/SliderInput';
-import TimeRange from '../Inputs/TimeRange';
-import SelectInput from '../Inputs/SelectInput';
-// import AudioCheck from '../Inputs/AudioCheck';
-import StaticReadOnly from '../Inputs/StaticReadOnly';
-import SaveData from '../Inputs/SaveData/SaveData';
-import StudySign from '../StudySign/StudySign';
-// import Static from '../Inputs/Static';
-import EmailInput from '../Inputs/EmailInput';
-import ParticipantId from '../Inputs/ParticipantId/ParticipantId';
+import DocumentUpload from '../Inputs/DocumentUpload/';
+import MultiTextInput from '../Inputs/MultiTextInput/';
+import SliderInput from '../Inputs/SliderInput/';
+import TimeRange from '../Inputs/TimeRange/';
+import SelectInput from '../Inputs/SelectInput/';
+import StaticReadOnly from '../Inputs/StaticReadOnly/';
+import SaveData from '../Inputs/SaveData/';
+import StudySign from '../StudySign/';
+import EmailInput from '../Inputs/EmailInput/';
+import ParticipantId from '../Inputs/ParticipantId/';
+import CanvasInput from '../Inputs/CanvasInput/';
 
 
 export default {
@@ -308,6 +317,11 @@ export default {
     ipAddress: {
       type: String,
     },
+    ui: {
+      type: Object,
+      required: false,
+      default: () => ({})
+    }
   },
   components: {
     ParticipantId,
@@ -328,7 +342,7 @@ export default {
     TimeRange,
     SelectInput,
     StaticReadOnly,
-    // Static,
+    CanvasInput,
   },
   data() {
     return {

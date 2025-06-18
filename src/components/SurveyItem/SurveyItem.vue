@@ -18,6 +18,7 @@
                        :ipAddress="clientIp"
                        :showPassOptions="showPassOptions"
                        :showItemPassOptions="itemAllow"
+                       :ui="uiConfig"
                        v-on:skip="sendSkip"
                        v-on:dontKnow="sendDontKnow"
                        v-on:next="sendNext"
@@ -180,6 +181,19 @@
         }
         return 'N/A';
         /* eslint-enable */
+      },
+      uiConfig() {
+        const config = {};
+        if (this.data['http://schema.repronim.org/inputType']) {
+          config.inputType = this.data['http://schema.repronim.org/inputType'][0]['@value'];
+        }
+        if (this.data['http://schema.repronim.org/backgroundImage']) {
+          config.backgroundImage = this.data['http://schema.repronim.org/backgroundImage'][0]['@value'];
+        }
+        if (this.data['http://schema.repronim.org/allow']) {
+          config.allow = this.data['http://schema.repronim.org/allow'].map(a => a['@id']);
+        }
+        return config;
       },
       widgetType() {
         if (this.data['http://schema.org/readonlyValue']) {
