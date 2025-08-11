@@ -1,5 +1,5 @@
 module.exports = {
-  githubSrc: 'https://raw.githubusercontent.com/ReproNim/demo-protocol/main/DemoProtocol/DemoProtocol_schema',
+  githubSrc: process.env.VUE_APP_REPROSCHEMA_GITHUB_SRC || 'https://raw.githubusercontent.com/ReproNim/demo-protocol/main/DemoProtocol/DemoProtocol_schema',
   startButton: {
     "en": 'Join',
     "es": 'Participar'
@@ -11,3 +11,5 @@ module.exports = {
   contact: 'voice_survey@mit.edu',
   emailSubject: 'Help with Covid19 study'
 };
+
+console.log(`Loading schema from REPROSCHEMA_GITHUB_SRC: ${process.env.VUE_APP_REPROSCHEMA_GITHUB_SRC}`);
