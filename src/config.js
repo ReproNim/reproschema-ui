@@ -12,4 +12,4 @@ module.exports = {
   emailSubject: 'Help with Covid19 study'
 };
 
-console.log(`Loading schema from REPROSCHEMA_GITHUB_SRC: ${process.env.VUE_APP_REPROSCHEMA_GITHUB_SRC}`);
+console.log(`Loading schema from VUE_APP_REPROSCHEMA_GITHUB_SRC: ${process.env.VUE_APP_REPROSCHEMA_GITHUB_SRC}`);
