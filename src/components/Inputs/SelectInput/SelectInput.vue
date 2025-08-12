@@ -121,7 +121,7 @@ export default {
     },
   },
   mounted() {
-    
+    if (this.init) {
       if (Array.isArray(this.init)) {
         this.selected = this.init[0];
         this.otherInput = this.init[1];
