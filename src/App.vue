@@ -299,7 +299,7 @@ export default {
       // but there will be a change in responses that needs to trigger
       // this.setVisibility().
       if ((oldP !== newP) && newP === 100) {
-        // console.log('time to check for branching activities!');
+        // 
         this.setVisbility();
       }
     },
@@ -518,16 +518,13 @@ export default {
         _.map(eachActivityList, (itemObj) => {
           const newObj = { ...itemObj };
           if (itemObj['@type'] === 'reproschema:Response') {
-            if (itemObj.value instanceof Blob && itemObj.mimeType == "audio/wav") {
+            if (itemObj.value instanceof Blob && (itemObj.mimeType === "audio/wav" || itemObj.mimeType === "video/mp4")) {
               const keyStrings = (itemObj.isAbout.split('/'));
               const rId = itemObj['@id'].split('uuid:')[1];
-              jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.wav`, itemObj.value); //changed from wav
-              newObj.value = `${keyStrings[keyStrings.length-1]}-${rId}.wav`; //changed from wav
-            } else if (itemObj.value instanceof Blob && itemObj.mimeType == "video/mp4") {
-              const keyStrings = (itemObj.isAbout.split('/'));
-              const rId = itemObj['@id'].split('uuid:')[1];
-              jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.mp4`, itemObj.value); //changed from wav
-              newObj.value = `${keyStrings[keyStrings.length-1]}-${rId}.mp4`; //changed from wav
+              const extension = itemObj.mimeType === "audio/wav" ? "wav" : "mp4";
+              const filename = `${keyStrings[keyStrings.length-1]}-${rId}.${extension}`;
+              jszip.folder(fileName).file(filename, itemObj.value);
+              newObj.value = filename;
             }
           }
           activityData.push(newObj);
@@ -585,7 +582,7 @@ export default {
             '$1-$2-$3T$4:$5:$6Z'
         );
         const time = Date.parse(formattedTime);
-        console.log(537, timestamp, formattedTime, time);
+        // console.log(537, timestamp, formattedTime, time);
         return time;
       },
       showTimer() {
@@ -634,7 +631,7 @@ export default {
       if (!_.isEmpty(this.$store.state.schema)) {
         const order = _.map(this.$store.state.schema['http://schema.repronim.org/order'][0]['@list'],
           u => u['@id']);
-        console.log(order)
+        // console.log(order)
         return order;
       }
       return [];

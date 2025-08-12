@@ -22,7 +22,7 @@
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
-    <div v-else-if="inputType === 'audioCheck'">
+    <div v-else-if="inputType === 'audioCheck' || inputType === 'audioVideoCheck'">
       <MediaRecord
         :constraints="valueConstraints"
         :selected_language="selected_language"
@@ -39,16 +39,6 @@
         :init="init"
         :audio="false"
         :visualizer="false"
-        v-on:valueChanged="sendData"/>
-    </div>
-
-    <div v-else-if="inputType === 'audioVideoCheck'">
-      <MediaRecord
-        :constraints="valueConstraints"
-        :selected_language="selected_language"
-        :init="init"
-        :audio="true"
-        :visualizer="true"
         v-on:valueChanged="sendData"/>
     </div>
 

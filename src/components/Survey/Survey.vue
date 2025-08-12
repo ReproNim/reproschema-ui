@@ -507,7 +507,7 @@
       },
       async sendRetry(url, formData, retries = 3, backoff = 10000) {
         if (!this.shouldUpload) {
-          console.log("Not uploading")
+          // console.log("Not uploading")
           return;
         }
         const config1 = {
@@ -524,7 +524,7 @@
             }, backoff)
           }
           else {
-            console.log(e.response.status);
+            // console.log(e.response.status);
           }
         }
       }

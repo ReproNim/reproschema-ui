@@ -124,7 +124,7 @@ export default {
       this.$emit('valueChanged', 'disagree');
     },
     accept() {
-      console.log(140, this.name);
+      // console.log(140, this.name);
       this.$emit('valueChanged', this.name);
     },
   },

@@ -74,7 +74,7 @@
                     // this.statusText = this.wordString.status.running;
 
                 } else if( distance > 0 && passTime > 0 ){
-                    console.log(84);
+                    // console.log(84);
                     this.calcTime(distance);
                     this.message = this.wordString.upcoming;
                     this.statusType = "upcoming";

@@ -117,16 +117,13 @@ export default {
         _.map(eachActivityList, (itemObj) => {
           const newObj = { ...itemObj };
           if (itemObj['@type'] === 'reproschema:Response') {
-            if (itemObj.value instanceof Blob && itemObj.mimeType === "audio/wav") {
+            if (itemObj.value instanceof Blob && (itemObj.mimeType === "audio/wav" || itemObj.mimeType === "video/mp4")) {
               const keyStrings = (itemObj.isAbout.split('/'));
               const rId = itemObj['@id'].split('uuid:')[1];
-              jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.wav`, itemObj.value); //changed from .wav
-              newObj.value = `${keyStrings[keyStrings.length-1]}-${rId}.wav`; //changed from .wav
-            } else if (itemObj.value instanceof Blob && itemObj.mimeType === "video/mp4") {
-              const keyStrings = (itemObj.isAbout.split('/'));
-              const rId = itemObj['@id'].split('uuid:')[1];
-              jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.mp4`, itemObj.value); //changed from .wav
-              newObj.value = `${keyStrings[keyStrings.length-1]}-${rId}.mp4`; //changed from .wav
+              const extension = itemObj.mimeType === "audio/wav" ? "wav" : "mp4";
+              const filename = `${keyStrings[keyStrings.length-1]}-${rId}.${extension}`;
+              jszip.folder(fileName).file(filename, itemObj.value);
+              newObj.value = filename;
             }
           }
           activityData.push(newObj);
@@ -188,7 +185,7 @@ export default {
     },
     sendRetry(url, formData, index, retries = 3, backoff = 10000) {
         if (!this.shouldUpload) {
-          console.log("Not uploading")
+          
           return 200;
         }
         const config1 = {
