@@ -206,6 +206,10 @@ const mutations = {
   setExport(state, value) {
     state.hasExport = value;
   },
+  // eslint-disable-next-line
+  setSelectedAudioInput(state, deviceId) {
+    state.selectedAudioInput = deviceId;
+  },
 };
 
 const actions = {
