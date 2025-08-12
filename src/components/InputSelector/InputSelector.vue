@@ -23,157 +23,57 @@
     </div>
 
     <div v-else-if="inputType === 'audioCheck'">
-      <AudioCheck
+      <MediaRecord
         :constraints="valueConstraints"
         :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"/>
-    </div>
-
-    <!-- If type is audioRecord -->
-    <div v-else-if="inputType === 'audioRecord'">
-      <AudioRecord
-        :constraints="valueConstraints"
-        :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"/>
-    </div>
-
-    <div v-else-if="inputType === 'audioPassageRecord'">
-      <AudioRecord
-        :constraints="valueConstraints"
-        :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"/>
-    </div>
-
-    <!-- If type is audioImageRecord -->
-    <div v-else-if="inputType === 'audioImageRecord'">
-      <AudioRecord
-        :constraints="valueConstraints"
-        :fieldData="fieldData"
-        :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"
-        mode="audioImageRecord" />
-    </div>
-
-    <!-- If type is audioRecordNumberTask -->
-    <div v-else-if="inputType === 'audioRecordNumberTask'">
-      <AudioRecord
-        :constraints="valueConstraints"
-        :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"
-        mode="audioRecordNumberTask" />
-    </div>
-
-    <!-- If type is audioRecordAudioTask -->
-    <div v-else-if="inputType === 'audioRecordAudioTask'">
-      <AudioRecord
-        :constraints="valueConstraints"
-        :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"
-        :fieldData="fieldData"
-        mode="audioRecordAudioTask" />
-    </div>
-
-    <!-- If type is audioRecordNoStop -->
-    <div v-else-if="inputType === 'audioRecordNoStop'">
-      <AudioRecord
-        :constraints="valueConstraints"
-        :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"
-        mode="audioRecordNoStop" />
-    </div>
-
-    <div v-else-if="inputType === 'audioVideoCheck'">
-      <AudioVideoCheck
-        :constraints="valueConstraints"
-        :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"/>
-    </div>
-
-    <!-- If type is audioVideoRecord -->
-    <div v-else-if="inputType === 'audioVideoRecord'">
-      <AudioVideoRecord
-        :constraints="valueConstraints"
-        :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"/>
-    </div>
-
-    <div v-else-if="inputType === 'audioVideoPassageRecord'">
-      <AudioVideoRecord
-        :constraints="valueConstraints"
-        :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"/>
-    </div>
-
-    <!-- If type is audioVideoImageRecord -->
-    <div v-else-if="inputType === 'audioVideoImageRecord'">
-      <AudioVideoRecord
-        :constraints="valueConstraints"
-        :fieldData="fieldData"
-        :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"
-        mode="audioVideoImageRecord" />
-    </div>
-
-    <!-- If type is audioRecordNumberTask -->
-    <div v-else-if="inputType === 'audioVideoRecordNumberTask'">
-      <AudioVideoRecord
-        :constraints="valueConstraints"
-        :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"
-        mode="audioVideoRecordNumberTask" />
-    </div>
-
-    <!-- If type is audioRecordAudioTask -->
-    <div v-else-if="inputType === 'audioVideoRecordAudioTask'">
-      <AudioVideoRecord
-        :constraints="valueConstraints"
-        :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"
-        :fieldData="fieldData"
-        mode="audioVideoRecordAudioTask" />
-    </div>
-
-    <!-- If type is audioVideoRecordNoStop -->
-    <div v-else-if="inputType === 'audioVideoRecordNoStop'">
-      <AudioVideoRecord
-        :constraints="valueConstraints"
-        :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"
-        mode="audioVideoRecordNoStop" />
+        :init="init"
+        :audio="true"
+        :visualizer="true"
+        v-on:valueChanged="sendData"/>
     </div>
 
     <div v-else-if="inputType === 'videoCheck'">
-      <VideoCheck
+      <MediaRecord
         :constraints="valueConstraints"
         :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"/>
+        :init="init"
+        :audio="false"
+        :visualizer="false"
+        v-on:valueChanged="sendData"/>
     </div>
 
-    <!-- If type is VideoRecord -->
-    <div v-else-if="inputType === 'videoRecord'">
-      <VideoRecord
+    <div v-else-if="inputType === 'audioVideoCheck'">
+      <MediaRecord
         :constraints="valueConstraints"
         :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"/>
+        :init="init"
+        :audio="true"
+        :visualizer="true"
+        v-on:valueChanged="sendData"/>
     </div>
 
-    <!-- If type is videoRecordVideoTask -->
-    <div v-else-if="inputType === 'videoRecordVideoTask'">
-      <VideoRecord
+    <div v-else-if="inputType.startsWith('audio')">
+      <MediaRecord
         :constraints="valueConstraints"
         :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"
+        :init="init"
+        :audio="true"
+        :visualizer="true"
+        :mode="inputType"
         :fieldData="fieldData"
-        mode="videoRecordVideoTask" />
+        v-on:valueChanged="sendData"/>
     </div>
 
-    <!-- If type is videoRecordNoStop -->
-    <div v-else-if="inputType === 'videoRecordNoStop'">
-      <VideoRecord
+    <div v-else-if="inputType.startsWith('video')">
+      <MediaRecord
         :constraints="valueConstraints"
         :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"
-        mode="videoRecordNoStop" />
+        :init="init"
+        :audio="false"
+        :visualizer="false"
+        :mode="inputType"
+        :fieldData="fieldData"
+        v-on:valueChanged="sendData"/>
     </div>
 
     <!-- If type is text -->
@@ -341,24 +241,19 @@
 
 <script>
 import Radio from '../Inputs/WebRadio/';
-import AudioRecord from '../Inputs/WebAudioRecord/';
-import AudioVideoRecord from '../Inputs/WebAudioVideoRecord/';
-import VideoRecord from '../Inputs/WebVideoRecord/';
+import MediaRecord from '../Inputs/MediaRecord/';
 import TextInput from '../Inputs/WebTextInput/';
 import TextArea from '../Inputs/TextArea/';
 import IntegerInput from '../Inputs/WebIntegerInput/';
 import FloatInput from '../Inputs/WebFloatInput/';
 import RangeInput from '../Inputs/RangeInput/';
 import DateInput from '../Inputs/YearInput/';
-import DocumentUpload from '../Inputs/DocumentUpload';
-import MultiTextInput from '../Inputs/MultiTextInput';
-import SliderInput from '../Inputs/SliderInput';
-import TimeRange from '../Inputs/TimeRange';
-import SelectInput from '../Inputs/SelectInput';
-import AudioCheck from '../Inputs/AudioCheck/';
-import VideoCheck from '../Inputs/VideoCheck/';
-import AudioVideoCheck from '../Inputs/AudioVideoCheck/';
-import StaticReadOnly from '../Inputs/StaticReadOnly';
+import DocumentUpload from '../Inputs/DocumentUpload/';
+import MultiTextInput from '../Inputs/MultiTextInput/';
+import SliderInput from '../Inputs/SliderInput/';
+import TimeRange from '../Inputs/TimeRange/';
+import SelectInput from '../Inputs/SelectInput/';
+import StaticReadOnly from '../Inputs/StaticReadOnly/';
 import SaveData from '../Inputs/SaveData/SaveData';
 import StudySign from '../StudySign/StudySign';
 // import Static from '../Inputs/Static';
@@ -411,12 +306,7 @@ export default {
     StudySign,
     SaveData,
     Radio,
-    AudioRecord,
-    AudioVideoRecord,
-    VideoRecord,
-    AudioCheck,
-    VideoCheck,
-    AudioVideoCheck,
+    MediaRecord,
     TextInput,
     TextArea,
     EmailInput,
@@ -474,3 +364,4 @@ export default {
   }
 
 </style>
+
