@@ -31,7 +31,7 @@ export default {
   methods: {
     onSubmit(e) {
       e.preventDefault();
-      // console.log(25, 'submit', this.input);
+      
       this.$emit('valueChanged', this.input);
     },
   },

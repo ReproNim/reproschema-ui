@@ -12,6 +12,11 @@
         <video v-show="!hasRecording" ref="live" id="live_recording" playsinline autoplay muted></video>
         <video v-show="hasRecording && isPlaying" ref="recorded" id="recorded-footage" playsinline autoplay></video>
       </div>
+      <div v-if="audio && visualizer" class="container-fluid">
+        <div class="pids-wrapper">
+          <div v-for="i in 10" :key="i" class="pid"></div>
+        </div>
+      </div>
       <div v-if="audio && !audioStreamDevice" class="mt-2">
         <label>{{ $t('select-microphone') }}</label>
         <select v-model="tempDeviceName" class="form-control">
@@ -54,6 +59,32 @@
 <script>
 import _ from 'lodash';
 const MediaStreamRecorder = require('msr');
+
+function handleInit(newInit) {
+  if (newInit === 'skip' || newInit === 'dontKnow') {
+    this.hasRecording = false;
+  } else if (newInit) {
+    if (_.isString(newInit) && newInit.startsWith('blob')) {
+      if (this.video) {
+        this.recording.src = newInit;
+      } else {
+        this.recording = new Audio(newInit);
+        this.recording.onended = this.endPlay;
+      }
+      this.hasRecording = true;
+    } else if (newInit instanceof Blob) {
+      const blobURL = URL.createObjectURL(newInit);
+      if (this.video) {
+        this.recording.src = blobURL;
+      } else {
+        this.recording = new Audio(blobURL);
+        this.recording.onended = this.endPlay;
+      }
+      this.recording.blob = newInit;
+      this.hasRecording = true;
+    }
+  }
+}
 
 export default {
   name: 'MediaRecord',
@@ -133,6 +164,21 @@ export default {
       }
       return '';
     },
+  },
+  watch: {
+    init: handleInit,
+  },
+  mounted() {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      this.supported = true;
+      if (this.audio) {
+        this.getDevices();
+      }
+      this.initializeMedia();
+    } else {
+      this.supported = false;
+    }
+    handleInit.call(this, this.init);
   },
   methods: {
     getDevices() {
@@ -263,44 +309,6 @@ export default {
         }
       };
     },
-  },
-  watch: {
-    init(newInit) {
-      if (newInit === 'skip' || newInit === 'dontKnow') {
-        this.hasRecording = false;
-      } else if (newInit) {
-        if (_.isString(newInit) && newInit.startsWith('blob')) {
-          if (this.video) {
-            this.recording.src = newInit;
-          } else {
-            this.recording = new Audio(newInit);
-            this.recording.onended = this.endPlay;
-          }
-          this.hasRecording = true;
-        } else if (newInit instanceof Blob) {
-          const blobURL = URL.createObjectURL(newInit);
-          if (this.video) {
-            this.recording.src = blobURL;
-          } else {
-            this.recording = new Audio(blobURL);
-            this.recording.onended = this.endPlay;
-          }
-          this.recording.blob = newInit;
-          this.hasRecording = true;
-        }
-      }
-    },
-  },
-  mounted() {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      this.supported = true;
-      if (this.audio) {
-        this.getDevices();
-      }
-      this.initializeMedia();
-    } else {
-      this.supported = false;
-    }
   },
 };
 </script>

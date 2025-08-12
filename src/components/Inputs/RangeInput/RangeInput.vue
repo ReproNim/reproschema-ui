@@ -96,7 +96,7 @@ export default {
       }
     },
     isValid() {
-      // console.log(this.input, Number.isInteger(this.input));
+
       const num = parseFloat(this.input);
       if (isNaN(num)) {
         return false;
@@ -104,7 +104,7 @@ export default {
       return Number.isFinite(num);
     },
     isValidRange() {
-      // console.log(this.input, Number.isInteger(this.input));
+
       const num1 = parseFloat(this.input1);
       const num2 = parseFloat(this.input2);
       if (num2 > num1) {

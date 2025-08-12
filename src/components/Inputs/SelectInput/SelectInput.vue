@@ -104,7 +104,7 @@ export default {
   computed: {
     multipleAllowed() {
       if (this.constraints['http://schema.repronim.org/multipleChoice']) {
-        // console.log(94, this.constraints[this.reprotermsUrl+'multipleChoice']);
+        
         return this.constraints['http://schema.repronim.org/multipleChoice'][0]['@value'];
       }
       return false;
@@ -121,8 +121,7 @@ export default {
     },
   },
   mounted() {
-    if (this.init) {
-      // console.log(74, this.init);
+    
       if (Array.isArray(this.init)) {
         this.selected = this.init[0];
         this.otherInput = this.init[1];
