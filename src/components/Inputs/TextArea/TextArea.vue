@@ -22,7 +22,12 @@
 <script>
 export default {
   name: 'TextArea',
-  props: ['constraints', 'init', 'inputType', 'selected_language'],
+  props: {
+    'constraints': {},
+    'init': {},
+    'inputType': {},
+    'selected_language': {}
+  },
   components: {
   },
   data() {

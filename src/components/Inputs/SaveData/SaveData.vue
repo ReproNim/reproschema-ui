@@ -62,7 +62,12 @@ let sentPartCount = 0;
 
 export default {
   name: 'SaveData',
-  props: ['constraints', 'init', 'selected_language', 'ipAddress'],
+  props: {
+    'constraints': {},
+    'init': {},
+    'selected_language': {},
+    'ipAddress': {}
+  },
   components: {
     Loader,
   },
@@ -80,24 +85,6 @@ export default {
       dataUploadPath: config.dataUploadPath,
       contact: config.contact
     };
-  },
-  computed: {
-    shouldUpload() {
-      return !!(config.backendServer && this.$store.getters.getAuthToken);
-    },
-    participantId() {
-      return this.$store.getters.getParticipantId;
-    },
-    exportOption() {
-      return this.$store.getters.getHasExport;
-    },
-    hasStripe() {
-      return !(this.percentCompleted === 100);
-    },
-    hasTimedOut() {
-      return this.timeout;
-    },
-
   },
   methods: {
     finish() {
@@ -130,11 +117,13 @@ export default {
         _.map(eachActivityList, (itemObj) => {
           const newObj = { ...itemObj };
           if (itemObj['@type'] === 'reproschema:Response') {
-            if (itemObj.value instanceof Blob) {
+            if (itemObj.value instanceof Blob && (itemObj.mimeType === "audio/wav" || itemObj.mimeType === "video/mp4")) {
               const keyStrings = (itemObj.isAbout.split('/'));
               const rId = itemObj['@id'].split('uuid:')[1];
-              jszip.folder(fileName).file(`${keyStrings[keyStrings.length-1]}-${rId}.wav`, itemObj.value);
-              newObj.value = `${keyStrings[keyStrings.length-1]}-${rId}.wav`;
+              const extension = itemObj.mimeType === "audio/wav" ? "wav" : "mp4";
+              const filename = `${keyStrings[keyStrings.length-1]}-${rId}.${extension}`;
+              jszip.folder(fileName).file(filename, itemObj.value);
+              newObj.value = filename;
             }
           }
           activityData.push(newObj);
@@ -196,7 +185,7 @@ export default {
     },
     sendRetry(url, formData, index, retries = 3, backoff = 10000) {
         if (!this.shouldUpload) {
-          console.log("Not uploading")
+          
           return 200;
         }
         const config1 = {
@@ -227,6 +216,24 @@ export default {
             }
           });
     }
+  },
+  computed: {
+    shouldUpload() {
+      return !!(config.backendServer && this.$store.getters.getAuthToken);
+    },
+    participantId() {
+      return this.$store.getters.getParticipantId;
+    },
+    exportOption() {
+      return this.$store.getters.getHasExport;
+    },
+    hasStripe() {
+      return !(this.percentCompleted === 100);
+    },
+    hasTimedOut() {
+      return this.timeout;
+    },
+
   },
 };
 </script>

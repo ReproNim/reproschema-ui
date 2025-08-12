@@ -72,7 +72,15 @@ import VueSelectImage from '../Utils/SelectImage';
 
 export default {
   name: 'radioInput',
-  props: ['constraints', 'init', 'selected_language', 'reprotermsUrl'],
+  props: {
+    'constraints': {},
+    'init': {},
+    'selected_language': {},
+    'reprotermsUrl': {},
+  },
+  components: {
+    VueSelectImage,
+  },
   data() {
     return {
       selected: null,
@@ -80,8 +88,18 @@ export default {
       answerLanguage: this.selected_language,
     };
   },
-  components: {
-    VueSelectImage,
+  methods: {
+    onSubmit(e) {
+      e.preventDefault();
+      this.$emit('valueChanged', this.checkboxSelected);
+    },
+    sendData(val) {
+      this.$emit('valueChanged', val);
+    },
+    onSelectImage(d) {
+      this.selected = d.id;
+      this.sendData(d.id);
+    },
   },
   computed: {
     options() {
@@ -116,23 +134,6 @@ export default {
       return [this.dataImages[this.selected]];
     },
   },
-  watch: {
-    // init: {
-    //   handler() {
-    //     if (this.init != null) {
-    //       this.selected = this.init.value;
-    //     } else {
-    //       this.selected = false;
-    //     }
-    //   },
-    //   deep: true, // this watches all of the changes within an object. init: {value: 1}  not init: 1
-    // },
-    // selectedImages() {
-    //   if (this.selectedImages) {
-    //     this.$set(this.$refs.imageSelect.singleSelected, this.selectedImage[0]);
-    //   }
-    // },
-  },
   mounted() {
     if (this.init !== undefined) {
       if (this.init instanceof Array) { // checkbox
@@ -149,18 +150,22 @@ export default {
       }
     }
   },
-  methods: {
-    onSubmit(e) {
-      e.preventDefault();
-      this.$emit('valueChanged', this.checkboxSelected);
-    },
-    sendData(val) {
-      this.$emit('valueChanged', val);
-    },
-    onSelectImage(d) {
-      this.selected = d.id;
-      this.sendData(d.id);
-    },
+  watch: {
+    // init: {
+    //   handler() {
+    //     if (this.init != null) {
+    //       this.selected = this.init.value;
+    //     } else {
+    //       this.selected = false;
+    //     }
+    //   },
+    //   deep: true, // this watches all of the changes within an object. init: {value: 1}  not init: 1
+    // },
+    // selectedImages() {
+    //   if (this.selectedImages) {
+    //     this.$set(this.$refs.imageSelect.singleSelected, this.selectedImage[0]);
+    //   }
+    // },
   },
 };
 

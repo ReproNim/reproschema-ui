@@ -40,21 +40,6 @@ export default {
       consent: config.consent,
     };
   },
-  computed: {
-    reprotermsUrl() {
-      return this.$store.getters.getTermsUrl;
-    },
-    selectedContent() {
-      const landingC = _.filter(this.$store.state.landing, c => c['@language'] === this.selected_language);
-      if (_.isEmpty(landingC)) {
-        return (this.$store.state.landing)[0]; // return default language content
-      }
-      return landingC[0];
-    },
-    activityUrl() {
-      return this.srcUrl;
-    },
-  },
   methods: {
     doBack() {
       if (this.step > 1) {
@@ -70,6 +55,21 @@ export default {
         'path': `/activities/${nextIndex}`,
         'query': this.$route.query}
       );
+    },
+  },
+  computed: {
+    reprotermsUrl() {
+      return this.$store.getters.getTermsUrl;
+    },
+    selectedContent() {
+      const landingC = _.filter(this.$store.state.landing, c => c['@language'] === this.selected_language);
+      if (_.isEmpty(landingC)) {
+        return (this.$store.state.landing)[0]; // return default language content
+      }
+      return landingC[0];
+    },
+    activityUrl() {
+      return this.srcUrl;
     },
   },
 };

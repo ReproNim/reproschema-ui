@@ -42,9 +42,18 @@ import 'vue-slider-component/theme/default.css';
 
 export default {
   name: 'SliderInput',
-  props: ['constraints', 'init', 'selected_language'],
+  props: {
+    'constraints': {},
+    'init': {},
+    'selected_language': {}
+  },
   components: {
     VueSlider,
+  },
+  data() {
+    return {
+      input: null
+    };
   },
   methods: {
     sendData(e) {
@@ -56,38 +65,38 @@ export default {
     choices() {
       return this.constraints['http://schema.repronim.org/choices'] || [];
     },
-    
+
     interval() {
       const minValue = this.constraints['http://schema.org/minValue'];
       const maxValue = this.constraints['http://schema.org/maxValue'];
-      
+
       if (minValue && maxValue) {
         const min = minValue[0]['@value'];
         const max = maxValue[0]['@value'];
         return Array.from({length: max - min + 1}, (_, i) => min + i);
       }
-      
+
       return this.choices.map(v => v['http://schema.repronim.org/value'][0]['@value']);
     },
-    
+
     getMinLabel() {
       if (this.choices.length) {
-        const activeLabel = _.find(this.choices[0]['http://schema.org/name'], 
+        const activeLabel = _.find(this.choices[0]['http://schema.org/name'],
           label => label['@language'] === this.selected_language);
         return activeLabel ? activeLabel['@value'] : '';
       }
       return '';
     },
-    
+
     getMaxLabel() {
       if (this.choices.length) {
-        const activeLabel = _.find(this.choices[this.choices.length - 1]['http://schema.org/name'], 
+        const activeLabel = _.find(this.choices[this.choices.length - 1]['http://schema.org/name'],
           label => label['@language'] === this.selected_language);
         return activeLabel ? activeLabel['@value'] : '';
       }
       return '';
     },
-    
+
     getMinImageLabel() {
       const vcList = this.choices;
       if (vcList[0]['http://schema.org/image']) {
@@ -95,7 +104,7 @@ export default {
       }
       return false;
     },
-    
+
     getMaxImageLabel() {
       const vcList = this.choices;
       const N = vcList.length;
@@ -104,14 +113,14 @@ export default {
       }
       return false;
     },
-    
+
     getMarks() {
-      if (this.constraints['http://schema.org/minValue'] && 
+      if (this.constraints['http://schema.org/minValue'] &&
           this.constraints['http://schema.org/maxValue']) {
         const min = this.constraints['http://schema.org/minValue'][0]['@value'];
         const max = this.constraints['http://schema.org/maxValue'][0]['@value'];
         const choices = this.choices;
-        
+
         if (choices) {
           const numChoices = choices.length;
           const step = (max - min) / (numChoices - 1);
@@ -120,17 +129,17 @@ export default {
       }
       return true; // fallback to default behavior
     },
-    
+
     getMidLabel() {
       if (this.choices.length % 2 === 1) { // Check if odd number of choices
         const midIndex = Math.floor(this.choices.length / 2);
-        const activeMidLabel = _.find(this.choices[midIndex]['http://schema.org/name'], 
+        const activeMidLabel = _.find(this.choices[midIndex]['http://schema.org/name'],
           label => label['@language'] === this.selected_language);
         return activeMidLabel ? activeMidLabel['@value'] : '';
       }
       return '';
     },
-    
+
     getMidImageLabel() {
       if (this.choices.length % 2 === 1) {
         const midIndex = Math.floor(this.choices.length / 2);
@@ -140,11 +149,6 @@ export default {
       }
       return false;
     },
-  },
-  data() {
-    return {
-      input: null
-    };
   },
   mounted() {
     if (this.init) {

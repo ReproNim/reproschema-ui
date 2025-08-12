@@ -57,7 +57,10 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 
 export default {
   name: 'IntegerInput',
-  props: ['constraints', 'init'],
+  props: {
+    'constraints': {},
+    'init': {}
+  },
   components: {
     Multiselect,
   },
@@ -83,7 +86,7 @@ export default {
       }
     },
     isValid() {
-      // console.log(this.input, Number.isInteger(this.input));
+      
       const num = parseFloat(this.input1);
       if (isNaN(num)) {
         return false;

@@ -22,66 +22,49 @@
         :init="init" v-on:valueChanged="sendData"/>
     </div>
 
-    <div v-else-if="inputType === 'audioCheck'">
-      <AudioRecord
+    <div v-else-if="inputType === 'audioCheck' || inputType === 'audioVideoCheck'">
+      <MediaRecord
         :constraints="valueConstraints"
         :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"/>
+        :init="init"
+        :audio="true"
+        :visualizer="true"
+        v-on:valueChanged="sendData"/>
     </div>
 
-    <!-- If type is audioRecord -->
-    <div v-else-if="inputType === 'audioRecord'">
-      <AudioRecord
+    <div v-else-if="inputType === 'videoCheck'">
+      <MediaRecord
         :constraints="valueConstraints"
         :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"/>
+        :init="init"
+        :audio="getVideoAudioSetting('videoCheck')"
+        :visualizer="false"
+        v-on:valueChanged="sendData"/>
     </div>
 
-    <div v-else-if="inputType === 'audioPassageRecord'">
-      <AudioRecord
+    <div v-else-if="inputType.startsWith('audio')">
+      <MediaRecord
         :constraints="valueConstraints"
         :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"/>
-    </div>
-
-    <!-- If type is audioImageRecord -->
-    <div v-else-if="inputType === 'audioImageRecord'">
-      <AudioRecord
-        :constraints="valueConstraints"
+        :init="init"
+        :audio="true"
+        :visualizer="true"
+        :mode="inputType"
         :fieldData="fieldData"
-        :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"
-        mode="audioImageRecord" />
+        v-on:valueChanged="sendData"/>
     </div>
 
-    <!-- If type is audioRecordNumberTask -->
-    <div v-else-if="inputType === 'audioRecordNumberTask'">
-      <AudioRecord
+    <div v-else-if="inputType.startsWith('video')">
+      <MediaRecord
         :constraints="valueConstraints"
         :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"
-        mode="audioRecordNumberTask" />
-    </div>
-
-    <!-- If type is audioRecordAudioTask -->
-    <div v-else-if="inputType === 'audioRecordAudioTask'">
-      <AudioRecord
-        :constraints="valueConstraints"
-        :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"
+        :init="init"
+        :audio="getVideoAudioSetting(inputType)"
+        :visualizer="false"
+        :mode="inputType"
         :fieldData="fieldData"
-        mode="audioRecordAudioTask" />
+        v-on:valueChanged="sendData"/>
     </div>
-
-    <!-- If type is audioRecordNoStop -->
-    <div v-else-if="inputType === 'audioRecordNoStop'">
-      <AudioRecord
-        :constraints="valueConstraints"
-        :selected_language="selected_language"
-        :init="init" v-on:valueChanged="sendData"
-        mode="audioRecordNoStop" />
-    </div>
-
 
     <!-- If type is text -->
     <div v-else-if="inputType === 'text'">
@@ -153,7 +136,7 @@
           :constraints="valueConstraints"
           :selected_language="selected_language"
           :init="init" v-on:valueChanged="sendData"/>
-    </div>    
+    </div>
 
     <!-- If type is date -->
     <div v-else-if="inputType === 'date' || inputType === 'year'">
@@ -258,7 +241,7 @@
 
 <script>
 import Radio from '../Inputs/WebRadio/';
-import AudioRecord from '../Inputs/WebAudioRecord/';
+import MediaRecord from '../Inputs/MediaRecord/';
 import TextInput from '../Inputs/WebTextInput/';
 import TextArea from '../Inputs/TextArea/';
 import IntegerInput from '../Inputs/WebIntegerInput/';
@@ -328,7 +311,7 @@ export default {
     StudySign,
     SaveData,
     Radio,
-    AudioRecord,
+    MediaRecord,
     TextInput,
     TextArea,
     EmailInput,
@@ -350,6 +333,15 @@ export default {
     };
   },
   methods: {
+    getVideoAudioSetting(inputType) {
+      // Check if there's a specific setting to disable audio for video recording
+      // Look in valueConstraints for a disableAudio flag
+      if (this.valueConstraints && this.valueConstraints['http://schema.repronim.org/disableAudio']) {
+        return !this.valueConstraints['http://schema.repronim.org/disableAudio'][0]['@value'];
+      }
+      // Default: include audio for all video recordings
+      return true;
+    },
     skip() {
       this.$emit('skip');
     },
@@ -386,3 +378,4 @@ export default {
   }
 
 </style>
+

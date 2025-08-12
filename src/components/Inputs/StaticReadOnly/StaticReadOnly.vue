@@ -18,18 +18,23 @@
 import config from '../../../config';
 export default {
   name: 'StaticReadOnly',
-  props: ['constraints', 'init', 'result', 'selected_language'],
-  methods: {
-    onSubmit(e) {
-      e.preventDefault();
-      this.$emit('valueChanged', this.input);
-    },
+  props: {
+    'constraints': {},
+    'init': {},
+    'result': {},
+    'selected_language': {}
   },
   data() {
     return {
       contact: config.contact,
       input: '',
     };
+  },
+    methods: {
+    onSubmit(e) {
+      e.preventDefault();
+      this.$emit('valueChanged', this.input);
+    },
   },
   computed: {
     getPId() {
