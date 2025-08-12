@@ -28,7 +28,7 @@
       </div>
       <div v-if="mode==='audioRecordAudioTask' || mode==='videoRecordAudioTask'" class="mb-3">
         <audio controls>
-          <source :src="getAudioSource" type="video/mp4">
+          <source :src="getAudioSource" type="audio/mp4">
           Your browser does not support the audio element.
         </audio>
       </div>
@@ -74,6 +74,7 @@ function handleInit(newInit) {
       this.hasRecording = true;
     } else if (newInit instanceof Blob) {
       const blobURL = URL.createObjectURL(newInit);
+      this.blobURLs.push(blobURL); // Track for cleanup
       if (this.video) {
         this.recording.src = blobURL;
       } else {
@@ -128,6 +129,7 @@ export default {
       hasError: false,
       devices: [],
       tempDeviceName: null,
+      blobURLs: [], // Track blob URLs for cleanup
     };
   },
   computed: {
@@ -179,6 +181,14 @@ export default {
       this.supported = false;
     }
     handleInit.call(this, this.init);
+  },
+  beforeDestroy() {
+    // Clean up blob URLs when component is destroyed
+    this.cleanupBlobURLs();
+    // Stop any active media streams
+    if (this.mediaRecorder && this.mediaRecorder.stream) {
+      this.mediaRecorder.stream.getTracks().forEach(track => track.stop());
+    }
   },
   methods: {
     getDevices() {
@@ -236,9 +246,17 @@ export default {
       clearInterval(this.interval);
     },
     reset() {
+      this.cleanupBlobURLs();
       this.hasRecording = false;
       this.isRecording = false;
       this.initializeMedia();
+    },
+    cleanupBlobURLs() {
+      // Clean up all blob URLs to prevent memory leaks
+      this.blobURLs.forEach(url => {
+        URL.revokeObjectURL(url);
+      });
+      this.blobURLs = [];
     },
     initializeMedia() {
       navigator.mediaDevices.getUserMedia(this.mediaConstraints).then(this.initializeRecorder).catch(() => {
@@ -260,6 +278,7 @@ export default {
       this.timeRemaining = this.recordingTime / 1000;
       this.mediaRecorder.ondataavailable = (e) => {
         const blobURL = URL.createObjectURL(e);
+        this.blobURLs.push(blobURL); // Track for cleanup
         if (this.video) {
           this.recording.src = blobURL;
         } else {
@@ -312,3 +331,20 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.pids-wrapper {
+  width: 100%;
+  background-color: white;
+  padding: 10px 0;
+}
+
+.pid {
+  width: calc(8% - 10px);
+  height: 10px;
+  display: inline-block;
+  margin: 5px;
+  background-color: #e6e7e8;
+  transition: background-color 0.1s ease;
+}
+</style>

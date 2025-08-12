@@ -37,7 +37,7 @@
         :constraints="valueConstraints"
         :selected_language="selected_language"
         :init="init"
-        :audio="false"
+        :audio="getVideoAudioSetting('videoCheck')"
         :visualizer="false"
         v-on:valueChanged="sendData"/>
     </div>
@@ -59,7 +59,7 @@
         :constraints="valueConstraints"
         :selected_language="selected_language"
         :init="init"
-        :audio="false"
+        :audio="getVideoAudioSetting(inputType)"
         :visualizer="false"
         :mode="inputType"
         :fieldData="fieldData"
@@ -333,6 +333,15 @@ export default {
     };
   },
   methods: {
+    getVideoAudioSetting(inputType) {
+      // Check if there's a specific setting to disable audio for video recording
+      // Look in valueConstraints for a disableAudio flag
+      if (this.valueConstraints && this.valueConstraints['http://schema.repronim.org/disableAudio']) {
+        return !this.valueConstraints['http://schema.repronim.org/disableAudio'][0]['@value'];
+      }
+      // Default: include audio for all video recordings
+      return true;
+    },
     skip() {
       this.$emit('skip');
     },
