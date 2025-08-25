@@ -66,17 +66,6 @@ export default {
       totalSteps: 4,
     };
   },
-  computed: {
-    nextName() {
-      return (this.step === this.totalSteps) ? 'Start' : 'Next';
-    },
-    appletURL() {
-      return 'https://raw.githubusercontent.com/ReproNim/reproschema/master/activity-sets/VoicePilot/VoicePilot_schema';
-    },
-    redirect() {
-      return { name: 'Applet', params: { appletId: this.appletURL }, query: { ...this.query, consent: true } };
-    },
-  },
   methods: {
     doBack() {
       if (this.step > 1) {
@@ -94,6 +83,17 @@ export default {
     },
     learnMore() {
       this.$refs.consentViewer.toggleMax();
+    },
+  },
+  computed: {
+    nextName() {
+      return (this.step === this.totalSteps) ? 'Start' : 'Next';
+    },
+    appletURL() {
+      return 'https://raw.githubusercontent.com/ReproNim/reproschema/master/activity-sets/VoicePilot/VoicePilot_schema';
+    },
+    redirect() {
+      return { name: 'Applet', params: { appletId: this.appletURL }, query: { ...this.query, consent: true } };
     },
   },
 };

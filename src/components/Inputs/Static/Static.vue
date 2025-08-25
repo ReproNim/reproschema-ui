@@ -9,7 +9,17 @@
 <script>
 export default {
   name: 'Static',
-  props: ['constraints', 'init', 'result', 'selected_language'],
+  props: {
+    'constraints': {},
+    'init': {},
+    'result': {},
+    'selected_language': {}
+  },
+  data() {
+    return {
+      input: 'show result',
+    };
+  },
   methods: {
     onSubmit(e) {
       e.preventDefault();
@@ -19,11 +29,6 @@ export default {
       } else this.input = 'Fail';
       // this.$emit('valueChanged', this.input);
     },
-  },
-  data() {
-    return {
-      input: 'show result',
-    };
   },
   mounted() {
     if (this.init) {

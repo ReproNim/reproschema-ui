@@ -20,7 +20,15 @@
 <script>
 export default {
   name: 'EmailInput',
-  props: ['constraints', 'init'],
+  props: {
+    'constraints': {},
+    'init': {}
+  },
+  data() {
+    return {
+      input: null,
+    };
+  },
   methods: {
     onSubmit(e) {
       e.preventDefault();
@@ -39,11 +47,6 @@ export default {
     isValidEmail() {
       return this.isValid(this.input);
     },
-  },
-  data() {
-    return {
-      input: null,
-    };
   },
   mounted() {
     if (this.init) {

@@ -105,7 +105,6 @@
 
   // const reproterms = 'https://raw.githubusercontent.com/ReproNim/reproschema/master/terms/';
 
-
   export default {
     name: 'SurveyItem',
     props: {

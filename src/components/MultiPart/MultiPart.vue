@@ -68,6 +68,10 @@ export default {
       type: Object,
     },
   },
+  components: {
+    // eslint-disable-next-line vue/no-unused-components
+    Loader,
+  },
   data() {
     return {
       activity: {},
@@ -77,17 +81,6 @@ export default {
       score: 0,
       currentIndex: 0,
     };
-  },
-  components: {
-    // eslint-disable-next-line vue/no-unused-components
-    Loader,
-  },
-  mounted() {
-    if (this.srcUrl) {
-      // eslint-disable-next-line
-      // console.log(87, this.srcUrl);
-      this.getData();
-    }
   },
   methods: {
     getData() {
@@ -233,13 +226,6 @@ export default {
       }
     },
   },
-  watch: {
-    srcUrl() {
-      if (this.srcUrl) {
-        this.getData();
-      }
-    },
-  },
   computed: {
     currentItem() {
       return this.context[this.currentIndex];
@@ -263,6 +249,19 @@ export default {
       return '';
     },
   },
+  mounted() {
+    if (this.srcUrl) {
+      // eslint-disable-next-line
+      // console.log(87, this.srcUrl);
+      this.getData();
+    }
+  },
+  watch: {
+    srcUrl() {
+      if (this.srcUrl) {
+        this.getData();
+      }
+    },
+  },
 };
 </script>
-

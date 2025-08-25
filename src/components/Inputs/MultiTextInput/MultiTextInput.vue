@@ -31,7 +31,17 @@
 <script>
 export default {
   name: 'TextInput',
-  props: ['constraints', 'init'],
+  props: {
+    'constraints': {},
+    'init': {}
+  },
+  data() {
+    return {
+      input1: '',
+      input2: '',
+      input3: '',
+    };
+  },
   methods: {
     onSubmit(e) {
       e.preventDefault();
@@ -41,13 +51,6 @@ export default {
         "@type": "schema:Person" };
       this.$emit('valueChanged', name);
     },
-  },
-  data() {
-    return {
-      input1: '',
-      input2: '',
-      input3: '',
-    };
   },
   mounted() {
     if (this.init) {
