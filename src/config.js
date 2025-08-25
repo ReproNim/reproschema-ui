@@ -11,5 +11,3 @@ module.exports = {
   contact: 'voice_survey@mit.edu',
   emailSubject: 'Help with Covid19 study'
 };
-
-console.log(`Loading schema from VUE_APP_REPROSCHEMA_GITHUB_SRC: ${process.env.VUE_APP_REPROSCHEMA_GITHUB_SRC}`);
